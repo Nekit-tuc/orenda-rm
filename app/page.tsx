@@ -8,6 +8,7 @@ import Image from "next/image";
 import Footer from "@/components/Footer";
 import FavoritesNav from "@/components/FavoritesNav";
 import Header from "@/components/Header";
+export const dynamic = "force-dynamic";
 
 
 export default async function Home() {
