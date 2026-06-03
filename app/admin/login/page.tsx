@@ -11,7 +11,7 @@ export default function AdminLoginPage() {
     e.preventDefault();
 console.log("ENV PASSWORD:", process.env.NEXT_PUBLIC_ADMIN_PASSWORD);
 console.log("INPUT PASSWORD:", password);
-    if (password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
+    if (password === "ztspace123") {    
       localStorage.setItem("zt-space-admin", "true");
       router.push("/admin");
       return;
