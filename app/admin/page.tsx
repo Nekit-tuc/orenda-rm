@@ -58,11 +58,13 @@ export default function AdminPage() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error(error);
-    } else {
-      setProperties(data || []);
-    }
+      if (error) {
+        console.error("SUPABASE LOAD ERROR:", error);
+        alert(error.message);
+      } else {
+        console.log("SUPABASE DATA:", data);
+        setProperties(data || []);
+      }
 
     setLoading(false);
   }
