@@ -51,14 +51,14 @@ export default function PropertyFeatures({
   ];
 
   return (
-    <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6">
-      <h2 className="mb-5 text-2xl font-bold">Характеристики</h2>
+    <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-4 md:mt-10 md:rounded-3xl md:p-6">
+      <h2 className="mb-5 text-xl font-bold md:text-2xl">Характеристики</h2>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-2 md:gap-4">
         {features.map((feature) => (
           <div
             key={feature.label}
-            className="rounded-2xl border border-white/10 bg-black/30 p-4"
+            className="rounded-xl border border-white/10 bg-black/30 p-4 md:rounded-2xl"
           >
             <p className="text-sm text-white/40">{feature.label}</p>
             <p className="mt-1 font-medium">{feature.value}</p>

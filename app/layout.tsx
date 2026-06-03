@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Orenda RM | Оренда та продаж нерухомості у Житомирі",
   description:
     "Orenda RM — каталог оренди та продажу нерухомості у Житомирі: комерційні приміщення, офіси, склади, квартири та об’єкти для бізнесу.",

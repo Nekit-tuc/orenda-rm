@@ -101,6 +101,7 @@ export default function Map({
   properties: MapProperty[];
 }) {
   const [activeFilter, setActiveFilter] = useState("Всі");
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const filteredProperties =
     activeFilter === "Всі"
@@ -108,13 +109,33 @@ export default function Map({
       : properties.filter((property) => property.type === activeFilter);
 
   return (
-    <div>
-      <div className="mb-6 flex flex-wrap gap-3">
+    <div
+      className={
+        isExpanded
+          ? "fixed inset-0 z-[100] overflow-auto bg-black p-3"
+          : "relative"
+      }
+    >
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <p className="text-sm text-white/50 md:hidden">
+          Натисніть на мітку, щоб відкрити об’єкт.
+        </p>
+
+        <button
+          type="button"
+          onClick={() => setIsExpanded((current) => !current)}
+          className="ml-auto rounded-xl border border-[#b89652]/50 px-4 py-3 text-sm font-medium text-[#b89652] transition hover:bg-[#b89652] hover:text-black md:hidden"
+        >
+          {isExpanded ? "Закрити карту" : "На весь екран"}
+        </button>
+      </div>
+
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-2 md:mb-6 md:flex-wrap md:gap-3 md:overflow-visible md:pb-0">
         {filters.map((filter) => (
           <button
             key={filter}
             onClick={() => setActiveFilter(filter)}
-            className={`rounded-full px-5 py-2 text-sm transition ${
+            className={`shrink-0 rounded-full px-4 py-3 text-sm transition md:px-5 md:py-2 ${
               activeFilter === filter
                 ? "bg-[#b89652] text-white"
                 : "border border-white/15 text-white/60 hover:bg-white hover:text-black"
@@ -125,11 +146,15 @@ export default function Map({
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-[1.5rem] border border-[#b89652]/20 bg-black p-2">        <MapContainer
+      <div className="overflow-hidden rounded-[1.25rem] border border-[#b89652]/20 bg-black p-1.5 md:rounded-[1.5rem] md:p-2">
+        <MapContainer
+          key={isExpanded ? "expanded" : "normal"}
           center={[50.2547, 28.6587]}
-          zoom={13}
-          scrollWheelZoom={true}
-          className="z-0 h-[600px] w-full rounded-2xl"
+          zoom={isExpanded ? 14 : 13}
+          scrollWheelZoom={false}
+          className={`z-0 w-full rounded-2xl ${
+            isExpanded ? "h-[calc(100dvh-132px)]" : "h-[430px] md:h-[600px]"
+          }`}
         >
           <TileLayer
             attribution='&copy; OpenStreetMap'

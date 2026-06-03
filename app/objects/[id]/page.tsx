@@ -18,7 +18,7 @@ import ContactForm from "@/components/ContactForm";
       export async function generateMetadata({ params }: Props) {
         const { id } = await params;
 
-        let query = supabase
+        const query = supabase
           .from("properties")
           .select("*");
 
@@ -62,7 +62,7 @@ import ContactForm from "@/components/ContactForm";
     export default async function PropertyPage({ params }: Props) {
       const { id } = await params;
 
-      let query = supabase
+      const query = supabase
         .from("properties")
         .select("*");
 
@@ -87,28 +87,28 @@ import ContactForm from "@/components/ContactForm";
         currentViews={property.views}
       />
       <header className="sticky top-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 md:px-6 md:py-5">
           <Link href="/" className="flex items-center gap-3">
             <Image
               src="/logo_v1.png"
               alt="Orenda RM"
               width={110}
               height={110}
-              className="rounded-full"
+              className="h-14 w-14 rounded-full md:h-24 md:w-24"
               priority
             />
 
 
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
 
           <FavoritesNav />
 
             <a
               href="https://t.me/zt_space"
               target="_blank"
-              className="rounded-full border border-white/20 px-5 py-2 text-sm transition hover:bg-white hover:text-black"
+              className="rounded-full border border-white/20 px-4 py-2 text-sm transition hover:bg-white hover:text-black md:px-5"
             >
               Telegram
             </a>
@@ -116,7 +116,7 @@ import ContactForm from "@/components/ContactForm";
         </div>
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 md:py-16">
         <div className="grid gap-10 lg:grid-cols-2">
           <PropertyGallery
             images={property.images || [property.image]}
@@ -124,11 +124,11 @@ import ContactForm from "@/components/ContactForm";
           />
 
           <div>
-            <p className="mb-4 text-sm uppercase tracking-[0.3em] text-white/40">
+            <p className="mb-4 text-xs uppercase tracking-[0.24em] text-white/40 sm:text-sm sm:tracking-[0.3em]">
               Житомир
             </p>
 
-            <h1 className="text-5xl font-bold leading-tight">
+            <h1 className="text-3xl font-bold leading-tight md:text-5xl">
               {property.title}
             </h1>
 
@@ -148,7 +148,7 @@ import ContactForm from "@/components/ContactForm";
               </span>
             </div>
 
-            <p className="mt-10 text-lg leading-8 text-white/60">
+            <p className="mt-8 text-base leading-7 text-white/60 md:mt-10 md:text-lg md:leading-8">
               {property.description}
             </p>
 
@@ -164,7 +164,7 @@ import ContactForm from "@/components/ContactForm";
             />
 
             <div className="mt-10">
-            <div className="text-5xl font-bold text-[#b89652]">
+            <div className="text-3xl font-bold text-[#b89652] md:text-5xl">
                 {property.dealType === "Оренда"
                   ? property.pricePerMeter
                   : property.priceTotal}
@@ -177,18 +177,18 @@ import ContactForm from "@/components/ContactForm";
               </p>
             </div>
 
-            <div className="mt-10 flex gap-4">
+            <div className="mt-10 grid gap-3 sm:flex sm:gap-4">
               <a
                 href="https://t.me/zt_space"
                 target="_blank"
-                className="rounded-full bg-white px-6 py-3 font-medium text-black transition hover:opacity-80"
+                className="rounded-full bg-white px-6 py-3 text-center font-medium text-black transition hover:opacity-80"
               >
                 Написати
               </a>
 
               <Link
                 href="/"
-                className="rounded-full border border-white/20 px-6 py-3 transition hover:bg-white hover:text-black"
+                className="rounded-full border border-white/20 px-6 py-3 text-center transition hover:bg-white hover:text-black"
               >
                 Назад
               </Link>

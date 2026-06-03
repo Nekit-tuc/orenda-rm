@@ -1,12 +1,8 @@
-import Link from "next/link";
-
 import PropertiesSection from "@/components/PropertiesSection";
 
 import MapWrapper from "@/components/MapWrapper";
 import { getProperties } from "@/lib/getProperties";
-import Image from "next/image";
 import Footer from "@/components/Footer";
-import FavoritesNav from "@/components/FavoritesNav";
 import Header from "@/components/Header";
 export const dynamic = "force-dynamic";
 
@@ -23,25 +19,25 @@ export default async function Home() {
 
       <Header />
 
-    <section className="mx-auto grid max-w-7xl gap-10 px-6 py-24 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+    <section className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-24">
       <div>
-        <p className="mb-5 text-sm uppercase tracking-[0.35em] text-[#b89652]">
+        <p className="mb-4 text-xs uppercase tracking-[0.24em] text-[#b89652] sm:text-sm sm:tracking-[0.35em]">
           Orenda RM • Житомир
         </p>
 
-        <h1 className="text-5xl font-bold leading-tight md:text-7xl">
+        <h1 className="text-3xl font-bold leading-tight sm:text-5xl md:text-6xl lg:text-7xl">
           Нерухомість в Житомирі та області
         </h1>
 
-        <p className="mt-8 max-w-xl text-lg leading-8 text-white/60">
+        <p className="mt-5 max-w-xl text-base leading-7 text-white/60 md:mt-8 md:text-lg md:leading-8">
           Комерційні приміщення, офіси, склади, квартири та інвестиційні
           об’єкти в одному сучасному каталозі.
         </p>
 
-        <div className="mt-10 flex flex-wrap gap-4">
+        <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap sm:gap-4 md:mt-10">
           <a
             href="#objects"
-            className="rounded-xl bg-[#b89652] px-6 py-4 font-medium text-white transition hover:opacity-80"
+            className="rounded-xl bg-[#b89652] px-6 py-4 text-center font-medium text-white transition hover:opacity-80"
           >
             Дивитись об’єкти
           </a>
@@ -49,35 +45,35 @@ export default async function Home() {
           <a
             href="https://t.me/zt_space"
             target="_blank"
-            className="rounded-xl border border-white/15 px-6 py-4 font-medium text-white transition hover:border-[#b89652]/60 hover:text-[#b89652]"
+            className="rounded-xl border border-white/15 px-6 py-4 text-center font-medium text-white transition hover:border-[#b89652]/60 hover:text-[#b89652]"
           >
             Зв’язатися
           </a>
         </div>
       </div>
 
-      <div className="rounded-[2rem] border border-white/10 bg-[#070707] p-5 shadow-[0_0_40px_rgba(184,150,82,0.08)]">
-        <div className="rounded-[1.5rem] border border-[#b89652]/20 bg-black p-8">
-          <p className="text-sm uppercase tracking-[0.3em] text-white/40">
+      <div className="rounded-3xl border border-white/10 bg-[#070707] p-3 shadow-[0_0_40px_rgba(184,150,82,0.08)] md:rounded-[2rem] md:p-5">
+        <div className="rounded-2xl border border-[#b89652]/20 bg-black p-5 md:rounded-[1.5rem] md:p-8">
+          <p className="text-xs uppercase tracking-[0.24em] text-white/40 sm:text-sm sm:tracking-[0.3em]">
             Premium real objeckts
           </p>
 
-          <div className="mt-8 grid gap-5">
+          <div className="mt-6 grid gap-4 md:mt-8 md:gap-5">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <p className="text-sm text-white/40">Об’єкти</p>
-              <p className="mt-2 text-4xl font-bold text-[#b89652]">
+              <p className="mt-2 text-3xl font-bold text-[#b89652] md:text-4xl">
                 {properties.length}
               </p>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <p className="text-sm text-white/40">Напрямок</p>
-              <p className="mt-2 text-2xl font-bold">Оренда / Продаж</p>
+              <p className="mt-2 text-xl font-bold md:text-2xl">Оренда / Продаж</p>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
               <p className="text-sm text-white/40">Регіон</p>
-              <p className="mt-2 text-2xl font-bold">Житомир та Житомирська область</p>
+              <p className="mt-2 text-xl font-bold md:text-2xl">Житомир та Житомирська область</p>
             </div>
           </div>
         </div>
@@ -86,14 +82,14 @@ export default async function Home() {
 
       <PropertiesSection properties={properties} />
 
-    <section id="map" className="mx-auto max-w-7xl px-6 pb-24">
+    <section id="map" className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 md:pb-24">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.3em] text-[#b89652]">
             Географія об’єктів
           </p>
 
-          <h3 className="mt-3 text-4xl font-bold">
+          <h3 className="mt-3 text-3xl font-bold md:text-4xl">
             Карта нерухомості Житомира
           </h3>
 
@@ -104,7 +100,7 @@ export default async function Home() {
         </div>
       </div>
 
-      <div className="rounded-[2rem] border border-white/10 bg-[#070707] p-4 shadow-[0_0_40px_rgba(184,150,82,0.08)]">
+      <div className="rounded-3xl border border-white/10 bg-[#070707] p-2 shadow-[0_0_40px_rgba(184,150,82,0.08)] md:rounded-[2rem] md:p-4">
         <MapWrapper properties={properties} />
       </div>
     </section>

@@ -36,8 +36,8 @@ export default function PropertyCard({
   }
 
   return (
-    <article className="group grid overflow-hidden rounded-3xl border border-white/10 bg-[#070707] transition duration-300 hover:-translate-y-1 hover:border-[#b89652]/50 hover:shadow-[0_0_35px_rgba(184,150,82,0.16)] lg:grid-cols-[0.75fr_1.45fr]">
-      <div className="flex flex-col p-6 md:p-7">
+    <article className="group grid overflow-hidden rounded-2xl border border-white/10 bg-[#070707] transition duration-300 hover:border-[#b89652]/50 hover:shadow-[0_0_35px_rgba(184,150,82,0.16)] md:rounded-3xl lg:grid-cols-[0.75fr_1.45fr]">
+      <div className="flex flex-col p-5 md:p-7">
         <div className="mb-5 flex items-center justify-between gap-3">
           <span className="rounded-md bg-[#b89652] px-4 py-2 text-xs font-bold uppercase text-white">
             {dealType}
@@ -55,7 +55,7 @@ export default function PropertyCard({
           {type}
         </p>
 
-        <h4 className="text-2xl font-bold leading-tight text-white">
+        <h4 className="text-xl font-bold leading-tight text-white md:text-2xl">
           {title}
         </h4>
 
@@ -92,14 +92,14 @@ export default function PropertyCard({
 
           <Link
             href={`/objects/${id}`}
-            className="mt-5 inline-flex items-center gap-2 rounded-xl border border-[#b89652]/50 px-5 py-3 text-sm font-medium text-[#b89652] transition hover:bg-[#b89652] hover:text-black"
+            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#b89652]/50 px-5 py-3 text-sm font-medium text-[#b89652] transition hover:bg-[#b89652] hover:text-black sm:w-auto"
           >
             Детальніше <span>→</span>
           </Link>
         </div>
       </div>
 
-      <div className="relative min-h-[420px] overflow-hidden lg:min-h-[500px]">
+      <div className="relative order-first min-h-[240px] overflow-hidden sm:min-h-[320px] lg:order-none lg:min-h-[500px]">
         <Image
           src={image}
           alt={title}

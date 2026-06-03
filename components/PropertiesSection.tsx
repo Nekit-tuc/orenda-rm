@@ -42,31 +42,31 @@ export default function PropertiesSection({
   });
 
   return (
-    <section id="objects" className="mx-auto max-w-7xl px-6 pb-24">
+    <section id="objects" className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 md:pb-24">
       <div className="mb-8">
         <div className="mb-8">
-          <p className="text-sm uppercase tracking-[0.3em] text-[#b89652]">
+          <p className="text-xs uppercase tracking-[0.24em] text-[#b89652] sm:text-sm sm:tracking-[0.3em]">
             Каталог нерухомості
           </p>
 
-          <h3 className="mt-3 text-4xl font-bold">
+          <h3 className="mt-3 text-3xl font-bold md:text-4xl">
             Актуальні об’єкти
           </h3>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[1fr_1fr_1fr_auto]">
+        <div className="grid gap-3 md:gap-4 lg:grid-cols-[1fr_1fr_1fr_auto]">
           <input
             type="text"
             placeholder="Пошук: офіс, склад, адреса..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="rounded-xl border border-white/10 bg-[#070707] px-5 py-4 text-white outline-none transition placeholder:text-white/30 focus:border-[#b89652]/60"
+            className="min-h-12 rounded-xl border border-white/10 bg-[#070707] px-4 py-4 text-white outline-none transition placeholder:text-white/30 focus:border-[#b89652]/60 md:px-5"
           />
 
           <select
             value={activeFilter}
             onChange={(e) => setActiveFilter(e.target.value as PropertyTypeFilter)}
-            className="rounded-xl border border-white/10 bg-[#070707] px-5 py-4 text-white outline-none transition focus:border-[#b89652]/60"
+            className="min-h-12 rounded-xl border border-white/10 bg-[#070707] px-4 py-4 text-white outline-none transition focus:border-[#b89652]/60 md:px-5"
           >
             {filters.map((filter) => (
               <option key={filter}>{filter}</option>
@@ -76,7 +76,7 @@ export default function PropertiesSection({
           <select
             value={activeDealType}
             onChange={(e) => setActiveDealType(e.target.value as DealType)}
-            className="rounded-xl border border-white/10 bg-[#070707] px-5 py-4 text-white outline-none transition focus:border-[#b89652]/60"
+            className="min-h-12 rounded-xl border border-white/10 bg-[#070707] px-4 py-4 text-white outline-none transition focus:border-[#b89652]/60 md:px-5"
           >
             {dealFilters.map((filter) => (
               <option key={filter}>{filter}</option>
@@ -85,7 +85,7 @@ export default function PropertiesSection({
 
           <a
             href="#objects"
-            className="rounded-xl bg-[#b89652] px-6 py-4 text-center font-medium text-white transition hover:opacity-80"
+            className="min-h-12 rounded-xl bg-[#b89652] px-6 py-4 text-center font-medium text-white transition hover:opacity-80"
           >
             Показати об’єкти
           </a>
@@ -93,7 +93,7 @@ export default function PropertiesSection({
       </div>
 
       {filteredProperties.length > 0 ? (
-        <div className="grid gap-8">
+        <div className="grid gap-5 md:gap-8">
               {filteredProperties.map((property) => (
             <PropertyCard
               key={property.id}

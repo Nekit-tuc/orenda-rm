@@ -9,9 +9,9 @@ export default function FavoritesNav() {
   return (
     <Link
       href="/favorites"
-      className="flex items-center gap-3 rounded-full border border-white/10 px-4 py-2 transition hover:border-[#b89652]/50 hover:bg-[#b89652]/10"
+      className="flex items-center justify-center gap-2 rounded-xl border border-white/10 px-3 py-2 transition hover:border-[#b89652]/50 hover:bg-[#b89652]/10 md:gap-3 md:rounded-full md:px-4"
     >
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#b89652]/15 text-[#b89652]">
+      <span className="hidden h-8 w-8 items-center justify-center rounded-full bg-[#b89652]/15 text-[#b89652] md:flex">
         ❤
       </span>
 
