@@ -8,7 +8,7 @@ export default function Footer() {
         <div>
           <Link href="/" className="flex items-center gap-3">
             <Image
-              src="/logo.png"
+              src="/logo_v1.png"
               alt="Orenda RM"
               width={80}
               height={80}
