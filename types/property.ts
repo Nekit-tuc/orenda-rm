@@ -1,0 +1,54 @@
+export type Property = {
+  id: number;
+  title: string;
+  type: string;
+  deal_type: "Оренда" | "Продаж";
+  price: string | null;
+  price_total: string;
+  price_per_meter: string;
+  area: string;
+  address: string;
+  floor: number | null;
+  floors: number | null;
+  parking: boolean;
+  heating: string | null;
+  internet: boolean;
+  security: boolean;
+  bathroom: boolean;
+  description: string;
+  image: string;
+  images: string[] | null;
+  lat: number | null;
+  lng: number | null;
+  views: number;
+  status: string;
+  slug: string | null;
+};
+
+export type FormattedProperty = {
+  id: number;
+  title: string;
+  type: string;
+  dealType: Property["deal_type"];
+  price: string | null;
+  priceTotal: string;
+  pricePerMeter: string;
+  area: string;
+  address: string;
+  floor: number;
+  floors: number;
+  parking: boolean;
+  heating: string;
+  internet: boolean;
+  security: boolean;
+  bathroom: boolean;
+  description: string;
+  image: string;
+  images: string[];
+  lat: number;
+  lng: number;
+  views: number;
+  status: string;
+  slug: string | null;
+};
+
