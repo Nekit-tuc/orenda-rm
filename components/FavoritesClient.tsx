@@ -35,12 +35,16 @@ export default function FavoritesClient({ properties }: FavoritesClientProps) {
             <PropertyCard
               key={property.id}
               id={property.id}
+              slug={property.slug}
               title={property.title}
               type={property.type}
               dealType={property.dealType}
               priceTotal={property.priceTotal}
               pricePerMeter={property.pricePerMeter}
               area={property.area}
+              address={property.address}
+              lat={property.lat}
+              lng={property.lng}
               description={property.description}
               image={property.image}
             />

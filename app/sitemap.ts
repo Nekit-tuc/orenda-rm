@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     ...properties.map((property) => ({
-      url: `${baseUrl}/objects/${property.id}`,
+      url: `${baseUrl}/objects/${property.slug || property.id}`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,

@@ -5,8 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import L from "leaflet";
 import { useRef, useState } from "react";
-
-const filters = ["Всі", "Офіси", "Склади", "Квартири", "Комерція"];
+import { propertyTypeFilters } from "@/lib/propertyCategories";
 
 const customIcon = L.divIcon({
   className: "",
@@ -26,6 +25,7 @@ const customIcon = L.divIcon({
 
 type MapProperty = {
   id: number;
+  slug?: string | null;
   title: string;
   type: string;
   dealType: string;
@@ -33,11 +33,16 @@ type MapProperty = {
   pricePerMeter: string;
   area: string;
   image: string;
+  lat: number | null;
+  lng: number | null;
+};
+
+type MappableProperty = MapProperty & {
   lat: number;
   lng: number;
 };
 
-function PropertyMarker({ property }: { property: MapProperty }) {
+function PropertyMarker({ property }: { property: MappableProperty }) {
   const markerRef = useRef<L.Marker | null>(null);
 
   return (
@@ -50,7 +55,7 @@ function PropertyMarker({ property }: { property: MapProperty }) {
       }}
     >
       <Popup closeButton={false}>
-        <div className="w-[230px] font-sans">
+        <div className="w-[min(230px,calc(100vw-64px))] font-sans">
           <Image
             src={property.image}
             alt={property.title}
@@ -65,13 +70,13 @@ function PropertyMarker({ property }: { property: MapProperty }) {
             {property.type}
           </p>
 
-          <h3 className="text-base font-semibold text-black">
+          <h3 className="break-words text-base font-semibold text-black">
             {property.title}
           </h3>
 
           <p className="mt-1 text-sm text-black/60">{property.area}</p>
 
-          <p className="mt-2 text-lg font-bold text-black">
+          <p className="mt-2 break-words text-lg font-bold text-black">
             {property.dealType === "Оренда"
             ? property.pricePerMeter
             : property.priceTotal}
@@ -84,7 +89,7 @@ function PropertyMarker({ property }: { property: MapProperty }) {
           </p>
 
           <Link
-            href={`/objects/${property.id}`}
+            href={`/objects/${property.slug || property.id}`}
             className="mt-4 inline-block rounded-full bg-black px-4 py-2 text-sm text-white"
           >
             Детальніше
@@ -107,6 +112,11 @@ export default function Map({
     activeFilter === "Всі"
       ? properties
       : properties.filter((property) => property.type === activeFilter);
+
+  const mappableProperties = filteredProperties.filter(
+    (property): property is MappableProperty =>
+      typeof property.lat === "number" && typeof property.lng === "number"
+  );
 
   return (
     <div
@@ -131,7 +141,7 @@ export default function Map({
       </div>
 
       <div className="mb-4 flex gap-2 overflow-x-auto pb-2 md:mb-6 md:flex-wrap md:gap-3 md:overflow-visible md:pb-0">
-        {filters.map((filter) => (
+        {propertyTypeFilters.map((filter) => (
           <button
             key={filter}
             onClick={() => setActiveFilter(filter)}
@@ -161,7 +171,7 @@ export default function Map({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {filteredProperties.map((property) => (
+          {mappableProperties.map((property) => (
             <PropertyMarker key={property.id} property={property} />
           ))}
         </MapContainer>

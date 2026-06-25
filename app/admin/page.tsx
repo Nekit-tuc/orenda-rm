@@ -2,20 +2,43 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import type { Property } from "@/types/property";
 import ImageUploader from "@/components/ImageUploader";
 import MultiImageUploader from "@/components/MultiImageUploader";
 import { useRouter } from "next/navigation";
 import { createSlug } from "@/lib/createSlug";
+import { propertyTypeOptions } from "@/lib/propertyCategories";
+import AdminHeader from "@/components/admin/AdminHeader";
+import AdminLayout from "@/components/admin/AdminLayout";
+import AdminObjectsTable from "@/components/admin/AdminObjectsTable";
+import AdminStatCard from "@/components/admin/AdminStatCard";
+import {
+  createEmptyRealEstateBlock,
+  defaultHomepageSettings,
+  getHomepageSettings,
+  type HomepageSettings,
+  type RealEstateBlockSettings,
+  updateHomepageSettings,
+} from "@/lib/homepageSettings";
+
+type AdminSection = "overview" | "objects" | "homepage";
 
 export default function AdminPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [activeSection, setActiveSection] = useState<AdminSection>("objects");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [adminSearch, setAdminSearch] = useState("");
+  const [adminTypeFilter, setAdminTypeFilter] = useState("Всі типи");
+  const [adminStatusFilter, setAdminStatusFilter] = useState("Всі статуси");
+  const [homepageContent, setHomepageContent] = useState<HomepageSettings>(
+    defaultHomepageSettings
+  );
+  const [homepageMessage, setHomepageMessage] = useState("");
+  const [homepageSaving, setHomepageSaving] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -43,15 +66,31 @@ export default function AdminPage() {
     const router = useRouter();
 
     useEffect(() => {
-      const isAdmin = localStorage.getItem("zt-space-admin");
+      let isMounted = true;
 
-      if (isAdmin !== "true") {
-        router.push("/admin/login");
+      async function checkAdminSession() {
+        const response = await fetch("/api/admin/session", {
+          cache: "no-store",
+        });
+        const result = (await response.json().catch(() => null)) as {
+          ok?: boolean;
+        } | null;
+
+        if (isMounted && !result?.ok) {
+          router.replace("/admin/login");
+        }
       }
+
+      void checkAdminSession();
+
+      return () => {
+        isMounted = false;
+      };
     }, [router]);
 
   async function loadProperties() {
     setLoading(true);
+    setLoadError("");
 
     const { data, error } = await supabase
       .from("properties")
@@ -60,6 +99,7 @@ export default function AdminPage() {
 
       if (error) {
         console.error("SUPABASE LOAD ERROR:", error);
+        setLoadError("Не вдалося завантажити обʼєкти. Спробуйте оновити список.");
         alert(error.message);
       } else {
         console.log("SUPABASE DATA:", data);
@@ -72,11 +112,14 @@ export default function AdminPage() {
   useEffect(() => {
     let isMounted = true;
 
-    async function loadInitialProperties() {
-      const { data, error } = await supabase
-        .from("properties")
-        .select("*")
-        .order("created_at", { ascending: false });
+    async function loadInitialData() {
+      const [{ data, error }, settings] = await Promise.all([
+        supabase
+          .from("properties")
+          .select("*")
+          .order("created_at", { ascending: false }),
+        getHomepageSettings(),
+      ]);
 
       if (!isMounted) {
         return;
@@ -84,14 +127,16 @@ export default function AdminPage() {
 
       if (error) {
         console.error(error);
+        setLoadError("Не вдалося завантажити обʼєкти. Спробуйте оновити список.");
       } else {
         setProperties(data || []);
       }
 
+      setHomepageContent(settings);
       setLoading(false);
     }
 
-    void loadInitialProperties();
+    void loadInitialData();
 
     return () => {
       isMounted = false;
@@ -178,15 +223,21 @@ export default function AdminPage() {
         ? `${formData.price_per_meter} грн/м²`
         : `${formData.price_per_meter} $/м²`;
 
-        const slug = createSlug(formData.title);
+        const initialSlug = createSlug({
+          title: formData.title,
+          type: formData.type,
+          deal_type: formData.deal_type,
+          address: formData.address,
+          area: formData.area,
+        });
  
-        const { error } = await supabase.from("properties").insert({
+        const { data: createdProperty, error } = await supabase.from("properties").insert({
       title: formData.title,
       type: formData.type,
       deal_type: formData.deal_type,
       price_total: formattedPriceTotal,
         price_per_meter: formattedPricePerMeter,
-        slug,
+        slug: initialSlug,
       area: formData.area,
       address: formData.address,
       floor: formData.floor ? Number(formData.floor) : null,
@@ -206,12 +257,32 @@ export default function AdminPage() {
       lng: formData.lng ? Number(formData.lng) : null,
       status: formData.status,
       views: 0,
-    });
+    }).select("id").single();
 
     if (error) {
       console.error(error);
       alert("Помилка при додаванні об’єкта");
       return;
+    }
+
+    if (createdProperty?.id) {
+      const slug = createSlug({
+        id: createdProperty.id,
+        title: formData.title,
+        type: formData.type,
+        deal_type: formData.deal_type,
+        address: formData.address,
+        area: formData.area,
+      });
+
+      const { error: slugError } = await supabase
+        .from("properties")
+        .update({ slug })
+        .eq("id", createdProperty.id);
+
+      if (slugError) {
+        console.error(slugError);
+      }
     }
 
     setFormData({
@@ -267,7 +338,14 @@ export default function AdminPage() {
                 ? `${formData.price_total} грн/міс`
                 : `${formData.price_total} $`;
 
-            const slug = createSlug(formData.title, editingId);
+            const slug = createSlug({
+              id: editingId,
+              title: formData.title,
+              type: formData.type,
+              deal_type: formData.deal_type,
+              address: formData.address,
+              area: formData.area,
+            });
 
             const { error } = await supabase
               .from("properties")
@@ -352,30 +430,47 @@ export default function AdminPage() {
     (property) => property.status === "Активний"
   ).length;
 
-    const filteredAdminProperties = properties.filter((property) => {
-      const searchValue = adminSearch.toLowerCase().trim();
+  const archivedCount = properties.filter((property) => {
+    const status = property.status.toLowerCase();
 
-      if (!searchValue) return true;
+    return status.includes("арх") || status.includes("видал");
+  }).length;
 
-      return (
-        property.title.toLowerCase().includes(searchValue) ||
-        property.address.toLowerCase().includes(searchValue) ||
-        property.type.toLowerCase().includes(searchValue) ||
-        property.deal_type.toLowerCase().includes(searchValue) ||
-        property.status.toLowerCase().includes(searchValue)
-      );
-    });
+  const inactiveCount = properties.length - activeCount - archivedCount;
 
-  const totalViews = properties.reduce(
-    (sum, property) => sum + (property.views || 0),
-    0
+  const adminTypeOptions = Array.from(
+    new Set([
+      ...propertyTypeOptions,
+      ...properties.map((property) => property.type).filter(Boolean),
+    ])
   );
 
+  const adminStatusOptions = Array.from(
+    new Set(properties.map((property) => property.status).filter(Boolean))
+  );
 
-  
+  const filteredAdminProperties = properties.filter((property) => {
+    const searchValue = adminSearch.toLowerCase().trim();
+    const typeMatch =
+      adminTypeFilter === "Всі типи" || property.type === adminTypeFilter;
+    const statusMatch =
+      adminStatusFilter === "Всі статуси" ||
+      property.status === adminStatusFilter;
 
-    async function copyPropertyLink(id: number) {
-      const url = `${window.location.origin}/objects/${id}`;
+    const searchMatch =
+      searchValue === "" ||
+      property.title.toLowerCase().includes(searchValue) ||
+      property.address.toLowerCase().includes(searchValue) ||
+      property.type.toLowerCase().includes(searchValue) ||
+      property.deal_type.toLowerCase().includes(searchValue) ||
+      property.status.toLowerCase().includes(searchValue);
+
+    return typeMatch && statusMatch && searchMatch;
+  });
+
+    async function copyPropertyLink(property: Property) {
+      const slug = property.slug || createSlug(property);
+      const url = `${window.location.origin}/objects/${slug}`;
 
       await navigator.clipboard.writeText(url);
 
@@ -410,80 +505,398 @@ export default function AdminPage() {
       });
     }
 
+    function startNewProperty() {
+      setActiveSection("objects");
+      setEditingId(null);
+      setFormData({
+        title: "",
+        type: "Комерція",
+        deal_type: "Оренда",
+        price_total: "",
+        price_per_meter: "",
+        area: "",
+        address: "",
+        floor: "",
+        floors: "",
+        parking: false,
+        heating: "",
+        internet: false,
+        security: false,
+        bathroom: false,
+        description: "",
+        image: "",
+        images: "",
+        lat: "",
+        lng: "",
+        status: "Активний",
+      });
+      setShowForm(true);
+    }
+
+    async function saveHomepageContent(e: React.FormEvent) {
+      e.preventDefault();
+      setHomepageSaving(true);
+      setHomepageMessage("");
+
+      const { error } = await updateHomepageSettings(homepageContent);
+
+      setHomepageSaving(false);
+
+      if (error) {
+        console.error(error);
+        setHomepageMessage(
+          "Помилка при збереженні. Перевірте таблицю homepage_settings у Supabase."
+        );
+        return;
+      }
+
+      setHomepageMessage("Контент головної сторінки оновлено");
+    }
+
+    function updateRealEstateBlock(
+      index: number,
+      field: keyof RealEstateBlockSettings,
+      value: string
+    ) {
+      setHomepageContent((current) => ({
+        ...current,
+        realEstateBlocks: current.realEstateBlocks.map((block, blockIndex) =>
+          blockIndex === index ? { ...block, [field]: value } : block
+        ),
+      }));
+    }
+
+    function addRealEstateBlock() {
+      setHomepageContent((current) => ({
+        ...current,
+        realEstateBlocks: [
+          ...current.realEstateBlocks,
+          createEmptyRealEstateBlock(),
+        ],
+      }));
+    }
+
+    function removeRealEstateBlock(index: number) {
+      setHomepageContent((current) => ({
+        ...current,
+        realEstateBlocks: current.realEstateBlocks.filter(
+          (_, blockIndex) => blockIndex !== index
+        ),
+      }));
+    }
+
   return (
-    <main className="min-h-screen bg-black text-white">
-      <header className="border-b border-white/10 bg-black/60 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-white/40">
-              Admin Panel
+    <AdminLayout
+      activeSection={activeSection}
+      onSectionChange={setActiveSection}
+    >
+      <AdminHeader
+        onLogout={async () => {
+          await fetch("/api/admin/logout", { method: "POST" });
+          router.replace("/admin/login");
+        }}
+      />
+
+      {activeSection === "overview" && (
+        <section className="mb-6 rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-blue-950/10 backdrop-blur-xl">
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-[0.28em] text-blue-300">
+              Огляд
             </p>
-         </div>
-
-          <Link
-            href="/"
-            className="rounded-full border border-white/20 px-5 py-2 text-sm transition hover:bg-white hover:text-black"
-          >
-            На сайт
-          </Link>
-          <button
-            onClick={() => {
-              localStorage.removeItem("zt-space-admin");
-              router.push("/admin/login");
-            }}
-            className="rounded-full border border-red-500/40 px-5 py-2 text-sm text-red-300 transition hover:bg-red-500 hover:text-white"
-          >
-            Вийти
-          </button> 
-        </div>
-      </header>
-
-      <section className="mx-auto max-w-7xl px-6 py-10">
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h2 className="text-4xl font-bold">Керування об’єктами</h2>
-            <p className="mt-2 text-white/50">
-              Дані вже зберігаються в Supabase.
+            <h2 className="mt-3 text-3xl font-bold text-white">
+              Стан адмін-панелі
+            </h2>
+            <p className="mt-2 text-sm text-slate-400">
+              Коротка зводка по обʼєктах, статусах і швидких діях.
             </p>
           </div>
 
-          <button
-            onClick={() => {
-              setEditingId(null);
-              setFormData({
-                title: "",
-                type: "Комерція",
-                deal_type: "Оренда",
-                price_total: "",
-                price_per_meter: "",
-                area: "",
-                address: "",
-                floor: "",
-                floors: "",
-                parking: false,
-                heating: "",
-                internet: false,
-                security: false,
-                bathroom: false,
-                description: "",
-                image: "",
-                images: "",
-                lat: "",
-                lng: "",
-                status: "Активний",
-              });
-              setShowForm(true);
-            }}
-            className="rounded-full bg-white px-6 py-3 font-medium text-black transition hover:opacity-80"
-          >
-            + Додати об’єкт
-          </button>
-        </div>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <AdminStatCard
+              label="Всі обʼєкти"
+              value={properties.length}
+              helper="Загальна кількість записів"
+            />
+            <AdminStatCard
+              label="Активні"
+              value={activeCount}
+              helper="Показуються на сайті"
+            />
+            <AdminStatCard
+              label="Неактивні"
+              value={inactiveCount}
+              helper="Інші статуси"
+            />
+            <AdminStatCard
+              label="Архівні"
+              value={archivedCount}
+              helper="Видалені або архівні статуси"
+            />
+          </div>
 
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            <button
+              type="button"
+              onClick={() => setActiveSection("objects")}
+              className="rounded-2xl border border-blue-400/30 bg-blue-500/10 p-5 text-left transition hover:bg-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              <span className="text-sm font-semibold text-blue-100">
+                Перейти до обʼєктів
+              </span>
+              <span className="mt-2 block text-sm text-slate-400">
+                Пошук, фільтри, таблиця та картки обʼєктів.
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={startNewProperty}
+              className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-blue-300/40 hover:bg-white/[0.06] focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              <span className="text-sm font-semibold text-white">
+                Додати обʼєкт
+              </span>
+              <span className="mt-2 block text-sm text-slate-400">
+                Відкриє форму створення у вкладці обʼєктів.
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveSection("homepage")}
+              className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-blue-300/40 hover:bg-white/[0.06] focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              <span className="text-sm font-semibold text-white">
+                Контент головної
+              </span>
+              <span className="mt-2 block text-sm text-slate-400">
+                Редагування головного заголовка та підзаголовка.
+              </span>
+            </button>
+          </div>
+        </section>
+      )}
+
+      {activeSection === "homepage" && (
+        <form
+          id="homepage-content"
+          onSubmit={saveHomepageContent}
+          className="mb-8 rounded-2xl border border-blue-400/20 bg-white/[0.04] p-6 shadow-2xl shadow-blue-950/10 backdrop-blur-xl"
+        >
+          <div className="mb-6">
+            <p className="text-sm uppercase tracking-[0.3em] text-blue-300">
+              Контент головної
+            </p>
+            <h3 className="mt-2 text-2xl font-bold">
+              Контент головної сторінки
+            </h3>
+            <p className="mt-2 text-sm text-white/50">
+              Редагуйте тексти головної сторінки без зміни коду.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="grid gap-2">
+              <span className="text-sm text-white/60">Головний заголовок</span>
+              <input
+                value={homepageContent.heroTitle}
+                onChange={(e) =>
+                  setHomepageContent({
+                    ...homepageContent,
+                    heroTitle: e.target.value,
+                  })
+                }
+                className="rounded-2xl border border-white/10 bg-[#030712] px-5 py-4 outline-none transition focus:border-blue-300/50"
+              />
+            </label>
+
+            <label className="grid gap-2 md:col-span-2">
+              <span className="text-sm text-white/60">Підзаголовок</span>
+              <textarea
+                value={homepageContent.heroSubtitle}
+                onChange={(e) =>
+                  setHomepageContent({
+                    ...homepageContent,
+                    heroSubtitle: e.target.value,
+                  })
+                }
+                className="min-h-28 rounded-2xl border border-white/10 bg-[#030712] px-5 py-4 outline-none transition focus:border-blue-300/50"
+              />
+            </label>
+          </div>
+
+          <div className="mt-8 border-t border-white/10 pt-6">
+            <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <h4 className="text-xl font-bold text-white">
+                  Новини ринку нерухомості
+                </h4>
+                <p className="mt-2 text-sm text-white/50">
+                  Додавайте новини для головної сторінки: фото, заголовок,
+                  текст, дату та посилання.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={addRealEstateBlock}
+                className="rounded-2xl border border-blue-400/40 bg-blue-500/10 px-5 py-3 text-sm font-semibold text-blue-100 transition hover:bg-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              >
+                + Додати новину
+              </button>
+            </div>
+
+            <div className="grid gap-4 xl:grid-cols-2">
+              {homepageContent.realEstateBlocks.map((block, index) => (
+                <div
+                  key={index}
+                  className="rounded-2xl border border-white/10 bg-[#030712]/70 p-4"
+                >
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-blue-200">
+                      Новина {index + 1}
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() => removeRealEstateBlock(index)}
+                      className="rounded-full border border-red-400/30 px-3 py-2 text-xs font-medium text-red-200 transition hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-300"
+                    >
+                      Видалити
+                    </button>
+                  </div>
+
+                  <div className="grid gap-3">
+                    <label className="grid gap-2">
+                      <span className="text-sm text-white/60">
+                        Категорія / бейдж
+                      </span>
+                      <input
+                        value={block.tag}
+                        onChange={(e) =>
+                          updateRealEstateBlock(index, "tag", e.target.value)
+                        }
+                        className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none transition focus:border-blue-300/50"
+                      />
+                    </label>
+
+                    <label className="grid gap-2">
+                      <span className="text-sm text-white/60">
+                        Заголовок новини
+                      </span>
+                      <input
+                        value={block.title}
+                        onChange={(e) =>
+                          updateRealEstateBlock(index, "title", e.target.value)
+                        }
+                        className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none transition focus:border-blue-300/50"
+                      />
+                    </label>
+
+                    <label className="grid gap-2">
+                      <span className="text-sm text-white/60">
+                        Текст новини
+                      </span>
+                      <textarea
+                        value={block.text}
+                        onChange={(e) =>
+                          updateRealEstateBlock(index, "text", e.target.value)
+                        }
+                        className="min-h-24 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none transition focus:border-blue-300/50"
+                      />
+                    </label>
+
+                    <label className="grid gap-2">
+                      <span className="text-sm text-white/60">Дата</span>
+                      <input
+                        value={block.date}
+                        onChange={(e) =>
+                          updateRealEstateBlock(index, "date", e.target.value)
+                        }
+                        placeholder="25 червня 2026"
+                        className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none transition placeholder:text-white/30 focus:border-blue-300/50"
+                      />
+                    </label>
+
+                    <div className="grid gap-3">
+                      <ImageUploader
+                        onUploaded={(url) =>
+                          updateRealEstateBlock(index, "image", url)
+                        }
+                      />
+
+                      <label className="grid gap-2">
+                        <span className="text-sm text-white/60">
+                          Фото новини URL
+                        </span>
+                        <input
+                          value={block.image}
+                          onChange={(e) =>
+                            updateRealEstateBlock(
+                              index,
+                              "image",
+                              e.target.value
+                            )
+                          }
+                          placeholder="https://..."
+                          className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none transition placeholder:text-white/30 focus:border-blue-300/50"
+                        />
+                      </label>
+
+                      {block.image && (
+                        <Image
+                          src={block.image}
+                          alt={block.title}
+                          width={640}
+                          height={220}
+                          sizes="(min-width: 1280px) 50vw, 100vw"
+                          unoptimized
+                          className="h-44 w-full rounded-2xl object-cover"
+                        />
+                      )}
+                    </div>
+
+                    <label className="grid gap-2">
+                      <span className="text-sm text-white/60">
+                        Посилання при натисканні
+                      </span>
+                      <input
+                        value={block.href}
+                        onChange={(e) =>
+                          updateRealEstateBlock(index, "href", e.target.value)
+                        }
+                        placeholder="/#objects або https://..."
+                        className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none transition placeholder:text-white/30 focus:border-blue-300/50"
+                      />
+                    </label>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center">
+            <button
+              type="submit"
+              disabled={homepageSaving}
+              className="rounded-2xl bg-blue-500 px-6 py-4 font-medium text-white shadow-lg shadow-blue-500/25 transition hover:bg-blue-400 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {homepageSaving ? "Збереження..." : "Зберегти зміни"}
+            </button>
+
+            {homepageMessage && (
+              <p className="text-sm text-white/60">{homepageMessage}</p>
+            )}
+          </div>
+        </form>
+      )}
+
+      {activeSection === "objects" && (
+        <>
         {showForm && (
           <form
             onSubmit={editingId ? updateProperty : addProperty}
-            className="mb-8 rounded-3xl border border-white/10 bg-white/5 p-6"
+            className="mb-8 rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-blue-950/10 backdrop-blur-xl"
           >
 
           <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
@@ -528,10 +941,9 @@ export default function AdminPage() {
                 }
                 className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4 outline-none"
               >
-                <option>Комерція</option>
-                <option>Офіси</option>
-                <option>Склади</option>
-                <option>Квартири</option>
+                {propertyTypeOptions.map((type) => (
+                  <option key={type}>{type}</option>
+                ))}
               </select>
 
               <select
@@ -672,10 +1084,14 @@ export default function AdminPage() {
                     .split("\n")
                     .filter(Boolean)
                     .map((image) => (
-                      <img
+                      <Image
                         key={image}
                         src={image}
                         alt="Gallery preview"
+                        width={320}
+                        height={112}
+                        sizes="(min-width: 768px) 25vw, 100vw"
+                        unoptimized
                         className="h-28 w-full rounded-2xl object-cover"
                       />
                     ))}
@@ -775,138 +1191,97 @@ export default function AdminPage() {
           </form>
         )}
 
-        <div className="mb-8 grid gap-4 md:grid-cols-4">
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <p className="text-sm text-white/40">Всього об’єктів</p>
-            <p className="mt-3 text-4xl font-bold">{properties.length}</p>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <p className="text-sm text-white/40">Активні</p>
-            <p className="mt-3 text-4xl font-bold">{activeCount}</p>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <p className="text-sm text-white/40">Перегляди</p>
-            <p className="mt-3 text-4xl font-bold">{totalViews}</p>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <p className="text-sm text-white/40">База</p>
-            <p className="mt-3 text-4xl font-bold">DB</p>
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <input
-            type="text"
-            placeholder="🔍 Пошук в адмінці: назва, адреса, тип, статус..."
-            value={adminSearch}
-            onChange={(e) => setAdminSearch(e.target.value)}
-            className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 outline-none transition placeholder:text-white/30 focus:border-white/30"
-          />
-        </div>
-
-        {loading ? (
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center">
-            Завантаження...
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-3xl border border-white/10">
-            <div className="grid grid-cols-12 border-b border-white/10 bg-white/5 px-5 py-4 text-sm text-white/40">
-              <div className="col-span-4">Об’єкт</div>
-              <div className="col-span-2">Тип</div>
-              <div className="col-span-2">Ціна</div>
-              <div className="col-span-1">Площа</div>
-              <div className="col-span-1">Views</div>
-              <div className="col-span-2 flex flex-wrap items-center gap-2">Дії</div>
+        <section className="mb-6 rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-blue-950/10 backdrop-blur-xl">
+          <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.28em] text-blue-300">
+                Каталог
+              </p>
+              <h2 className="mt-3 text-3xl font-bold text-white">Обʼєкти</h2>
+              <p className="mt-2 text-sm text-slate-400">
+                Список усіх обʼєктів нерухомості
+              </p>
             </div>
 
-            {filteredAdminProperties.map((property) => (
-              <div
-                key={property.id}
-                className="grid grid-cols-12 items-center border-b border-white/10 px-5 py-4 last:border-b-0"
-              >
-                <div className="col-span-4 flex items-center gap-4">
-                  <Image
-                    src={property.image}
-                    alt={property.title}
-                    width={80}
-                    height={64}
-                    sizes="80px"
-                    unoptimized
-                    className="h-16 w-20 rounded-xl object-cover"
-                  />
-
-                  <div>
-                    <p className="font-medium">{property.title}</p>
-
-                    <select
-                      value={property.status}
-                      onChange={(e) =>
-                        changeStatus(property.id, e.target.value)
-                      }
-                      className="mt-2 rounded-full border border-white/10 bg-black px-3 py-1 text-xs text-white"
-                    >
-                      <option>Активний</option>
-                      <option>Чернетка</option>
-                      <option>Здано</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="col-span-2 text-white/60">
-                  {property.type} / {property.deal_type}
-                </div>
-
-                <div className="col-span-2 font-medium">
-                  {property.price_total}
-                </div>
-
-                <div className="col-span-1 text-white/60">
-                  {property.area}
-                </div>
-
-                <div className="col-span-1 text-white/60">
-                  {property.views}
-                </div>
-
-                <div className="col-span-2 flex flex-wrap items-center gap-2">
-                  <button
-                    onClick={() => startEdit(property)}
-                    className="rounded-full border border-white/15 px-3 py-2 text-xs transition hover:bg-white hover:text-black"
-                  >
-                    Редагувати
-                  </button>
-
-                  <a
-                    href={`/objects/${property.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-full border border-white/15 px-3 py-2 text-xs transition hover:bg-white hover:text-black"
-                  >
-                    Відкрити
-                  </a>
-
-                  <button
-                    onClick={() => copyPropertyLink(property.id)}
-                    className="rounded-full border border-white/15 px-3 py-2 text-xs transition hover:bg-white hover:text-black"
-                  >
-                    Копіювати
-                  </button>
-
-                  <button
-                    onClick={() => deleteProperty(property.id)}
-                    className="rounded-full border border-red-500/40 px-3 py-2 text-xs text-red-300 transition hover:bg-red-500 hover:text-white"
-                  >
-                    Видалити
-                  </button>
-                </div>
-              </div>
-            ))}
+            <button
+              type="button"
+              onClick={startNewProperty}
+              className="w-full rounded-2xl bg-blue-500 px-5 py-4 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition hover:bg-blue-400 lg:w-auto"
+            >
+              + Додати обʼєкт
+            </button>
           </div>
-        )}
-      </section>
-    </main>
+
+          <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <AdminStatCard
+              label="Всі обʼєкти"
+              value={properties.length}
+              helper="Усі записи з адмінської бази"
+            />
+            <AdminStatCard
+              label="Активні"
+              value={activeCount}
+              helper="Показуються на сайті"
+            />
+            <AdminStatCard
+              label="Неактивні"
+              value={inactiveCount}
+              helper="Інші статуси"
+            />
+            <AdminStatCard
+              label="Видалені або архівні"
+              value={archivedCount}
+              helper="Якщо є така логіка"
+            />
+          </div>
+
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_220px]">
+            <input
+              type="text"
+              placeholder="Пошук: назва, адреса, тип..."
+              value={adminSearch}
+              onChange={(e) => setAdminSearch(e.target.value)}
+              className="w-full rounded-2xl border border-white/10 bg-[#030712] px-5 py-4 outline-none transition placeholder:text-slate-500 focus:border-blue-300/50"
+            />
+
+            <select
+              value={adminTypeFilter}
+              onChange={(e) => setAdminTypeFilter(e.target.value)}
+              className="w-full rounded-2xl border border-white/10 bg-[#030712] px-5 py-4 text-slate-100 outline-none transition focus:border-blue-300/50"
+            >
+              <option>Всі типи</option>
+              {adminTypeOptions.map((type) => (
+                <option key={type}>{type}</option>
+              ))}
+            </select>
+
+            <select
+              value={adminStatusFilter}
+              onChange={(e) => setAdminStatusFilter(e.target.value)}
+              className="w-full rounded-2xl border border-white/10 bg-[#030712] px-5 py-4 text-slate-100 outline-none transition focus:border-blue-300/50"
+            >
+              <option>Всі статуси</option>
+              {adminStatusOptions.map((status) => (
+                <option key={status}>{status}</option>
+              ))}
+            </select>
+          </div>
+        </section>
+
+        <AdminObjectsTable
+          properties={filteredAdminProperties}
+          totalCount={properties.length}
+          loading={loading}
+          error={loadError}
+          onRetry={loadProperties}
+          onAddFirst={startNewProperty}
+          onEdit={startEdit}
+          onStatusChange={changeStatus}
+          onCopy={copyPropertyLink}
+          onDelete={deleteProperty}
+        />
+        </>
+      )}
+    </AdminLayout>
   );
 }

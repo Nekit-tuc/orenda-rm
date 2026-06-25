@@ -1,4 +1,5 @@
 import type { FormattedProperty, Property } from "@/types/property";
+import { createSlug } from "@/lib/createSlug";
 
 export function formatProperty(property: Property): FormattedProperty {
   return {
@@ -21,10 +22,10 @@ export function formatProperty(property: Property): FormattedProperty {
     description: property.description,
     image: property.image,
     images: property.images ?? [property.image],
-    lat: property.lat ?? 50.2547,
-    lng: property.lng ?? 28.6587,
+    lat: property.lat,
+    lng: property.lng,
     views: property.views,
     status: property.status,
-    slug: property.slug,
+    slug: property.slug || createSlug(property),
   };
 }

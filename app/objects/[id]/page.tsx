@@ -1,13 +1,17 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import PropertyGallery from "@/components/PropertyGallery";
 import PropertyFeatures from "@/components/PropertyFeatures";
-import { supabase } from "@/lib/supabase";
 import { formatProperty } from "@/lib/formatProperty";
-import type { Property } from "@/types/property";
 import ViewCounter from "@/components/ViewCounter";
 import Image from "next/image";
 import FavoritesNav from "@/components/FavoritesNav";
 import ContactForm from "@/components/ContactForm";
+import { getRouteUrl } from "@/lib/getRouteUrl";
+import { getPropertyBySlugOrId } from "@/lib/getPropertyBySlugOrId";
+import SharePropertyButton from "@/components/SharePropertyButton";
+
+const baseUrl = "https://orenda-rm.vercel.app";
 
       type Props = {
         params: Promise<{
@@ -18,13 +22,7 @@ import ContactForm from "@/components/ContactForm";
       export async function generateMetadata({ params }: Props) {
         const { id } = await params;
 
-        const query = supabase
-          .from("properties")
-          .select("*");
-
-        const { data } = Number(id)
-          ? await query.eq("id", Number(id)).single()
-          : await query.eq("slug", id).single();
+        const { data } = await getPropertyBySlugOrId(id);
 
         if (!data) {
           return {
@@ -33,19 +31,24 @@ import ContactForm from "@/components/ContactForm";
           };
         }
 
-        const property = formatProperty(data as Property);
+        const property = formatProperty(data);
 
         const mainPrice =
           property.dealType === "Оренда"
             ? property.pricePerMeter
             : property.priceTotal;
+        const canonicalUrl = `${baseUrl}/objects/${property.slug}`;
 
         return {
-          title: `${property.dealType}: ${property.title}, ${property.area} | ZT SPACE`,
-          description: `${property.dealType} нерухомості у Житомирі: ${property.title}, ${property.area}, ${mainPrice}. ${property.address}`,
+          title: `${property.dealType}: ${property.title}, ${property.area} | Orenda RM`,
+          description: `${property.title}. ${property.address}. ${property.area}, ${mainPrice}. ${property.dealType} нерухомості у Житомирі та області.`,
+          alternates: {
+            canonical: canonicalUrl,
+          },
           openGraph: {
-            title: `${property.dealType}: ${property.title} | ZT SPACE`,
+            title: `${property.dealType}: ${property.title} | Orenda RM`,
             description: `${property.area}, ${mainPrice}, ${property.address}`,
+            url: canonicalUrl,
             images: [
               {
                 url: property.image,
@@ -62,13 +65,7 @@ import ContactForm from "@/components/ContactForm";
     export default async function PropertyPage({ params }: Props) {
       const { id } = await params;
 
-      const query = supabase
-        .from("properties")
-        .select("*");
-
-      const { data, error } = Number(id)
-        ? await query.eq("id", Number(id)).single()
-        : await query.eq("slug", id).single();
+      const { data, error, foundBy } = await getPropertyBySlugOrId(id);
 
       if (error || !data) {
         return (
@@ -78,7 +75,15 @@ import ContactForm from "@/components/ContactForm";
         );
       }
 
-  const property = formatProperty(data as Property);
+  const property = formatProperty(data);
+
+  if (foundBy === "id" && property.slug) {
+    redirect(`/objects/${property.slug}`);
+  }
+
+  const routeUrl = getRouteUrl(property);
+  const propertyUrl = `/objects/${property.slug || property.id}`;
+  const shareText = `${property.description} ${property.priceTotal}`.trim();
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -192,6 +197,27 @@ import ContactForm from "@/components/ContactForm";
               >
                 Назад
               </Link>
+            </div>
+
+            {routeUrl && (
+              <a
+                href={routeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#b89652]/60 bg-[#b89652]/10 px-6 py-3 text-center font-medium text-[#e2c875] transition hover:bg-[#b89652] hover:text-black sm:w-auto"
+              >
+                <span>📍</span>
+                Побудувати маршрут
+              </a>
+            )}
+
+            <div className="mt-3">
+              <SharePropertyButton
+                title={property.title}
+                text={shareText}
+                url={propertyUrl}
+                rounded="full"
+              />
             </div>
 
             <ContactForm

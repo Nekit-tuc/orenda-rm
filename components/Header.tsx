@@ -20,34 +20,34 @@ export default function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-50 border-b border-white/10 transition-all duration-300 ${
+      className={`relative z-50 border-b border-white/10 transition-all duration-300 md:sticky md:top-0 ${
         scrolled
           ? "bg-black/95 py-2 backdrop-blur-xl"
-          : "bg-black/80 py-3 backdrop-blur-xl md:py-4"
+          : "bg-black/82 py-3 backdrop-blur-xl md:py-4"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 md:px-6">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 md:flex-nowrap md:px-6">
         <Link href="/" className="flex items-center gap-3">
           <Image
             src="/logo_v1.png"
             alt="Orenda RM"
             width={110}
             height={110}
-            className={`rounded-full transition-all duration-300 ${
-              scrolled ? "h-12 w-12" : "h-14 w-14 md:h-24 md:w-24"
+            className={`object-contain transition-all duration-300 ${
+              scrolled ? "h-12 w-16" : "h-14 w-20 md:h-16 md:w-24"
             }`}
             priority
           />
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
-          <a href="#objects" className="hover:text-[#b89652]">
+        <nav className="hidden items-center gap-7 text-sm font-semibold md:flex">
+          <a href="#objects" className="transition hover:text-[#b89652]">
             Об’єкти
           </a>
 
           <FavoritesNav />
 
-          <a href="#map" className="hover:text-[#b89652]">
+          <a href="#map" className="transition hover:text-[#b89652]">
             Карта
           </a>
         </nav>
@@ -56,7 +56,7 @@ export default function Header() {
           href="https://t.me/zt_space"
           target="_blank"
           rel="noreferrer"
-          className="rounded-xl bg-[#b89652] px-4 py-3 text-sm font-medium text-white transition hover:opacity-80 md:px-5"
+          className="rounded-xl bg-[#caa854] px-4 py-3 text-sm font-bold text-white shadow-[0_14px_34px_rgba(202,168,84,0.22)] transition hover:bg-[#d8ba68] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] md:px-5"
         >
           Telegram
         </a>
@@ -64,7 +64,7 @@ export default function Header() {
         <nav className="grid w-full grid-cols-3 gap-2 text-center text-sm md:hidden">
           <a
             href="#objects"
-            className="rounded-xl border border-white/10 px-3 py-2 text-white/70"
+            className="rounded-xl border border-white/10 px-3 py-2 text-white/70 transition hover:border-[#b89652]/50"
           >
             Об’єкти
           </a>
@@ -73,7 +73,7 @@ export default function Header() {
 
           <a
             href="#map"
-            className="rounded-xl border border-white/10 px-3 py-2 text-white/70"
+            className="rounded-xl border border-white/10 px-3 py-2 text-white/70 transition hover:border-[#b89652]/50"
           >
             Карта
           </a>

@@ -22,7 +22,7 @@ export type Property = {
   lng: number | null;
   views: number;
   status: string;
-  slug: string | null;
+  slug?: string | null;
 };
 
 export type FormattedProperty = {
@@ -45,10 +45,9 @@ export type FormattedProperty = {
   description: string;
   image: string;
   images: string[];
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   views: number;
   status: string;
-  slug: string | null;
+  slug?: string | null;
 };
-

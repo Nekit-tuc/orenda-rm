@@ -2,20 +2,24 @@
 
 import { useState } from "react";
 import PropertyCard from "@/components/PropertyCard";
+import { propertyTypeFilters } from "@/lib/propertyCategories";
 import type { FormattedProperty } from "@/types/property";
 
-const filters = ["Всі", "Офіси", "Склади", "Квартири", "Комерція"] as const;
 const dealFilters = ["Всі", "Оренда", "Продаж"] as const;
 
-type PropertyTypeFilter = (typeof filters)[number];
+type PropertyTypeFilter = (typeof propertyTypeFilters)[number];
 type DealType = (typeof dealFilters)[number];
 
 type PropertiesSectionProps = {
   properties: FormattedProperty[];
+  sectionTitle: string;
+  sectionSubtitle: string;
 };
 
 export default function PropertiesSection({
   properties,
+  sectionTitle,
+  sectionSubtitle,
 }: PropertiesSectionProps) {
   const [activeFilter, setActiveFilter] = useState<PropertyTypeFilter>("Всі");
   const [activeDealType, setActiveDealType] = useState<DealType>("Всі");
@@ -46,11 +50,11 @@ export default function PropertiesSection({
       <div className="mb-8">
         <div className="mb-8">
           <p className="text-xs uppercase tracking-[0.24em] text-[#b89652] sm:text-sm sm:tracking-[0.3em]">
-            Каталог нерухомості
+            {sectionSubtitle}
           </p>
 
           <h3 className="mt-3 text-3xl font-bold md:text-4xl">
-            Актуальні об’єкти
+            {sectionTitle}
           </h3>
         </div>
 
@@ -68,7 +72,7 @@ export default function PropertiesSection({
             onChange={(e) => setActiveFilter(e.target.value as PropertyTypeFilter)}
             className="min-h-12 rounded-xl border border-white/10 bg-[#070707] px-4 py-4 text-white outline-none transition focus:border-[#b89652]/60 md:px-5"
           >
-            {filters.map((filter) => (
+            {propertyTypeFilters.map((filter) => (
               <option key={filter}>{filter}</option>
             ))}
           </select>
@@ -104,6 +108,9 @@ export default function PropertiesSection({
               priceTotal={property.priceTotal}
               pricePerMeter={property.pricePerMeter}
               area={property.area}
+              address={property.address}
+              lat={property.lat}
+              lng={property.lng}
               description={property.description}
               image={property.image}
               slug={property.slug}

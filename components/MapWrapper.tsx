@@ -8,6 +8,7 @@ const MapClient = dynamic(() => import("@/components/MapClient"), {
 
 type MapProperty = {
   id: number;
+  slug?: string | null;
   title: string;
   type: string;
   dealType: "Оренда" | "Продаж";
@@ -15,8 +16,8 @@ type MapProperty = {
   pricePerMeter: string;
   area: string;
   image: string;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
 };
 
 type MapWrapperProps = {
