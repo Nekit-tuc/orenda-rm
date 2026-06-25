@@ -2,6 +2,20 @@ import { supabase } from "@/lib/supabase";
 import type { Property } from "@/types/property";
 import { getPropertySlug } from "@/lib/getPropertySlug";
 
+export function extractIdFromSlug(slugOrId: string) {
+  if (/^\d+$/.test(slugOrId)) {
+    return Number(slugOrId);
+  }
+
+  const match = slugOrId.match(/-(\d+)$/);
+
+  if (!match) {
+    return null;
+  }
+
+  return Number(match[1]);
+}
+
 export async function getPropertyBySlugOrId(slugOrId: string) {
   const { data: propertyBySlug, error: slugError } = await supabase
     .from("properties")
@@ -21,20 +35,20 @@ export async function getPropertyBySlugOrId(slugOrId: string) {
     console.error("Property slug lookup error:", slugError);
   }
 
-  const id = Number(slugOrId);
+  const idFromSlug = extractIdFromSlug(slugOrId);
 
-  if (Number.isInteger(id)) {
+  if (idFromSlug !== null) {
     const { data: propertyById, error: idError } = await supabase
       .from("properties")
       .select("*")
-      .eq("id", id)
+      .eq("id", idFromSlug)
       .maybeSingle();
 
     if (propertyById) {
       return {
         data: propertyById as Property,
         error: null,
-        foundBy: "id" as const,
+        foundBy: slugOrId === String(idFromSlug) ? ("id" as const) : ("slug-id" as const),
       };
     }
 

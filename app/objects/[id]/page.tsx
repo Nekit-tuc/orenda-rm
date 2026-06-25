@@ -80,7 +80,7 @@ const baseUrl = "https://orenda-rm.vercel.app";
   const property = formatProperty(data);
   const propertySlug = getPropertySlug(property);
 
-  if (foundBy === "id" && propertySlug) {
+  if ((foundBy === "id" || id !== propertySlug) && propertySlug) {
     redirect(`/objects/${propertySlug}`);
   }
 
