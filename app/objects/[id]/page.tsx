@@ -10,6 +10,7 @@ import ContactForm from "@/components/ContactForm";
 import { getRouteUrl } from "@/lib/getRouteUrl";
 import { getPropertyBySlugOrId } from "@/lib/getPropertyBySlugOrId";
 import SharePropertyButton from "@/components/SharePropertyButton";
+import { getPropertySlug } from "@/lib/getPropertySlug";
 
 const baseUrl = "https://orenda-rm.vercel.app";
 
@@ -37,7 +38,8 @@ const baseUrl = "https://orenda-rm.vercel.app";
           property.dealType === "Оренда"
             ? property.pricePerMeter
             : property.priceTotal;
-        const canonicalUrl = `${baseUrl}/objects/${property.slug}`;
+        const propertySlug = getPropertySlug(property);
+        const canonicalUrl = `${baseUrl}/objects/${propertySlug}`;
 
         return {
           title: `${property.dealType}: ${property.title}, ${property.area} | Orenda RM`,
@@ -76,13 +78,14 @@ const baseUrl = "https://orenda-rm.vercel.app";
       }
 
   const property = formatProperty(data);
+  const propertySlug = getPropertySlug(property);
 
-  if (foundBy === "id" && property.slug) {
-    redirect(`/objects/${property.slug}`);
+  if (foundBy === "id" && propertySlug) {
+    redirect(`/objects/${propertySlug}`);
   }
 
   const routeUrl = getRouteUrl(property);
-  const propertyUrl = `/objects/${property.slug || property.id}`;
+  const propertyUrl = `/objects/${propertySlug}`;
   const shareText = `${property.description} ${property.priceTotal}`.trim();
 
   return (

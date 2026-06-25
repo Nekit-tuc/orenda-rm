@@ -1,5 +1,5 @@
 import type { FormattedProperty, Property } from "@/types/property";
-import { createSlug } from "@/lib/createSlug";
+import { getPropertySlug } from "@/lib/getPropertySlug";
 
 export function formatProperty(property: Property): FormattedProperty {
   return {
@@ -26,6 +26,6 @@ export function formatProperty(property: Property): FormattedProperty {
     lng: property.lng,
     views: property.views,
     status: property.status,
-    slug: property.slug || createSlug(property),
+    slug: getPropertySlug(property),
   };
 }

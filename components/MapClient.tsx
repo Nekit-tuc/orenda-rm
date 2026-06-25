@@ -6,6 +6,7 @@ import Link from "next/link";
 import L from "leaflet";
 import { useRef, useState } from "react";
 import { propertyTypeFilters } from "@/lib/propertyCategories";
+import { getPropertySlug } from "@/lib/getPropertySlug";
 
 const customIcon = L.divIcon({
   className: "",
@@ -89,7 +90,7 @@ function PropertyMarker({ property }: { property: MappableProperty }) {
           </p>
 
           <Link
-            href={`/objects/${property.slug || property.id}`}
+            href={`/objects/${getPropertySlug(property)}`}
             className="mt-4 inline-block rounded-full bg-black px-4 py-2 text-sm text-white"
           >
             Детальніше

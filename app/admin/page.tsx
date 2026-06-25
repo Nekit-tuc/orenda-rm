@@ -8,6 +8,7 @@ import ImageUploader from "@/components/ImageUploader";
 import MultiImageUploader from "@/components/MultiImageUploader";
 import { useRouter } from "next/navigation";
 import { createSlug } from "@/lib/createSlug";
+import { getPropertySlug } from "@/lib/getPropertySlug";
 import { propertyTypeOptions } from "@/lib/propertyCategories";
 import AdminHeader from "@/components/admin/AdminHeader";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -469,7 +470,7 @@ export default function AdminPage() {
   });
 
     async function copyPropertyLink(property: Property) {
-      const slug = property.slug || createSlug(property);
+      const slug = getPropertySlug(property);
       const url = `${window.location.origin}/objects/${slug}`;
 
       await navigator.clipboard.writeText(url);

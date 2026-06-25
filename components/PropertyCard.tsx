@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { toggleFavoriteId, useFavoriteIds } from "@/lib/favorites";
 import { getRouteUrl } from "@/lib/getRouteUrl";
+import { getPropertySlug } from "@/lib/getPropertySlug";
 import SharePropertyButton from "@/components/SharePropertyButton";
 
 type PropertyCardProps = {
@@ -40,7 +41,8 @@ export default function PropertyCard({
   const favoriteIds = useFavoriteIds();
   const isFavorite = favoriteIds.includes(id);
   const routeUrl = getRouteUrl({ address, lat, lng });
-  const propertyUrl = `/objects/${slug || id}`;
+  const propertySlug = getPropertySlug({ id, title, slug });
+  const propertyUrl = `/objects/${propertySlug}`;
   const shareText = `${description} ${priceTotal}`.trim();
 
   function toggleFavorite() {

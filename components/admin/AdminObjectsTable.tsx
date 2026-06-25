@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { createSlug } from "@/lib/createSlug";
+import { getPropertySlug } from "@/lib/getPropertySlug";
 import type { Property } from "@/types/property";
 
 type AdminObjectsTableProps = {
@@ -30,7 +30,7 @@ function ActionButtons({
 }) {
   const buttonClass =
     "grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-sm text-slate-200 transition hover:border-blue-300/40 hover:bg-blue-500/15 hover:text-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-300";
-  const propertySlug = property.slug || createSlug(property);
+  const propertySlug = getPropertySlug(property);
 
   return (
     <div className="flex flex-wrap gap-2">
