@@ -4,6 +4,7 @@ import { useState } from "react";
 import PropertyCard from "@/components/PropertyCard";
 import { propertyTypeFilters } from "@/lib/propertyCategories";
 import type { FormattedProperty } from "@/types/property";
+import { ObjectsIcon } from "@/components/PremiumIcons";
 
 const dealFilters = ["Всі", "Оренда", "Продаж"] as const;
 
@@ -89,8 +90,9 @@ export default function PropertiesSection({
 
           <a
             href="#objects"
-            className="min-h-12 rounded-xl bg-[#b89652] px-6 py-4 text-center font-medium text-white transition hover:opacity-80"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#b89652]/45 bg-[#b89652]/10 px-6 py-4 text-center font-semibold text-white shadow-[0_0_25px_rgba(184,150,82,0.14)] transition-all duration-300 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_30px_rgba(212,175,55,0.28)] focus:outline-none focus:ring-2 focus:ring-[#b89652] [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
           >
+            <ObjectsIcon />
             Показати об’єкти
           </a>
         </div>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useFavoriteIds } from "@/lib/favorites";
+import { FavoriteIcon } from "@/components/PremiumIcons";
 
 export default function FavoritesNav() {
   const favoriteIds = useFavoriteIds();
@@ -12,7 +13,7 @@ export default function FavoritesNav() {
       className="flex min-w-0 items-center justify-center gap-1 rounded-xl border border-white/10 px-2 py-1.5 text-white/72 transition hover:border-[#b89652]/50 hover:bg-[#b89652]/10 focus:outline-none focus:ring-2 focus:ring-[#b89652] md:gap-3 md:rounded-full md:px-4 md:py-2 md:text-white"
     >
       <span className="hidden h-8 w-8 items-center justify-center rounded-full bg-[#b89652]/15 text-[#b89652] md:flex">
-        ♥
+        <FavoriteIcon filled={favoriteIds.length > 0} />
       </span>
 
       <span className="truncate">Обране</span>

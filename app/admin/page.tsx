@@ -14,6 +14,7 @@ import AdminHeader from "@/components/admin/AdminHeader";
 import AdminLayout from "@/components/admin/AdminLayout";
 import AdminObjectsTable from "@/components/admin/AdminObjectsTable";
 import AdminStatCard from "@/components/admin/AdminStatCard";
+import { RouteIcon } from "@/components/PremiumIcons";
 import {
   createEmptyRealEstateBlock,
   defaultHomepageSettings,
@@ -1004,9 +1005,10 @@ export default function AdminPage() {
               <button
                 type="button"
                 onClick={geocodeAddress}
-                className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4 text-left text-white/70 transition hover:bg-white hover:text-black md:col-span-2"
+                className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-black/40 px-5 py-4 text-left text-white/70 transition hover:bg-white hover:text-black md:col-span-2"
                 >
-                📍 Знайти координати по адресі
+                <RouteIcon />
+                Знайти координати по адресі
                 </button>
 
               <input

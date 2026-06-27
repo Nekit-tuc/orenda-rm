@@ -51,17 +51,21 @@ export default function PropertyFeatures({
   ];
 
   return (
-    <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-4 md:mt-10 md:rounded-3xl md:p-6">
-      <h2 className="mb-5 text-xl font-bold md:text-2xl">Характеристики</h2>
+    <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-2.5 shadow-[0_0_18px_rgba(184,150,82,0.05)] md:p-3">
+      <h2 className="mb-2 text-sm font-extrabold md:text-base">Характеристики</h2>
 
-      <div className="grid gap-3 md:grid-cols-2 md:gap-4">
+      <div className="grid grid-cols-2 gap-1.5 md:gap-2">
         {features.map((feature) => (
           <div
             key={feature.label}
-            className="rounded-xl border border-white/10 bg-black/30 p-4 md:rounded-2xl"
+            className="min-w-0 rounded-xl border border-white/10 bg-black/30 p-2 md:p-2.5"
           >
-            <p className="text-sm text-white/40">{feature.label}</p>
-            <p className="mt-1 font-medium">{feature.value}</p>
+            <p className="truncate text-[10px] uppercase tracking-[0.07em] text-white/38">
+              {feature.label}
+            </p>
+            <p className="mt-0.5 line-clamp-2 break-words text-xs font-semibold leading-snug text-white/82 md:text-sm">
+              {feature.value}
+            </p>
           </div>
         ))}
       </div>

@@ -1,5 +1,6 @@
 import type { FormattedProperty, Property } from "@/types/property";
 import { getPropertySlug } from "@/lib/getPropertySlug";
+import { formatArea } from "@/lib/formatArea";
 
 export function formatProperty(property: Property): FormattedProperty {
   return {
@@ -10,7 +11,7 @@ export function formatProperty(property: Property): FormattedProperty {
     price: property.price,
     priceTotal: property.price_total,
     pricePerMeter: property.price_per_meter,
-    area: property.area,
+    area: formatArea(property.area),
     address: property.address,
     floor: property.floor ?? 0,
     floors: property.floors ?? 0,

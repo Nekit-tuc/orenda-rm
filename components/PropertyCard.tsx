@@ -2,10 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type { KeyboardEvent, MouseEvent } from "react";
 import { toggleFavoriteId, useFavoriteIds } from "@/lib/favorites";
 import { getRouteUrl } from "@/lib/getRouteUrl";
 import { getPropertySlug } from "@/lib/getPropertySlug";
 import SharePropertyButton from "@/components/SharePropertyButton";
+import { DetailsIcon, FavoriteIcon, RouteIcon } from "@/components/PremiumIcons";
 
 type PropertyCardProps = {
   id: number;
@@ -38,6 +41,7 @@ export default function PropertyCard({
   description,
   image,
 }: PropertyCardProps) {
+  const router = useRouter();
   const favoriteIds = useFavoriteIds();
   const isFavorite = favoriteIds.includes(id);
   const routeUrl = getRouteUrl({ address, lat, lng });
@@ -45,12 +49,61 @@ export default function PropertyCard({
   const propertyUrl = `/objects/${propertySlug}`;
   const shareText = `${description} ${priceTotal}`.trim();
 
-  function toggleFavorite() {
+  function isMobileCardNavigationEnabled() {
+    return window.matchMedia("(max-width: 1024px)").matches;
+  }
+
+  function isInteractiveElement(target: EventTarget | null) {
+    if (!(target instanceof HTMLElement)) {
+      return false;
+    }
+
+    return Boolean(
+      target.closest(
+        'a, button, input, select, textarea, [role="button"], [data-card-action="true"]'
+      )
+    );
+  }
+
+  function openPropertyFromCard() {
+    router.push(propertyUrl);
+  }
+
+  function handleCardClick(event: MouseEvent<HTMLElement>) {
+    if (!isMobileCardNavigationEnabled() || isInteractiveElement(event.target)) {
+      return;
+    }
+
+    openPropertyFromCard();
+  }
+
+  function handleCardKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (
+      !isMobileCardNavigationEnabled() ||
+      isInteractiveElement(event.target) ||
+      (event.key !== "Enter" && event.key !== " ")
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    openPropertyFromCard();
+  }
+
+  function toggleFavorite(event?: MouseEvent<HTMLButtonElement>) {
+    event?.stopPropagation();
     toggleFavoriteId(id);
   }
 
   return (
-    <article className="group grid overflow-hidden rounded-[1.75rem] border border-[#b89652]/35 bg-[#070707] shadow-[0_18px_50px_rgba(0,0,0,0.35)] transition duration-300 hover:border-[#b89652]/55 hover:shadow-[0_0_35px_rgba(184,150,82,0.16)] md:rounded-3xl md:border-white/10 lg:grid-cols-[0.75fr_1.45fr]">
+    <article
+      role="link"
+      tabIndex={0}
+      aria-label={`Відкрити обʼєкт ${title}`}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+      className="group grid cursor-pointer overflow-hidden rounded-[1.75rem] border border-[#b89652]/35 bg-[#070707] shadow-[0_18px_50px_rgba(0,0,0,0.35)] transition duration-300 hover:border-[#b89652]/55 hover:shadow-[0_0_35px_rgba(184,150,82,0.2)] active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b89652]/70 md:rounded-3xl md:border-white/10 lg:grid-cols-[0.75fr_1.45fr] min-[1025px]:cursor-default min-[1025px]:active:scale-100"
+    >
       <div className="flex min-w-0 flex-col p-4 md:p-7">
         <div className="mb-3 hidden items-center justify-between gap-3 md:mb-5 md:flex">
           <span className="rounded-md bg-[#b89652] px-3 py-1.5 text-[11px] font-bold uppercase text-white md:px-4 md:py-2 md:text-xs">
@@ -59,9 +112,10 @@ export default function PropertyCard({
 
           <button
             onClick={toggleFavorite}
-            className="rounded-full border border-white/10 bg-black/50 px-3 py-2 text-base transition hover:border-[#b89652]/50 hover:bg-[#b89652] hover:text-white md:text-lg"
+            className="grid h-10 w-10 place-items-center rounded-full border border-[#b89652]/35 bg-black/50 text-[#d8ba68] transition hover:border-[#d4af37] hover:bg-[#b89652]/18 hover:text-[#f1d787] hover:shadow-[0_0_24px_rgba(212,175,55,0.28)]"
+            aria-label={isFavorite ? "Прибрати з обраного" : "Додати в обране"}
           >
-            {isFavorite ? "❤️" : "🤍"}
+            <FavoriteIcon filled={isFavorite} />
           </button>
         </div>
 
@@ -113,9 +167,11 @@ export default function PropertyCard({
           <div className="mt-3 grid grid-cols-2 gap-2 md:mt-5 md:flex md:flex-wrap md:gap-3">
             <Link
               href={propertyUrl}
-              className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-[#b89652]/50 bg-[#b89652]/5 px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-[#b89652] hover:text-black md:min-h-0 md:w-auto md:px-5 md:py-3 md:text-sm"
+              onClick={(event) => event.stopPropagation()}
+              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#b89652]/50 bg-[#b89652]/5 px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-[#b89652] hover:text-black md:min-h-0 md:w-auto md:px-5 md:py-3 md:text-sm [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
             >
-              Детальніше <span>→</span>
+              <DetailsIcon />
+              Детальніше
             </Link>
 
             {routeUrl && (
@@ -123,9 +179,10 @@ export default function PropertyCard({
                 href={routeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl bg-[#b89652]/12 px-2.5 py-2 text-center text-xs font-semibold leading-tight text-white ring-1 ring-[#b89652]/45 transition hover:bg-[#b89652] hover:text-black md:min-h-0 md:w-auto md:px-5 md:py-3 md:text-sm"
+                onClick={(event) => event.stopPropagation()}
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#b89652]/12 px-2.5 py-2 text-center text-xs font-semibold leading-tight text-white ring-1 ring-[#b89652]/45 transition hover:bg-[#b89652] hover:text-black md:min-h-0 md:w-auto md:px-5 md:py-3 md:text-sm [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
               >
-                <span>📍</span>
+                <RouteIcon />
                 Побудувати маршрут
               </a>
             )}
@@ -140,9 +197,9 @@ export default function PropertyCard({
             <button
               type="button"
               onClick={toggleFavorite}
-              className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-[#b89652]/45 bg-[#b89652]/5 px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-[#b89652] hover:text-black md:hidden"
+              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#b89652]/45 bg-[#b89652]/5 px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-[#b89652] hover:text-black md:hidden [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
             >
-              <span>{isFavorite ? "❤️" : "♡"}</span>
+              <FavoriteIcon filled={isFavorite} />
               В обране
             </button>
           </div>
@@ -168,10 +225,10 @@ export default function PropertyCard({
           <button
             type="button"
             onClick={toggleFavorite}
-            className="grid h-10 w-10 place-items-center rounded-full border border-white/25 bg-black/35 text-lg text-white shadow-[0_12px_28px_rgba(0,0,0,0.35)] backdrop-blur transition hover:bg-[#b89652]"
+            className="grid h-10 w-10 place-items-center rounded-full border border-[#b89652]/45 bg-black/35 text-[#d8ba68] shadow-[0_12px_28px_rgba(0,0,0,0.35)] backdrop-blur transition hover:border-[#d4af37] hover:bg-[#b89652]/18 hover:text-[#f1d787] hover:shadow-[0_0_24px_rgba(212,175,55,0.28)]"
             aria-label="Додати в обране"
           >
-            {isFavorite ? "❤️" : "♡"}
+            <FavoriteIcon filled={isFavorite} />
           </button>
         </div>
       </div>

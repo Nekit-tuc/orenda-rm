@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { shareProperty } from "@/lib/shareProperty";
+import { ShareIcon } from "@/components/PremiumIcons";
 
 type SharePropertyButtonProps = {
   title: string;
@@ -54,9 +55,9 @@ export default function SharePropertyButton({
       <button
         type="button"
         onClick={handleShare}
-        className={`${roundedClass} inline-flex w-full items-center justify-center gap-2 border border-white/15 bg-white/[0.04] text-sm font-medium text-white transition hover:-translate-y-0.5 hover:border-[#b89652]/60 hover:bg-[#b89652]/15 hover:text-[#e2c875] focus:outline-none focus:ring-2 focus:ring-[#b89652]/60 md:w-auto ${className || "px-5 py-3"}`}
+        className={`${roundedClass} inline-flex w-full items-center justify-center gap-2 border border-[#b89652]/45 bg-[#b89652]/10 text-sm font-semibold text-white shadow-[0_0_25px_rgba(184,150,82,0.16)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_32px_rgba(212,175,55,0.3)] focus:outline-none focus:ring-2 focus:ring-[#b89652]/70 md:w-auto [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black ${className || "px-5 py-3"}`}
       >
-        <span aria-hidden="true">↗</span>
+        <ShareIcon />
         Поділитися
       </button>
 

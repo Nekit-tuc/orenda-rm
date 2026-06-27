@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@/components/PremiumIcons";
 
 type PropertyGalleryProps = {
   images: readonly string[];
@@ -40,10 +41,10 @@ export default function PropertyGallery({
           sizes="(min-width: 1024px) 50vw, 100vw"
           priority
           unoptimized
-          className="h-[320px] w-full object-cover sm:h-[420px] lg:h-[520px]"
+          className="h-[260px] w-full object-cover sm:h-[340px] lg:h-[460px]"
         />
 
-        <div className="absolute left-3 top-3 rounded-full bg-black/70 px-3 py-2 text-sm text-white backdrop-blur md:left-5 md:top-5 md:px-4">
+        <div className="absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1.5 text-xs text-white backdrop-blur md:left-5 md:top-5 md:px-4 md:text-sm">
           {activeIndex + 1} / {safeImages.length}
         </div>
 
@@ -52,32 +53,34 @@ export default function PropertyGallery({
             <button
               type="button"
               onClick={prevImage}
-              className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/60 text-2xl text-white backdrop-blur transition hover:border-[#b89652]/60 hover:bg-[#b89652] md:left-5 md:h-12 md:w-12"
+              className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#b89652]/40 bg-black/60 text-[#d8ba68] shadow-[0_0_25px_rgba(184,150,82,0.16)] backdrop-blur transition-all duration-300 hover:scale-105 hover:border-[#d4af37] hover:bg-[#b89652]/20 hover:text-[#f1d787] hover:shadow-[0_0_35px_rgba(212,175,55,0.32)] focus:outline-none focus:ring-2 focus:ring-[#b89652] md:left-5 md:h-11 md:w-11"
+              aria-label="Попереднє фото"
             >
-              ‹
+              <ChevronLeftIcon />
             </button>
 
             <button
               type="button"
               onClick={nextImage}
-              className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/60 text-2xl text-white backdrop-blur transition hover:border-[#b89652]/60 hover:bg-[#b89652] md:right-5 md:h-12 md:w-12"
+              className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#b89652]/40 bg-black/60 text-[#d8ba68] shadow-[0_0_25px_rgba(184,150,82,0.16)] backdrop-blur transition-all duration-300 hover:scale-105 hover:border-[#d4af37] hover:bg-[#b89652]/20 hover:text-[#f1d787] hover:shadow-[0_0_35px_rgba(212,175,55,0.32)] focus:outline-none focus:ring-2 focus:ring-[#b89652] md:right-5 md:h-11 md:w-11"
+              aria-label="Наступне фото"
             >
-              ›
+              <ChevronRightIcon />
             </button>
           </>
         )}
       </div>
 
       {safeImages.length > 1 && (
-        <div className="mt-4 flex gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-5 md:overflow-visible md:pb-0">
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-2 md:grid md:grid-cols-5 md:overflow-visible md:pb-0">
           {safeImages.map((image, index) => (
             <button
               key={`${image}-${index}`}
               type="button"
               onClick={() => setActiveIndex(index)}
-              className={`w-24 shrink-0 overflow-hidden rounded-2xl border transition md:w-auto ${
+              className={`w-20 shrink-0 overflow-hidden rounded-xl border transition md:w-auto md:rounded-2xl ${
                 activeIndex === index
-                  ? "border-[#b89652] opacity-100"
+                  ? "border-[#b89652] opacity-100 shadow-[0_0_18px_rgba(184,150,82,0.24)]"
                   : "border-white/10 opacity-55 hover:border-[#b89652]/40 hover:opacity-100"
               }`}
             >
@@ -88,7 +91,7 @@ export default function PropertyGallery({
                 height={130}
                 sizes="20vw"
                 unoptimized
-                className="h-20 w-full object-cover md:h-24"
+                className="h-16 w-full object-cover md:h-20"
               />
             </button>
           ))}

@@ -15,6 +15,7 @@ type MapProperty = {
   priceTotal: string;
   pricePerMeter: string;
   area: string;
+  address?: string | null;
   image: string;
   lat: number | null;
   lng: number | null;

@@ -1,12 +1,19 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import Image from "next/image";
 import Link from "next/link";
 import L from "leaflet";
 import { useRef, useState } from "react";
 import { propertyTypeFilters } from "@/lib/propertyCategories";
+import { getRouteUrl } from "@/lib/getRouteUrl";
 import { getPropertySlug } from "@/lib/getPropertySlug";
+import {
+  CloseIcon,
+  DetailsIcon,
+  ExpandIcon,
+  RouteIcon,
+} from "@/components/PremiumIcons";
 
 const customIcon = L.divIcon({
   className: "",
@@ -33,6 +40,7 @@ type MapProperty = {
   priceTotal: string;
   pricePerMeter: string;
   area: string;
+  address?: string | null;
   image: string;
   lat: number | null;
   lng: number | null;
@@ -45,6 +53,16 @@ type MappableProperty = MapProperty & {
 
 function PropertyMarker({ property }: { property: MappableProperty }) {
   const markerRef = useRef<L.Marker | null>(null);
+  const routeUrl = getRouteUrl({
+    lat: property.lat,
+    lng: property.lng,
+    address: property.address,
+  });
+  const propertyUrl = `/objects/${getPropertySlug(property)}`;
+  const mainPrice =
+    property.dealType === "Оренда"
+      ? property.pricePerMeter
+      : property.priceTotal;
 
   return (
     <Marker
@@ -55,62 +73,90 @@ function PropertyMarker({ property }: { property: MappableProperty }) {
         mouseover: () => markerRef.current?.openPopup(),
       }}
     >
-      <Popup closeButton={false}>
-        <div className="w-[min(230px,calc(100vw-64px))] font-sans">
-          <Image
-            src={property.image}
-            alt={property.title}
-            width={230}
-            height={112}
-            sizes="230px"
-            unoptimized
-            className="mb-3 h-28 w-full rounded-xl object-cover"
-          />
+      <Popup
+        closeButton={false}
+        className="orenda-map-popup"
+        maxWidth={320}
+        minWidth={0}
+        autoPanPadding={[16, 16]}
+        keepInView
+      >
+        <div className="group w-[min(320px,calc(100vw-32px))] max-w-[calc(100vw-32px)] overflow-hidden rounded-3xl border border-[#b89652]/35 bg-[#0c0c0c] p-2 font-sans text-white shadow-[0_20px_60px_rgba(0,0,0,0.55)] backdrop-blur-2xl transition-all duration-300 hover:border-[#d4af37]/50 hover:shadow-[0_0_34px_rgba(184,150,82,0.26),0_24px_70px_rgba(0,0,0,0.58)]">
+          <div className="relative overflow-hidden rounded-[1.15rem]">
+            <Image
+              src={property.image}
+              alt={property.title}
+              width={320}
+              height={160}
+              sizes="320px"
+              unoptimized
+              className="h-[136px] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] min-[390px]:h-[150px] sm:h-40"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/5" />
+            <div className="absolute left-2 top-2 flex max-w-[calc(100%-1rem)] flex-wrap gap-1.5">
+              <span className="rounded-full border border-[#b89652]/45 bg-black/55 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#d8ba68] shadow-[0_8px_26px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+                {property.dealType}
+              </span>
+              <span className="rounded-full border border-[#b89652]/25 bg-black/55 px-2.5 py-1 text-[10px] font-semibold text-white/90 shadow-[0_8px_26px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+                {property.type}
+              </span>
+            </div>
+            <span className="absolute bottom-2 left-2 rounded-full border border-[#b89652]/40 bg-black/60 px-2.5 py-1 text-[10px] font-bold uppercase text-[#d8ba68] shadow-[0_8px_26px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+              {property.area}
+            </span>
+          </div>
 
-          <p className="mb-1 text-xs uppercase tracking-[0.2em] text-black/40">
-            {property.type}
-          </p>
+          <div className="space-y-1.5 px-1.5 py-2.5">
+            <h3 className="line-clamp-1 break-words text-base font-black leading-tight text-white">
+              {property.title}
+            </h3>
 
-          <h3 className="break-words text-base font-semibold text-black">
-            {property.title}
-          </h3>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-4">
+              <span className="line-clamp-1 max-w-full break-words text-white/62">
+                <span className="text-[#d8ba68]">📍</span>{" "}
+                {property.address || "Житомир"}
+              </span>
+              <span className="font-black text-[#d8ba68]">
+                <span className="text-[#d8ba68]">₴</span> {mainPrice}
+              </span>
+            </div>
+          </div>
 
-          <p className="mt-1 text-sm text-black/60">{property.area}</p>
+          <div className="grid gap-2 px-1 pb-1 min-[360px]:grid-cols-2">
+            {routeUrl && (
+              <a
+                href={routeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-xl border border-[#b89652]/45 bg-black/45 px-2.5 py-2 text-[11px] font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-all duration-300 hover:border-[#d4af37] hover:bg-[#b89652]/14 hover:text-[#d8ba68] hover:shadow-[0_0_24px_rgba(212,175,55,0.24)] focus:outline-none focus:ring-2 focus:ring-[#b89652]/60 [&>svg]:h-4 [&>svg]:w-4 [&>svg]:text-[#d8ba68]"
+              >
+                <RouteIcon />
+                <span className="truncate">Маршрут</span>
+              </a>
+            )}
 
-          <p className="mt-2 break-words text-lg font-bold text-black">
-            {property.dealType === "Оренда"
-            ? property.pricePerMeter
-            : property.priceTotal}
-            
-          </p>
-          <p className="mt-1 text-sm text-black/50">
-            {property.dealType === "Оренда"
-              ? property.priceTotal
-              : property.pricePerMeter}
-          </p>
-
-          <Link
-            href={`/objects/${getPropertySlug(property)}`}
-            className="mt-4 inline-block rounded-full bg-black px-4 py-2 text-sm text-white"
-          >
-            Детальніше
-          </Link>
+            <Link
+              href={propertyUrl}
+              className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-xl border border-[#b89652]/45 bg-black/45 px-2.5 py-2 text-[11px] font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-all duration-300 hover:border-[#d4af37] hover:bg-[#b89652]/14 hover:text-[#d8ba68] hover:shadow-[0_0_24px_rgba(212,175,55,0.24)] focus:outline-none focus:ring-2 focus:ring-[#b89652]/60 [&>svg]:h-4 [&>svg]:w-4 [&>svg]:text-[#d8ba68]"
+            >
+              <DetailsIcon />
+              Детальніше
+            </Link>
+          </div>
         </div>
       </Popup>
     </Marker>
   );
 }
 
-export default function Map({
-  properties,
-}: {
-  properties: MapProperty[];
-}) {
-  const [activeFilter, setActiveFilter] = useState("Всі");
+export default function Map({ properties }: { properties: MapProperty[] }) {
+  const [activeFilter, setActiveFilter] = useState<
+    (typeof propertyTypeFilters)[number]
+  >(propertyTypeFilters[0]);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const filteredProperties =
-    activeFilter === "Всі"
+    activeFilter === propertyTypeFilters[0]
       ? properties
       : properties.filter((property) => property.type === activeFilter);
 
@@ -129,14 +175,15 @@ export default function Map({
     >
       <div className="mb-4 flex items-center justify-between gap-3">
         <p className="text-sm text-white/50 md:hidden">
-          Натисніть на мітку, щоб відкрити об’єкт.
+          Натисніть на мітку, щоб відкрити обʼєкт.
         </p>
 
         <button
           type="button"
           onClick={() => setIsExpanded((current) => !current)}
-          className="ml-auto rounded-xl border border-[#b89652]/50 px-4 py-3 text-sm font-medium text-[#b89652] transition hover:bg-[#b89652] hover:text-black md:hidden"
+          className="ml-auto inline-flex items-center justify-center gap-2 rounded-xl border border-[#b89652]/45 bg-[#b89652]/10 px-4 py-3 text-sm font-semibold text-white shadow-[0_0_20px_rgba(184,150,82,0.14)] transition-all duration-300 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_28px_rgba(212,175,55,0.28)] focus:outline-none focus:ring-2 focus:ring-[#b89652] md:hidden [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
         >
+          {isExpanded ? <CloseIcon /> : <ExpandIcon />}
           {isExpanded ? "Закрити карту" : "На весь екран"}
         </button>
       </div>
@@ -145,11 +192,12 @@ export default function Map({
         {propertyTypeFilters.map((filter) => (
           <button
             key={filter}
+            type="button"
             onClick={() => setActiveFilter(filter)}
-            className={`shrink-0 rounded-full px-4 py-3 text-sm transition md:px-5 md:py-2 ${
+            className={`shrink-0 rounded-full border px-4 py-3 text-sm font-semibold transition-all duration-300 md:px-5 md:py-2 ${
               activeFilter === filter
-                ? "bg-[#b89652] text-white"
-                : "border border-white/15 text-white/60 hover:bg-white hover:text-black"
+                ? "border-[#d4af37] bg-[#b89652] text-black shadow-[0_0_24px_rgba(212,175,55,0.28)]"
+                : "border-[#b89652]/30 bg-black/30 text-white/70 hover:border-[#d4af37] hover:bg-[#b89652]/15 hover:text-[#d8ba68]"
             }`}
           >
             {filter}

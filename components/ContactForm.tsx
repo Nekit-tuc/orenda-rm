@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SendIcon } from "@/components/PremiumIcons";
 
 type ContactFormProps = {
   propertyTitle: string;
@@ -26,7 +27,7 @@ ID: ${propertyId}
 Телефон: ${phone}`;
 
     window.open(
-      `https://t.me/zt_space?text=${encodeURIComponent(message)}`,
+      `https://t.me/orenda_rm?text=${encodeURIComponent(message)}`,
       "_blank"
     );
   }
@@ -34,13 +35,13 @@ ID: ${propertyId}
   return (
     <form
       onSubmit={submitForm}
-      className="mt-10 rounded-[2rem] border border-[#b89652]/20 bg-[#070707] p-6"
+      className="mt-6 rounded-2xl border border-[#b89652]/20 bg-[#070707] p-4 md:p-5"
     >
-      <p className="text-sm uppercase tracking-[0.25em] text-[#b89652]">
+      <p className="text-[11px] uppercase tracking-[0.22em] text-[#b89652]">
         Заявка
       </p>
 
-      <h3 className="mt-3 text-2xl font-bold">
+      <h3 className="mt-2 text-lg font-extrabold md:text-xl">
         Залишити заявку на дзвінок
       </h3>
 
@@ -49,7 +50,7 @@ ID: ${propertyId}
         placeholder="Ваше ім’я"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="mt-6 w-full rounded-xl border border-white/10 bg-black px-5 py-4 outline-none placeholder:text-white/30 focus:border-[#b89652]/60"
+        className="mt-4 w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none placeholder:text-white/30 focus:border-[#b89652]/60"
       />
 
       <input
@@ -57,10 +58,11 @@ ID: ${propertyId}
         placeholder="Телефон"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
-        className="mt-4 w-full rounded-xl border border-white/10 bg-black px-5 py-4 outline-none placeholder:text-white/30 focus:border-[#b89652]/60"
+        className="mt-3 w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none placeholder:text-white/30 focus:border-[#b89652]/60"
       />
 
-      <button className="mt-5 w-full rounded-xl bg-[#b89652] px-6 py-4 font-medium text-white transition hover:opacity-80">
+      <button className="mt-4 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#b89652]/45 bg-[#b89652]/10 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_0_22px_rgba(184,150,82,0.14)] backdrop-blur transition-all duration-300 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_28px_rgba(212,175,55,0.26)] focus:outline-none focus:ring-2 focus:ring-[#b89652] [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black">
+        <SendIcon />
         Відправити заявку
       </button>
     </form>

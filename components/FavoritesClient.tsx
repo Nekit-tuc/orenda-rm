@@ -4,6 +4,7 @@ import Link from "next/link";
 import PropertyCard from "@/components/PropertyCard";
 import { useFavoriteIds } from "@/lib/favorites";
 import type { FormattedProperty } from "@/types/property";
+import { ObjectsIcon } from "@/components/PremiumIcons";
 
 type FavoritesClientProps = {
   properties: FormattedProperty[];
@@ -59,8 +60,9 @@ export default function FavoritesClient({ properties }: FavoritesClientProps) {
 
           <Link
             href="/#objects"
-            className="mt-6 inline-block rounded-full bg-[#b89652] px-6 py-3 font-medium text-white px-6 py-3 font-medium text-black transition hover:opacity-80"
+            className="mt-6 inline-flex items-center justify-center gap-2 rounded-full border border-[#b89652]/45 bg-[#b89652]/10 px-6 py-3 font-semibold text-white shadow-[0_0_25px_rgba(184,150,82,0.16)] transition-all duration-300 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_32px_rgba(212,175,55,0.3)] focus:outline-none focus:ring-2 focus:ring-[#b89652] [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
           >
+            <ObjectsIcon />
             Перейти до об’єктів
           </Link>
         </div>

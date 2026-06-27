@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getPropertySlug } from "@/lib/getPropertySlug";
+import { formatArea } from "@/lib/formatArea";
 import type { Property } from "@/types/property";
 
 type AdminObjectsTableProps = {
@@ -17,6 +18,37 @@ type AdminObjectsTableProps = {
 
 const statusOptions = ["Активний", "Чернетка", "Здано"];
 
+function AdminIcon({ type }: { type: "edit" | "open" | "copy" | "delete" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="h-4 w-4 fill-none stroke-current stroke-[1.8] [stroke-linecap:round] [stroke-linejoin:round]"
+    >
+      {type === "edit" && (
+        <>
+          <path d="M4 20h4l10.5-10.5-4-4L4 16v4Z" />
+          <path d="m13.5 6.5 4 4M15 5l1.3-1.3a1.7 1.7 0 0 1 2.4 0l1.6 1.6a1.7 1.7 0 0 1 0 2.4L19 9" />
+        </>
+      )}
+      {type === "open" && (
+        <>
+          <path d="M14 4h6v6M20 4l-9 9" />
+          <path d="M20 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4" />
+        </>
+      )}
+      {type === "copy" && (
+        <>
+          <rect x="8" y="8" width="11" height="11" rx="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1" />
+        </>
+      )}
+      {type === "delete" && (
+        <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+      )}
+    </svg>
+  );
+}
 function ActionButtons({
   property,
   onEdit,
@@ -41,7 +73,7 @@ function ActionButtons({
         onClick={() => onEdit(property)}
         className={buttonClass}
       >
-        ✎
+        <AdminIcon type="edit" />
       </button>
 
       <a
@@ -52,7 +84,7 @@ function ActionButtons({
         aria-label="Відкрити"
         className={buttonClass}
       >
-        ↗
+        <AdminIcon type="open" />
       </a>
 
       <button
@@ -62,7 +94,7 @@ function ActionButtons({
         onClick={() => onCopy(property)}
         className={buttonClass}
       >
-        ⧉
+        <AdminIcon type="copy" />
       </button>
 
       <button
@@ -72,7 +104,7 @@ function ActionButtons({
         onClick={() => onDelete(property.id)}
         className="grid h-10 w-10 place-items-center rounded-xl border border-red-400/30 bg-red-500/10 text-sm text-red-200 transition hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-300"
       >
-        ×
+        <AdminIcon type="delete" />
       </button>
     </div>
   );
@@ -220,7 +252,7 @@ export default function AdminObjectsTable({
                 </td>
 
                 <td className="px-5 py-4 text-sm text-slate-300">
-                  <p className="break-words">{property.area}</p>
+                  <p className="break-words">{formatArea(property.area)}</p>
                 </td>
 
                 <td className="px-5 py-4">
@@ -282,7 +314,7 @@ export default function AdminObjectsTable({
                 <div className="rounded-2xl border border-white/10 bg-[#030712]/70 p-3">
                   <p className="text-xs text-slate-500">Площа</p>
                   <p className="mt-1 break-words text-sm font-semibold text-white">
-                    {property.area}
+                    {formatArea(property.area)}
                   </p>
                 </div>
 

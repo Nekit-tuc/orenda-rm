@@ -48,3 +48,51 @@ body {
   max-width: 100%;
   overflow-x: clip;
 }
+
+.orenda-map-popup.leaflet-popup {
+  max-width: calc(100vw - 32px) !important;
+  animation: orenda-popup-in 250ms ease-out both;
+}
+
+.orenda-map-popup .leaflet-popup-content-wrapper {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.orenda-map-popup .leaflet-popup-content {
+  margin: 0 !important;
+  max-width: calc(100vw - 32px) !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+
+.orenda-map-popup .leaflet-popup-tip-container,
+.orenda-map-popup .leaflet-popup-tip {
+  display: none !important;
+}
+
+@media (max-width: 430px) {
+  .orenda-map-popup.leaflet-popup {
+    max-width: calc(100vw - 32px) !important;
+  }
+
+  .orenda-map-popup .leaflet-popup-content-wrapper {
+    max-height: 330px;
+    overflow: hidden;
+  }
+}
+
+@keyframes orenda-popup-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
