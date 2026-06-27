@@ -28,6 +28,13 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+a,
+button,
+input,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
 html {
   scroll-behavior: smooth;
 }

@@ -8,6 +8,15 @@ import Header from "@/components/Header";
 
 export const dynamic = "force-dynamic";
 
+const quickCategories = [
+  { icon: "▦", title: "Офіси" },
+  { icon: "▤", title: "Склади" },
+  { icon: "⌂", title: "Квартири" },
+  { icon: "▱", title: "Комерція" },
+  { icon: "◌", title: "Оренда" },
+  { icon: "◇", title: "Продаж" },
+];
+
 const benefits = [
   {
     icon: "▥",
@@ -46,76 +55,73 @@ export default async function Home() {
 
       <Header />
 
-      <section className="relative border-b border-white/10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_58%_45%,rgba(184,150,82,0.18),transparent_32%),linear-gradient(90deg,#020202_0%,rgba(2,2,2,0.9)_34%,rgba(2,2,2,0.42)_58%,#020202_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#020202] to-transparent" />
+      <section className="relative overflow-hidden border-b border-white/10">
+        <Image
+          src="/hero-building.png"
+          alt="Сучасний будинок Orenda RM"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[61%_center] opacity-45 md:object-contain md:object-right md:opacity-70"
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_76%_34%,rgba(184,150,82,0.2),transparent_28%),linear-gradient(90deg,#020202_0%,rgba(2,2,2,0.86)_40%,rgba(2,2,2,0.42)_68%,#020202_100%)]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#020202] via-transparent to-black/30" />
 
-        <div className="relative mx-auto grid min-h-[calc(100svh-92px)] w-full max-w-7xl gap-8 px-4 py-10 sm:px-6 md:min-h-[700px] md:py-12 lg:grid-cols-[1fr_390px] lg:items-center lg:py-6">
-          <div className="relative z-10 max-w-3xl pt-4 lg:pt-0">
-            <p className="mb-5 text-xs uppercase tracking-[0.36em] text-[#c9a85a] sm:text-sm">
+        <div className="relative mx-auto grid min-h-[calc(100svh-76px)] w-full max-w-7xl gap-5 px-4 py-7 sm:px-6 sm:py-9 md:min-h-[660px] md:gap-8 md:py-12 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-center lg:py-10 xl:grid-cols-[minmax(0,1fr)_390px]">
+          <div className="relative z-10 max-w-3xl">
+            <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-[#c9a85a] sm:text-[11px] sm:tracking-[0.32em]">
               Orenda RM • Житомир
             </p>
 
-            <h1 className="max-w-2xl text-[clamp(2.25rem,6.4vw,4.75rem)] font-black leading-[1.02] tracking-[-0.025em] text-white">
+            <h1 className="max-w-[570px] text-[clamp(2.05rem,9.6vw,2.55rem)] font-extrabold uppercase leading-[1.1] tracking-[-0.01em] text-white md:text-[clamp(2.85rem,4.9vw,4.15rem)]">
               {homepageSettings.heroTitle}
             </h1>
 
-            <p className="mt-5 max-w-lg text-sm leading-7 text-white/70 sm:text-base sm:leading-8">
+            <p className="mt-4 max-w-[480px] text-sm leading-6 text-white/72 sm:text-[15px] md:mt-5 md:text-base md:leading-7">
               {homepageSettings.heroSubtitle}
             </p>
 
-            <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap">
+            <div className="mt-5 grid gap-2.5 sm:flex sm:flex-wrap md:mt-7">
               <a
                 href={homepageSettings.heroButtonUrl}
-                className="rounded-xl bg-[#caa854] px-6 py-4 text-center text-sm font-bold text-white shadow-[0_18px_48px_rgba(202,168,84,0.28)] transition hover:bg-[#d8ba68] focus:outline-none focus:ring-2 focus:ring-[#d8ba68]"
+                className="rounded-2xl bg-[#caa854] px-5 py-2.5 text-center text-[13px] font-bold text-white shadow-[0_18px_48px_rgba(202,168,84,0.28)] transition hover:-translate-y-0.5 hover:bg-[#d8ba68] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] md:px-7 md:py-3.5 md:text-sm"
               >
                 Дивитись обʼєкти
               </a>
 
               <a
                 href="#contacts"
-                className="rounded-xl border border-white/18 bg-black/30 px-6 py-4 text-center text-sm font-bold text-white transition hover:border-[#caa854] hover:text-[#d8ba68] focus:outline-none focus:ring-2 focus:ring-[#d8ba68]"
+                className="rounded-2xl border border-white/25 bg-black/35 px-5 py-2.5 text-center text-[13px] font-bold text-white backdrop-blur transition hover:-translate-y-0.5 hover:border-[#caa854] hover:text-[#d8ba68] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] md:px-7 md:py-3.5 md:text-sm"
               >
-                Звʼязатися
+                Звʼязатись
               </a>
             </div>
           </div>
 
-          <div className="pointer-events-none absolute inset-x-[-18%] bottom-[5%] top-[20%] sm:inset-x-[-8%] sm:bottom-[3%] sm:top-[12%] lg:left-[29%] lg:right-[22%] lg:bottom-[7%] lg:top-[8%]">
-            <Image
-              src="/hero-building.png"
-              alt="Сучасний будинок Orenda RM"
-              fill
-              priority
-              sizes="(min-width: 1024px) 720px, 100vw"
-              className="object-contain object-bottom opacity-70 drop-shadow-[0_0_58px_rgba(202,168,84,0.18)] lg:opacity-78"
-            />
-          </div>
-
-          <div className="relative z-10 mt-4 rounded-[1.25rem] border border-white/12 bg-[#101010]/78 p-3 shadow-[0_28px_90px_rgba(0,0,0,0.55)] backdrop-blur-2xl sm:mt-6 sm:p-5 lg:mt-0 lg:rounded-[1.75rem] lg:p-6">
-            <p className="text-[10px] uppercase tracking-[0.26em] text-[#c9a85a] sm:text-[11px] sm:tracking-[0.32em]">
+          <div className="relative z-10 rounded-[1.35rem] border border-white/12 bg-[#101010]/70 p-3 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl md:p-4 lg:rounded-[1.75rem] lg:p-5">
+            <p className="text-[10px] uppercase tracking-[0.24em] text-[#c9a85a] sm:tracking-[0.32em]">
               Premium real objects
             </p>
 
-            <div className="mt-3 grid gap-2 sm:mt-5 sm:gap-3">
-              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3 sm:rounded-2xl sm:p-4">
-                <p className="text-[11px] text-white/42 sm:text-xs">Обʼєкти</p>
-                <p className="mt-1 text-2xl font-black text-[#c9a85a] sm:mt-2 sm:text-3xl">
+            <div className="mt-3 grid grid-cols-3 gap-2 lg:grid-cols-1 lg:gap-3">
+              <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.045] p-3 lg:rounded-2xl lg:p-4">
+                <p className="text-[10px] text-white/45 sm:text-xs">Обʼєкти</p>
+                <p className="mt-1 text-lg font-extrabold text-[#c9a85a] sm:text-xl lg:text-2xl">
                   {properties.length}
                 </p>
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3 sm:rounded-2xl sm:p-4">
-                <p className="text-[11px] text-white/42 sm:text-xs">Напрямок</p>
-                <p className="mt-1 text-base font-black sm:mt-2 sm:text-xl">
+              <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.045] p-3 lg:rounded-2xl lg:p-4">
+                <p className="text-[10px] text-white/45 sm:text-xs">Напрямок</p>
+                <p className="mt-1 text-xs font-extrabold leading-tight sm:text-sm lg:text-lg">
                   Оренда / Продаж
                 </p>
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3 sm:rounded-2xl sm:p-4">
-                <p className="text-[11px] text-white/42 sm:text-xs">Регіон</p>
-                <p className="mt-1 text-base font-black leading-tight sm:mt-2 sm:text-xl">
-                  Житомир та Житомирська область
+              <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.045] p-3 lg:rounded-2xl lg:p-4">
+                <p className="text-[10px] text-white/45 sm:text-xs">Регіон</p>
+                <p className="mt-1 text-xs font-extrabold leading-tight sm:text-sm lg:text-lg">
+                  Житомир та область
                 </p>
               </div>
             </div>
@@ -123,11 +129,71 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 md:py-12">
-        <div className="mb-6">
-          <div className="flex flex-wrap items-center gap-4">
-            <h2 className="text-2xl font-black">Новини ринку нерухомості</h2>
+      <section className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 md:py-12">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.28em] text-[#b89652]">
+              Швидкий пошук
+            </p>
+            <h2 className="mt-2 text-xl font-extrabold sm:text-2xl md:text-3xl">
+              Популярні <span className="text-[#b89652]">категорії</span>
+            </h2>
           </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 lg:gap-4">
+          {quickCategories.map((category) => (
+            <a
+              key={category.title}
+              href="#objects"
+              className="group rounded-2xl border border-white/10 bg-[linear-gradient(145deg,rgba(255,255,255,0.075),rgba(255,255,255,0.025))] p-3.5 text-center shadow-[inset_0_-28px_44px_rgba(184,150,82,0.06)] transition hover:-translate-y-1 hover:border-[#b89652]/55 focus:outline-none focus:ring-2 focus:ring-[#b89652] sm:p-5 md:rounded-3xl md:p-6"
+            >
+              <span className="mx-auto grid h-10 w-10 place-items-center rounded-2xl bg-[#b89652]/12 text-xl text-[#d8ba68] transition group-hover:bg-[#b89652]/20 sm:h-12 sm:w-12 sm:text-2xl">
+                {category.icon}
+              </span>
+              <span className="mt-2.5 block text-sm font-bold sm:text-base">
+                {category.title}
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="relative mx-auto max-w-7xl px-4 pb-10 sm:px-6 md:pb-14">
+        <div className="overflow-hidden rounded-3xl border border-[#b89652]/30 bg-[radial-gradient(circle_at_80%_35%,rgba(184,150,82,0.22),transparent_28%),linear-gradient(135deg,rgba(184,150,82,0.16),rgba(255,255,255,0.035))] p-5 shadow-[0_26px_90px_rgba(0,0,0,0.32)] sm:p-6 md:p-8">
+          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
+              <h2 className="text-xl font-extrabold sm:text-2xl md:text-3xl">
+                Не знайшли <span className="text-[#d8ba68]">потрібний варіант?</span>
+              </h2>
+              <p className="mt-2.5 max-w-2xl text-sm leading-6 text-white/68 sm:text-[15px]">
+                Не знайшли потрібний варіант? Напишіть нам — підберемо приміщення під ваш бюджет і задачу.
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:flex md:justify-end">
+              <a
+                href="https://t.me/zt_space"
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-2xl bg-[#caa854] px-5 py-2.5 text-center text-[13px] font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#d8ba68] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] sm:text-sm"
+              >
+                Написати в Telegram
+              </a>
+              <a
+                href="#objects"
+                className="rounded-2xl border border-white/25 bg-black/25 px-5 py-2.5 text-center text-[13px] font-bold text-white transition hover:-translate-y-0.5 hover:border-[#caa854] hover:text-[#d8ba68] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] sm:text-sm"
+              >
+                Переглянути обʼєкти
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 md:py-12">
+        <div className="mb-6">
+          <h2 className="text-xl font-extrabold sm:text-2xl">Новини ринку нерухомості</h2>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

@@ -1,76 +1,33 @@
-import Image from "next/image";
 import Link from "next/link";
+import { FooterSocialLinks } from "./SocialLinks";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-[#050505]">
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 md:grid-cols-[1.2fr_1fr_1fr]">
-        <div>
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/logo_v1.png"
-              alt="Orenda RM"
-              width={80}
-              height={80}
-              className="rounded-full shadow-[0_0_30px_rgba(184,150,82,0.25)]"
-            />
+    <footer className="relative overflow-hidden border-t border-white/10 bg-[#030303]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_18%,rgba(184,150,82,0.18),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent_42%)]" />
 
-            <div>
-              <p className="text-2xl font-bold text-[#b89652]">Orenda RM</p>
-              <p className="text-xs uppercase tracking-[0.18em] text-white/40">
-                Нерухомість Житомира
-              </p>
-            </div>
+      <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-9 sm:px-6 md:grid-cols-[1fr_auto] md:items-center md:py-12">
+        <div className="text-center md:text-left">
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center text-2xl font-extrabold tracking-tight text-[#d4af37] transition hover:text-[#e2c56d] md:text-3xl"
+          >
+            Orenda RM
           </Link>
 
-          <p className="mt-5 max-w-md text-sm leading-6 text-white/50">
-            Каталог оренди та продажу нерухомості у Житомирі: комерційні
-            приміщення, офіси, склади, квартири та об’єкти для бізнесу.
+          <p className="mt-3 max-w-md text-sm leading-6 text-white/58 md:text-base">
+            Нерухомість Житомира та області.
           </p>
         </div>
 
-        <div>
-          <h4 className="mb-4 text-sm uppercase tracking-[0.25em] text-[#b89652]">
-            Навігація
-          </h4>
+        <div className="text-center md:text-right">
+          <FooterSocialLinks />
 
-          <div className="flex flex-col gap-3 text-sm text-white/60">
-            <Link href="/" className="transition hover:text-[#b89652]">
-              Головна
-            </Link>
-            <Link href="/#objects" className="transition hover:text-[#b89652]">
-              Об’єкти
-            </Link>
-            <Link href="/favorites" className="transition hover:text-[#b89652]">
-              Обране
-            </Link>
-            <Link href="/#map" className="transition hover:text-[#b89652]">
-              Карта
-            </Link>
+          <div className="mt-5 text-xs leading-6 text-white/42 sm:text-sm">
+            <p>© 2026 Orenda RM</p>
+            <p>Всі права захищені.</p>
           </div>
         </div>
-
-        <div>
-          <h4 className="mb-4 text-sm uppercase tracking-[0.25em] text-[#b89652]">
-            Контакти
-          </h4>
-
-          <div className="flex flex-col gap-3 text-sm text-white/60">
-            <a
-              href="https://t.me/zt_space"
-              target="_blank"
-              className="transition hover:text-[#b89652]"
-            >
-              Telegram
-            </a>
-
-            <p>Житомир, Україна</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="border-t border-white/10 px-6 py-5 text-center text-xs text-white/35">
-        © {new Date().getFullYear()} Orenda RM. Всі права захищено.
       </div>
     </footer>
   );

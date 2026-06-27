@@ -46,14 +46,14 @@ export default function PropertiesSection({
   });
 
   return (
-    <section id="objects" className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 md:pb-24">
+    <section id="objects" className="mx-auto max-w-7xl scroll-mt-24 px-4 pb-16 sm:px-6 md:pb-24">
       <div className="mb-8">
         <div className="mb-8">
-          <p className="text-xs uppercase tracking-[0.24em] text-[#b89652] sm:text-sm sm:tracking-[0.3em]">
+          <p className="text-[11px] uppercase tracking-[0.22em] text-[#b89652] sm:text-xs sm:tracking-[0.28em]">
             {sectionSubtitle}
           </p>
 
-          <h3 className="mt-3 text-3xl font-bold md:text-4xl">
+          <h3 className="mt-2.5 text-2xl font-extrabold md:text-3xl">
             {sectionTitle}
           </h3>
         </div>
