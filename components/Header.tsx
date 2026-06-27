@@ -37,8 +37,8 @@ export default function Header() {
               height={110}
               className={`object-contain transition-all duration-300 ${
                 scrolled
-                  ? "h-9 w-14 md:h-12 md:w-16"
-                  : "h-10 w-16 md:h-16 md:w-24"
+                  ? "h-11 w-[4.25rem] md:h-12 md:w-16"
+                  : "h-12 w-[4.75rem] md:h-16 md:w-24"
               }`}
               priority
             />

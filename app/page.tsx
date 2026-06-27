@@ -173,7 +173,7 @@ export default async function Home() {
 
             <div className="grid gap-3 sm:flex md:justify-end">
               <a
-                href="https://t.me/zt_space"
+                href="https://t.me/orenda_rm"
                 target="_blank"
                 rel="noreferrer"
                 className="rounded-2xl bg-[#caa854] px-5 py-2.5 text-center text-[13px] font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#d8ba68] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] sm:text-sm"

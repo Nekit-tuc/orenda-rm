@@ -4,13 +4,12 @@ import PropertyGallery from "@/components/PropertyGallery";
 import PropertyFeatures from "@/components/PropertyFeatures";
 import { formatProperty } from "@/lib/formatProperty";
 import ViewCounter from "@/components/ViewCounter";
-import Image from "next/image";
-import FavoritesNav from "@/components/FavoritesNav";
 import ContactForm from "@/components/ContactForm";
 import { getRouteUrl } from "@/lib/getRouteUrl";
 import { getPropertyBySlugOrId } from "@/lib/getPropertyBySlugOrId";
 import SharePropertyButton from "@/components/SharePropertyButton";
 import { getPropertySlug } from "@/lib/getPropertySlug";
+import Header from "@/components/Header";
 
 const baseUrl = "https://orenda-rm.vercel.app";
 
@@ -94,35 +93,7 @@ const baseUrl = "https://orenda-rm.vercel.app";
         propertyId={property.id}
         currentViews={property.views}
       />
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 md:px-6 md:py-5">
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/logo_v1.png"
-              alt="Orenda RM"
-              width={110}
-              height={110}
-              className="h-14 w-14 rounded-full md:h-24 md:w-24"
-              priority
-            />
-
-
-          </Link>
-
-          <div className="flex items-center gap-2 md:gap-3">
-
-          <FavoritesNav />
-
-            <a
-              href="https://t.me/zt_space"
-              target="_blank"
-              className="rounded-full border border-white/20 px-4 py-2 text-sm transition hover:bg-white hover:text-black md:px-5"
-            >
-              Telegram
-            </a>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 md:py-16">
         <div className="grid gap-10 lg:grid-cols-2">
