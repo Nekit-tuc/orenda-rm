@@ -21,7 +21,6 @@ import {
   getHomepageSettings,
   type HomepageSettings,
   type RealEstateBlockSettings,
-  updateHomepageSettings,
 } from "@/lib/homepageSettings";
 
 type AdminSection = "overview" | "objects" | "homepage" | "blocks" | "leads" | "submissions";
@@ -92,6 +91,25 @@ export default function AdminPage() {
   const [submissionsLoading, setSubmissionsLoading] = useState(false);
   const [submissionsError, setSubmissionsError] = useState("");
   const [selectedSubmission, setSelectedSubmission] = useState<PropertySubmission | null>(null);
+
+  async function saveHomepageSettingsFromAdmin() {
+    const response = await fetch("/api/admin/homepage-settings", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(homepageContent),
+    });
+
+    const result = (await response.json().catch(() => null)) as {
+      ok?: boolean;
+      message?: string;
+    } | null;
+
+    if (!response.ok || !result?.ok) {
+      throw new Error(result?.message || "Помилка при збереженні.");
+    }
+  }
 
   const [formData, setFormData] = useState({
     title: "",
@@ -800,18 +818,18 @@ export default function AdminPage() {
       setHomepageSaving(true);
       setHomepageMessage("");
 
-      const { error } = await updateHomepageSettings(homepageContent);
-
-      setHomepageSaving(false);
-
-      if (error) {
-        console.error(error);
+      try {
+        await saveHomepageSettingsFromAdmin();
+      } catch (error) {
+        console.error("Homepage content save error:", error);
         setHomepageMessage(
-          "Помилка при збереженні. Перевірте таблицю homepage_settings у Supabase."
+          error instanceof Error ? error.message : "Помилка при збереженні."
         );
+        setHomepageSaving(false);
         return;
       }
 
+      setHomepageSaving(false);
       setHomepageMessage("Контент головної сторінки оновлено");
     }
 
@@ -820,18 +838,18 @@ export default function AdminPage() {
       setBlocksSaving(true);
       setBlocksMessage("");
 
-      const { error } = await updateHomepageSettings(homepageContent);
-
-      setBlocksSaving(false);
-
-      if (error) {
-        console.error(error);
+      try {
+        await saveHomepageSettingsFromAdmin();
+      } catch (error) {
+        console.error("Block settings save error:", error);
         setBlocksMessage(
-          "Помилка при збереженні. Перевірте поле show_quick_search у таблиці homepage_settings."
+          error instanceof Error ? error.message : "Помилка при збереженні."
         );
+        setBlocksSaving(false);
         return;
       }
 
+      setBlocksSaving(false);
       setBlocksMessage("Налаштування блоків оновлено");
     }
 

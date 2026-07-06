@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { setPropertyLeadAccess } from "@/lib/propertyLeadAccess";
 
 type PropertyLeadModalProps = {
@@ -40,12 +41,15 @@ export default function PropertyLeadModal({
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!isOpen) {
+  const portalTarget = typeof document === "undefined" ? null : document.body;
+
+  if (!portalTarget || !isOpen) {
     return null;
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    event.stopPropagation();
     setMessage("");
 
     if (!isValidFullName(fullName)) {
@@ -100,8 +104,13 @@ export default function PropertyLeadModal({
     onSuccess();
   }
 
-  return (
-    <div className="fixed inset-0 z-[120] flex min-h-[100dvh] items-end justify-center overflow-y-auto overscroll-contain bg-black/82 px-3 py-3 backdrop-blur-xl sm:items-center sm:px-4 sm:py-6">
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[120] flex min-h-[100dvh] items-end justify-center overflow-y-auto overscroll-contain bg-black/82 px-3 py-3 backdrop-blur-xl sm:items-center sm:px-4 sm:py-6"
+      onClick={(event) => event.stopPropagation()}
+      onPointerDown={(event) => event.stopPropagation()}
+      onTouchStart={(event) => event.stopPropagation()}
+    >
       <button
         type="button"
         aria-label="Закрити"
@@ -111,11 +120,14 @@ export default function PropertyLeadModal({
 
       <form
         onSubmit={handleSubmit}
-        className="orenda-lead-modal-panel relative w-full max-w-[430px] overflow-y-auto overscroll-contain rounded-3xl border border-[#b89652]/35 bg-[#090909] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.62)] sm:p-6"
+        onClick={(event) => event.stopPropagation()}
+        onPointerDown={(event) => event.stopPropagation()}
+        onTouchStart={(event) => event.stopPropagation()}
+        className="orenda-lead-modal-panel relative w-full max-w-[430px] min-w-0 overflow-y-auto overscroll-contain rounded-t-3xl border border-[#b89652]/35 bg-[#090909] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.62)] sm:rounded-3xl sm:p-6"
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(184,150,82,0.18),transparent_42%)]" />
 
-        <div className="relative">
+        <div className="relative min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#b89652]">
             Orenda RM
           </p>
@@ -134,7 +146,7 @@ export default function PropertyLeadModal({
                 onChange={(event) => setFullName(event.target.value)}
                 placeholder="Іваненко Іван"
                 autoComplete="name"
-                className="min-h-12 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-base text-white outline-none transition placeholder:text-white/28 focus:border-[#d4af37]/70 focus:ring-2 focus:ring-[#b89652]/25"
+                className="min-h-12 w-full max-w-full rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-base text-white outline-none transition placeholder:text-white/28 focus:border-[#d4af37]/70 focus:ring-2 focus:ring-[#b89652]/25"
               />
             </label>
 
@@ -148,23 +160,27 @@ export default function PropertyLeadModal({
                 placeholder="0961212121"
                 inputMode="numeric"
                 autoComplete="tel"
-                className="min-h-12 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-base text-white outline-none transition placeholder:text-white/28 focus:border-[#d4af37]/70 focus:ring-2 focus:ring-[#b89652]/25"
+                className="min-h-12 w-full max-w-full rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-base text-white outline-none transition placeholder:text-white/28 focus:border-[#d4af37]/70 focus:ring-2 focus:ring-[#b89652]/25"
               />
             </label>
           </div>
 
-          {message && (
-            <p className="mt-4 rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm leading-5 text-red-100">
-              {message}
-            </p>
-          )}
+          <div className="mt-4 min-h-[3.25rem]" aria-live="polite">
+            {message && (
+              <p className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm leading-5 text-red-100">
+                {message}
+              </p>
+            )}
+          </div>
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-2xl border border-[#d4af37]/55 bg-[#b89652] px-5 py-3 text-base font-black text-black shadow-[0_0_30px_rgba(184,150,82,0.28)] transition-all duration-300 hover:bg-[#d4af37] hover:shadow-[0_0_38px_rgba(212,175,55,0.36)] focus:outline-none focus:ring-2 focus:ring-[#d4af37]/70 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-2xl border border-[#d4af37]/55 bg-[#b89652] px-5 py-3 text-base font-black text-black shadow-[0_0_30px_rgba(184,150,82,0.28)] transition-colors duration-300 hover:bg-[#d4af37] focus:outline-none focus:ring-2 focus:ring-[#d4af37]/70 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isSubmitting ? "Зберігаємо..." : "Переглянути обʼєкт"}
+            <span className="min-w-[10.5rem] text-center">
+              {isSubmitting ? "Зберігаємо..." : "Переглянути обʼєкт"}
+            </span>
           </button>
 
           <p className="mt-3 text-center text-xs leading-5 text-white/38">
@@ -172,6 +188,7 @@ export default function PropertyLeadModal({
           </p>
         </div>
       </form>
-    </div>
+    </div>,
+    portalTarget
   );
 }

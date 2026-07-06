@@ -193,25 +193,3 @@ export async function getHomepageSettings(): Promise<HomepageSettings> {
 
   return rowToSettings(data as HomepageSettingsRow | null);
 }
-
-export async function updateHomepageSettings(data: HomepageSettings) {
-  return supabase.from("homepage_settings").upsert(
-    {
-      id: 1,
-      hero_title: data.heroTitle,
-      hero_subtitle: data.heroSubtitle,
-      hero_button_text: data.heroButtonText,
-      hero_button_url: data.heroButtonUrl,
-      section_title: data.sectionTitle,
-      section_subtitle: data.sectionSubtitle,
-      telegram_title: data.telegramTitle,
-      telegram_text: data.telegramText,
-      telegram_button_text: data.telegramButtonText,
-      telegram_url: data.telegramUrl,
-      show_quick_search: data.showQuickSearch ?? true,
-      real_estate_blocks: data.realEstateBlocks,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "id" }
-  );
-}

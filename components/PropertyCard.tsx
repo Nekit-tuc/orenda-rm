@@ -92,7 +92,11 @@ export default function PropertyCard({
   }
 
   function handleCardClick(event: MouseEvent<HTMLElement>) {
-    if (!isMobileCardNavigationEnabled() || isInteractiveElement(event.target)) {
+    if (
+      isLeadModalOpen ||
+      !isMobileCardNavigationEnabled() ||
+      isInteractiveElement(event.target)
+    ) {
       return;
     }
 
@@ -102,6 +106,7 @@ export default function PropertyCard({
   function handleCardKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (
       !isMobileCardNavigationEnabled() ||
+      isLeadModalOpen ||
       isInteractiveElement(event.target) ||
       (event.key !== "Enter" && event.key !== " ")
     ) {

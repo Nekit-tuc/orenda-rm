@@ -88,6 +88,23 @@ alter table public.homepage_settings
 alter table public.homepage_settings
   add column if not exists show_quick_search boolean default true;
 
+alter table public.homepage_settings enable row level security;
+
+drop policy if exists "Allow public homepage settings select" on public.homepage_settings;
+drop policy if exists "Allow public homepage settings update" on public.homepage_settings;
+drop policy if exists "Allow public homepage settings insert" on public.homepage_settings;
+drop policy if exists "Allow homepage settings updates" on public.homepage_settings;
+drop policy if exists "Allow homepage settings inserts" on public.homepage_settings;
+
+create policy "Allow public homepage settings select"
+  on public.homepage_settings
+  for select
+  to anon, authenticated
+  using (true);
+
+grant select on public.homepage_settings to anon, authenticated;
+revoke insert, update, delete on public.homepage_settings from anon, authenticated;
+
 insert into public.homepage_settings (
   id,
   hero_title,
