@@ -89,7 +89,7 @@ export const defaultHomepageSettings: HomepageSettings = {
   telegramText:
     "Напишіть нам у Telegram, щоб уточнити деталі, домовитися про перегляд або запропонувати свій об'єкт.",
   telegramButtonText: "Зв'язатися",
-  telegramUrl: "https://t.me/zt_space",
+  telegramUrl: "https://t.me/orenda_rm",
   realEstateBlocks: defaultRealEstateBlocks,
 };
 

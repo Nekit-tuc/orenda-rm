@@ -129,7 +129,7 @@ insert into public.homepage_settings (
   'Зв''язатися в Telegram',
   'Напишіть нам у Telegram, щоб уточнити деталі, домовитися про перегляд або запропонувати свій об''єкт.',
   'Зв''язатися',
-  'https://t.me/zt_space',
+  'https://t.me/orenda_rm',
   '[
     {
       "tag": "Ринок",

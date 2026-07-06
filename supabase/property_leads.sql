@@ -25,6 +25,7 @@ alter table public.property_leads enable row level security;
 
 drop policy if exists "Allow public lead inserts" on public.property_leads;
 drop policy if exists "Allow admin lead reads through server route" on public.property_leads;
+drop policy if exists "Allow public lead reads" on public.property_leads;
 
 create policy "Allow public lead inserts"
   on public.property_leads
@@ -32,12 +33,6 @@ create policy "Allow public lead inserts"
   to anon, authenticated
   with check (true);
 
-create policy "Allow admin lead reads through server route"
-  on public.property_leads
-  for select
-  to anon, authenticated
-  using (true);
-
 grant insert on public.property_leads to anon, authenticated;
-grant select on public.property_leads to anon, authenticated;
-grant select on public.property_leads to service_role;
+revoke select, update, delete on public.property_leads from anon, authenticated;
+grant select, delete on public.property_leads to service_role;

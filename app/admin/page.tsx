@@ -82,6 +82,8 @@ export default function AdminPage() {
   const [leadsSearch, setLeadsSearch] = useState("");
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [leadsError, setLeadsError] = useState("");
+  const [leadMessage, setLeadMessage] = useState("");
+  const [deletingLeadId, setDeletingLeadId] = useState<string | null>(null);
   const [submissions, setSubmissions] = useState<PropertySubmission[]>([]);
   const [submissionsSearch, setSubmissionsSearch] = useState("");
   const [submissionsStatusFilter, setSubmissionsStatusFilter] = useState<"all" | SubmissionStatus>("all");
@@ -191,7 +193,6 @@ export default function AdminPage() {
         setLoadError("Не вдалося завантажити обʼєкти. Спробуйте оновити список.");
         alert(error.message);
       } else {
-        console.log("SUPABASE DATA:", data);
         setProperties(data || []);
       }
 
@@ -687,6 +688,44 @@ export default function AdminPage() {
     link.download = `orendarm-leads-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function deleteLead(lead: PropertyLead) {
+    const confirmed = window.confirm(
+      "Ви точно хочете видалити цього клієнта/ліда?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingLeadId(lead.id);
+    setLeadMessage("");
+    setLeadsError("");
+
+    try {
+      const response = await fetch(`/api/admin/property-leads/${lead.id}`, {
+        method: "DELETE",
+      });
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        message?: string;
+      } | null;
+
+      if (!response.ok || !result?.ok) {
+        throw new Error(result?.message || "Не вдалося видалити ліда.");
+      }
+
+      setLeads((current) => current.filter((item) => item.id !== lead.id));
+      setLeadMessage("Лід видалено");
+    } catch (error) {
+      console.error("Lead delete error:", error);
+      setLeadsError(
+        error instanceof Error ? error.message : "Не вдалося видалити ліда."
+      );
+    } finally {
+      setDeletingLeadId(null);
+    }
   }
 
   const filteredSubmissions = submissions.filter((submission) => {
@@ -1267,6 +1306,12 @@ export default function AdminPage() {
             </div>
           )}
 
+          {leadMessage && !leadsError && (
+            <div className="mb-5 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-sm text-emerald-100">
+              {leadMessage}
+            </div>
+          )}
+
           {!leadsLoading && !leadsError && filteredLeads.length === 0 && (
             <div className="rounded-2xl border border-white/10 bg-black/30 p-8 text-center">
               <h3 className="text-xl font-bold text-white">
@@ -1289,6 +1334,7 @@ export default function AdminPage() {
                       <th className="px-4 py-4">Телефон</th>
                       <th className="px-4 py-4">Обʼєкт</th>
                       <th className="px-4 py-4">Джерело</th>
+                      <th className="px-4 py-4 text-right">Дії</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
@@ -1308,6 +1354,18 @@ export default function AdminPage() {
                         </td>
                         <td className="px-4 py-4 text-slate-400">
                           {lead.source || "price_access"}
+                        </td>
+                        <td className="px-4 py-4 text-right">
+                          <button
+                            type="button"
+                            onClick={() => deleteLead(lead)}
+                            disabled={deletingLeadId === lead.id}
+                            className="rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-100 transition hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {deletingLeadId === lead.id
+                              ? "Видалення..."
+                              : "Видалити"}
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -1341,6 +1399,16 @@ export default function AdminPage() {
                     <p className="mt-2 text-xs text-slate-500">
                       {formatLeadDate(lead.created_at)}
                     </p>
+                    <button
+                      type="button"
+                      onClick={() => deleteLead(lead)}
+                      disabled={deletingLeadId === lead.id}
+                      className="mt-4 w-full rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100 transition hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {deletingLeadId === lead.id
+                        ? "Видалення..."
+                        : "Видалити"}
+                    </button>
                   </article>
                 ))}
               </div>
