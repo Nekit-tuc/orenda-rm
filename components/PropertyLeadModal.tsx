@@ -18,7 +18,7 @@ function isValidFullName(value: string) {
 
   return (
     parts.length >= 2 &&
-    parts.every((part) => /^[A-Za-zА-Яа-яІіЇїЄєҐґ'’ʼ-]{2,}$/.test(part))
+    parts.every((part) => /^[\p{L}'’ʼ-]{2,}$/u.test(part))
   );
 }
 
@@ -31,7 +31,7 @@ export default function PropertyLeadModal({
   propertyId,
   propertyTitle,
   propertySlug,
-  source = "property_card",
+  source = "price_access",
   onClose,
   onSuccess,
 }: PropertyLeadModalProps) {
@@ -60,20 +60,29 @@ export default function PropertyLeadModal({
 
     setIsSubmitting(true);
 
-    const response = await fetch("/api/property-leads", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        fullName,
-        phone,
-        propertyId,
-        propertyTitle,
-        propertySlug,
-        source,
-      }),
-    });
+    let response: Response;
+
+    try {
+      response = await fetch("/api/property-leads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName,
+          phone,
+          propertyId,
+          propertyTitle,
+          propertySlug,
+          source,
+        }),
+      });
+    } catch (error) {
+      console.error("PROPERTY LEAD SUBMIT ERROR:", error);
+      setIsSubmitting(false);
+      setMessage("Не вдалося відправити заявку. Перевірте інтернет і спробуйте ще раз.");
+      return;
+    }
 
     const result = (await response.json().catch(() => null)) as {
       ok?: boolean;
@@ -92,7 +101,7 @@ export default function PropertyLeadModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center overflow-y-auto bg-black/82 px-4 py-6 backdrop-blur-xl">
+    <div className="fixed inset-0 z-[120] flex min-h-[100dvh] items-end justify-center overflow-y-auto overscroll-contain bg-black/82 px-3 py-3 backdrop-blur-xl sm:items-center sm:px-4 sm:py-6">
       <button
         type="button"
         aria-label="Закрити"
@@ -102,7 +111,7 @@ export default function PropertyLeadModal({
 
       <form
         onSubmit={handleSubmit}
-        className="relative w-full max-w-[430px] overflow-hidden rounded-3xl border border-[#b89652]/35 bg-[#090909] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.62)] sm:p-6"
+        className="orenda-lead-modal-panel relative w-full max-w-[430px] overflow-y-auto overscroll-contain rounded-3xl border border-[#b89652]/35 bg-[#090909] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.62)] sm:p-6"
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(184,150,82,0.18),transparent_42%)]" />
 

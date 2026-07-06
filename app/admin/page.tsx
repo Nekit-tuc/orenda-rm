@@ -1340,7 +1340,7 @@ export default function AdminPage() {
                           {lead.property_title || "Не вказано"}
                         </td>
                         <td className="px-4 py-4 text-slate-400">
-                          {lead.source || "property_card"}
+                          {lead.source || "price_access"}
                         </td>
                       </tr>
                     ))}
@@ -1364,7 +1364,7 @@ export default function AdminPage() {
                         </p>
                       </div>
                       <span className="shrink-0 rounded-full border border-white/10 px-3 py-1 text-[11px] text-slate-400">
-                        {lead.source || "property_card"}
+                        {lead.source || "price_access"}
                       </span>
                     </div>
 

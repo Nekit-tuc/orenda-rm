@@ -7,7 +7,7 @@ create table if not exists public.property_leads (
   property_id bigint,
   property_title text,
   property_slug text,
-  source text default 'property_card',
+  source text default 'price_access',
   user_agent text,
   created_at timestamptz default now()
 );
@@ -18,9 +18,13 @@ create index if not exists property_leads_created_at_idx
 create index if not exists property_leads_property_id_idx
   on public.property_leads (property_id);
 
+alter table public.property_leads
+  alter column source set default 'price_access';
+
 alter table public.property_leads enable row level security;
 
 drop policy if exists "Allow public lead inserts" on public.property_leads;
+drop policy if exists "Allow admin lead reads through server route" on public.property_leads;
 
 create policy "Allow public lead inserts"
   on public.property_leads
@@ -28,5 +32,12 @@ create policy "Allow public lead inserts"
   to anon, authenticated
   with check (true);
 
+create policy "Allow admin lead reads through server route"
+  on public.property_leads
+  for select
+  to anon, authenticated
+  using (true);
+
 grant insert on public.property_leads to anon, authenticated;
+grant select on public.property_leads to anon, authenticated;
 grant select on public.property_leads to service_role;

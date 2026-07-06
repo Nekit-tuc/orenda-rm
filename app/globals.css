@@ -36,7 +36,7 @@ select {
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 * {
@@ -47,6 +47,19 @@ html,
 body {
   max-width: 100%;
   overflow-x: clip;
+}
+
+.orenda-lead-modal-panel {
+  max-height: calc(100dvh - 24px);
+  -webkit-overflow-scrolling: touch;
+}
+
+@supports (-webkit-touch-callout: none) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
 }
 
 .property-thumbnails {

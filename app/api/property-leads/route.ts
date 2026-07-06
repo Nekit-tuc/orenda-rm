@@ -15,7 +15,10 @@ type LeadPayload = {
 function isValidFullName(value: string) {
   const parts = value.trim().split(/\s+/).filter(Boolean);
 
-  return parts.length >= 2 && parts.every((part) => /^[A-Za-zА-Яа-яІіЇїЄєҐґ'’ʼ-]{2,}$/.test(part));
+  return (
+    parts.length >= 2 &&
+    parts.every((part) => /^[\p{L}'’ʼ-]{2,}$/u.test(part))
+  );
 }
 
 function isValidPhone(value: string) {
@@ -49,24 +52,41 @@ export async function POST(request: Request) {
     );
   }
 
-  const headersList = await headers();
-  const supabase = createSupabaseAdminClient();
+  try {
+    const headersList = await headers();
+    const supabase = createSupabaseAdminClient();
 
-  const { error } = await supabase.from("property_leads").insert({
-    full_name: fullName,
-    phone,
-    property_id: payload.propertyId ?? null,
-    property_title: payload.propertyTitle?.trim() || null,
-    property_slug: payload.propertySlug?.trim() || null,
-    source: payload.source?.trim() || "property_card",
-    user_agent: headersList.get("user-agent"),
-  });
+    const { error } = await supabase.from("property_leads").insert({
+      full_name: fullName,
+      phone,
+      property_id: payload.propertyId ?? null,
+      property_title: payload.propertyTitle?.trim() || null,
+      property_slug: payload.propertySlug?.trim() || null,
+      source: payload.source?.trim() || "price_access",
+      user_agent: headersList.get("user-agent"),
+    });
 
-  if (error) {
-    console.error("PROPERTY LEAD INSERT ERROR:", error);
+    if (error) {
+      console.error("PROPERTY LEAD INSERT ERROR:", error);
+
+      return Response.json(
+        {
+          ok: false,
+          message:
+            "Не вдалося зберегти заявку. Перевірте таблицю property_leads у Supabase.",
+        },
+        { status: 500 }
+      );
+    }
+  } catch (error) {
+    console.error("PROPERTY LEAD API ERROR:", error);
 
     return Response.json(
-      { ok: false, message: "Не вдалося зберегти заявку. Спробуйте ще раз." },
+      {
+        ok: false,
+        message:
+          "Не вдалося зберегти заявку. Перевірте Supabase env та SQL для property_leads.",
+      },
       { status: 500 }
     );
   }

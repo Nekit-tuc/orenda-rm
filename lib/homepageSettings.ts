@@ -177,6 +177,10 @@ export async function getHomepageSettings(): Promise<HomepageSettings> {
       .maybeSingle();
 
     if (!retry.error) {
+      if (!retry.data) {
+        return defaultHomepageSettings;
+      }
+
       return rowToSettings({
         ...(retry.data as Omit<HomepageSettingsRow, "show_quick_search">),
         show_quick_search: true,
