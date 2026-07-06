@@ -31,8 +31,8 @@ export default function PropertyGallery({
   }
 
   return (
-    <div>
-      <div className="relative overflow-hidden rounded-2xl border border-[#b89652]/20 bg-[#070707] shadow-[0_0_35px_rgba(184,150,82,0.12)] md:rounded-[2rem]">
+    <div className="min-w-0 max-w-full overflow-hidden">
+      <div className="relative w-full max-w-full overflow-hidden rounded-3xl border border-[#b89652]/20 bg-[#070707] shadow-[0_0_35px_rgba(184,150,82,0.12)] md:rounded-[2rem]">
         <Image
           src={activeImage}
           alt={title}
@@ -41,7 +41,7 @@ export default function PropertyGallery({
           sizes="(min-width: 1024px) 50vw, 100vw"
           priority
           unoptimized
-          className="h-[260px] w-full object-cover sm:h-[340px] lg:h-[460px]"
+          className="aspect-[4/3] h-auto w-full max-w-full object-cover sm:aspect-[16/10] lg:h-[460px] lg:aspect-auto"
         />
 
         <div className="absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1.5 text-xs text-white backdrop-blur md:left-5 md:top-5 md:px-4 md:text-sm">
@@ -72,13 +72,13 @@ export default function PropertyGallery({
       </div>
 
       {safeImages.length > 1 && (
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-2 md:grid md:grid-cols-5 md:overflow-visible md:pb-0">
+        <div className="property-thumbnails mt-3 flex max-w-full gap-2 overflow-x-auto overscroll-x-contain pb-2 md:grid md:grid-cols-5 md:overflow-visible md:pb-0">
           {safeImages.map((image, index) => (
             <button
               key={`${image}-${index}`}
               type="button"
               onClick={() => setActiveIndex(index)}
-              className={`w-20 shrink-0 overflow-hidden rounded-xl border transition md:w-auto md:rounded-2xl ${
+              className={`h-[68px] w-[82px] shrink-0 overflow-hidden rounded-xl border transition md:h-auto md:w-auto md:rounded-2xl ${
                 activeIndex === index
                   ? "border-[#b89652] opacity-100 shadow-[0_0_18px_rgba(184,150,82,0.24)]"
                   : "border-white/10 opacity-55 hover:border-[#b89652]/40 hover:opacity-100"
@@ -91,7 +91,7 @@ export default function PropertyGallery({
                 height={130}
                 sizes="20vw"
                 unoptimized
-                className="h-16 w-full object-cover md:h-20"
+                className="h-full w-full object-cover md:h-20"
               />
             </button>
           ))}

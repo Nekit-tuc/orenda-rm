@@ -49,6 +49,14 @@ body {
   overflow-x: clip;
 }
 
+.property-thumbnails {
+  scrollbar-width: none;
+}
+
+.property-thumbnails::-webkit-scrollbar {
+  display: none;
+}
+
 .orenda-map-popup.leaflet-popup {
   max-width: calc(100vw - 32px) !important;
   animation: orenda-popup-in 250ms ease-out both;

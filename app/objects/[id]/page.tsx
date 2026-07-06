@@ -102,8 +102,8 @@ const baseUrl = "https://orenda-rm.vercel.app";
         propertySlug={propertySlug}
       />
 
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:py-10">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)] lg:gap-8">
+      <section className="mx-auto max-w-7xl overflow-hidden px-4 py-6 sm:px-6 md:py-10">
+        <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)] lg:gap-8">
           <PropertyGallery
             images={property.images || [property.image]}
             title={property.title}
