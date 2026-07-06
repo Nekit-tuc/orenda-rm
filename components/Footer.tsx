@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FooterSocialLinks } from "./SocialLinks";
+import SubmitPropertyButton from "@/components/SubmitPropertyButton";
 
 export default function Footer() {
   return (
@@ -18,6 +19,10 @@ export default function Footer() {
           <p className="mt-3 max-w-md text-sm leading-6 text-white/58 md:text-base">
             Нерухомість Житомира та області.
           </p>
+
+          <div className="mt-5">
+            <SubmitPropertyButton className="inline-flex items-center justify-center rounded-full border border-[#b89652]/40 bg-black/40 px-5 py-3 text-sm font-bold text-white shadow-[0_0_25px_rgba(184,150,82,0.18)] backdrop-blur transition-all duration-300 hover:border-[#d4af37] hover:text-[#d8ba68]" />
+          </div>
         </div>
 
         <div className="text-center md:text-right">

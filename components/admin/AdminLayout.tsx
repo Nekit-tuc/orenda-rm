@@ -5,8 +5,8 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 
 type AdminLayoutProps = {
   children: React.ReactNode;
-  activeSection: "overview" | "objects" | "homepage" | "leads";
-  onSectionChange: (section: "overview" | "objects" | "homepage" | "leads") => void;
+  activeSection: "overview" | "objects" | "homepage" | "leads" | "submissions";
+  onSectionChange: (section: "overview" | "objects" | "homepage" | "leads" | "submissions") => void;
 };
 
 export default function AdminLayout({

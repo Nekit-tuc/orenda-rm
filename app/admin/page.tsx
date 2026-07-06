@@ -24,7 +24,7 @@ import {
   updateHomepageSettings,
 } from "@/lib/homepageSettings";
 
-type AdminSection = "overview" | "objects" | "homepage" | "leads";
+type AdminSection = "overview" | "objects" | "homepage" | "leads" | "submissions";
 
 type PropertyLead = {
   id: string;
@@ -36,6 +36,31 @@ type PropertyLead = {
   source: string | null;
   user_agent: string | null;
   created_at: string;
+};
+
+type SubmissionStatus = "new" | "contacted" | "rejected" | "approved";
+
+type PropertySubmission = {
+  id: string;
+  full_name: string;
+  phone: string;
+  telegram: string | null;
+  object_type: "Земля" | "Комерція" | "Будинок";
+  address: string;
+  area: string;
+  price: string;
+  cadastral_number: string;
+  description: string | null;
+  photos: string[];
+  status: SubmissionStatus;
+  created_at: string;
+};
+
+const submissionStatusLabels: Record<SubmissionStatus, string> = {
+  new: "Нові",
+  contacted: "Звʼязались",
+  rejected: "Відхилені",
+  approved: "Схвалені",
 };
 
 export default function AdminPage() {
@@ -57,6 +82,12 @@ export default function AdminPage() {
   const [leadsSearch, setLeadsSearch] = useState("");
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [leadsError, setLeadsError] = useState("");
+  const [submissions, setSubmissions] = useState<PropertySubmission[]>([]);
+  const [submissionsSearch, setSubmissionsSearch] = useState("");
+  const [submissionsStatusFilter, setSubmissionsStatusFilter] = useState<"all" | SubmissionStatus>("all");
+  const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [submissionsError, setSubmissionsError] = useState("");
+  const [selectedSubmission, setSelectedSubmission] = useState<PropertySubmission | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -151,6 +182,31 @@ export default function AdminPage() {
     setLeadsLoading(false);
   }, []);
 
+  const loadSubmissions = useCallback(async function loadSubmissions() {
+    setSubmissionsLoading(true);
+    setSubmissionsError("");
+
+    const response = await fetch("/api/admin/property-submissions", {
+      cache: "no-store",
+    });
+    const result = (await response.json().catch(() => null)) as {
+      ok?: boolean;
+      submissions?: PropertySubmission[];
+      message?: string;
+    } | null;
+
+    if (!response.ok || !result?.ok) {
+      setSubmissionsError(
+        result?.message || "Не вдалося завантажити пропозиції."
+      );
+      setSubmissions([]);
+    } else {
+      setSubmissions(result.submissions || []);
+    }
+
+    setSubmissionsLoading(false);
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -194,6 +250,16 @@ export default function AdminPage() {
       return () => window.clearTimeout(timeoutId);
     }
   }, [activeSection, loadLeads]);
+
+  useEffect(() => {
+    if (activeSection === "submissions") {
+      const timeoutId = window.setTimeout(() => {
+        void loadSubmissions();
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
+    }
+  }, [activeSection, loadSubmissions]);
         
         async function geocodeAddress() {
         if (!formData.address.trim()) {
@@ -572,6 +638,92 @@ export default function AdminPage() {
     link.download = `orendarm-leads-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
+  }
+
+  const filteredSubmissions = submissions.filter((submission) => {
+    const searchValue = submissionsSearch.toLowerCase().trim();
+    const statusMatch =
+      submissionsStatusFilter === "all" ||
+      submission.status === submissionsStatusFilter;
+
+    const searchMatch =
+      !searchValue ||
+      submission.full_name.toLowerCase().includes(searchValue) ||
+      submission.phone.toLowerCase().includes(searchValue) ||
+      submission.address.toLowerCase().includes(searchValue) ||
+      submission.cadastral_number.toLowerCase().includes(searchValue);
+
+    return statusMatch && searchMatch;
+  });
+
+  function downloadSubmissionsCsv() {
+    const rows = [
+      [
+        "Дата",
+        "ПІБ",
+        "Телефон",
+        "Telegram",
+        "Тип",
+        "Адреса",
+        "Площа",
+        "Ціна",
+        "Кадастр",
+        "Статус",
+      ],
+      ...submissions.map((submission) => [
+        formatLeadDate(submission.created_at),
+        submission.full_name,
+        submission.phone,
+        submission.telegram || "",
+        submission.object_type,
+        submission.address,
+        submission.area,
+        submission.price,
+        submission.cadastral_number,
+        submissionStatusLabels[submission.status],
+      ]),
+    ];
+
+    const csv = rows
+      .map((row) => row.map((value) => escapeCsvValue(value)).join(","))
+      .join("\n");
+    const blob = new Blob([`\uFEFF${csv}`], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `orendarm-submissions-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function updateSubmissionStatus(id: string, status: SubmissionStatus) {
+    const response = await fetch("/api/admin/property-submissions", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id, status }),
+    });
+    const result = (await response.json().catch(() => null)) as {
+      ok?: boolean;
+      message?: string;
+    } | null;
+
+    if (!response.ok || !result?.ok) {
+      alert(result?.message || "Не вдалося змінити статус.");
+      return;
+    }
+
+    setSubmissions((current) =>
+      current.map((submission) =>
+        submission.id === id ? { ...submission, status } : submission
+      )
+    );
+    setSelectedSubmission((current) =>
+      current?.id === id ? { ...current, status } : current
+    );
   }
 
     async function copyPropertyLink(property: Property) {
@@ -1143,6 +1295,288 @@ export default function AdminPage() {
                 ))}
               </div>
             </>
+          )}
+        </section>
+      )}
+
+      {activeSection === "submissions" && (
+        <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-blue-950/10 backdrop-blur-xl">
+          <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.28em] text-blue-300">
+                Пропозиції
+              </p>
+              <h2 className="mt-3 text-3xl font-bold text-white">
+                Запропоновані обʼєкти
+              </h2>
+              <p className="mt-2 text-sm text-slate-400">
+                Ці заявки не публікуються на сайті та доступні тільки адміністратору.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={downloadSubmissionsCsv}
+              disabled={submissions.length === 0}
+              className="w-full rounded-2xl border border-[#b89652]/45 bg-[#b89652]/10 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_22px_rgba(184,150,82,0.14)] transition hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black disabled:cursor-not-allowed disabled:opacity-50 lg:w-auto"
+            >
+              Скачати CSV
+            </button>
+          </div>
+
+          <div className="mb-5 grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_auto]">
+            <input
+              type="text"
+              placeholder="Пошук: ПІБ, телефон, адреса, кадастр..."
+              value={submissionsSearch}
+              onChange={(e) => setSubmissionsSearch(e.target.value)}
+              className="w-full rounded-2xl border border-white/10 bg-[#030712] px-5 py-4 outline-none transition placeholder:text-slate-500 focus:border-blue-300/50"
+            />
+
+            <select
+              value={submissionsStatusFilter}
+              onChange={(e) =>
+                setSubmissionsStatusFilter(
+                  e.target.value as "all" | SubmissionStatus
+                )
+              }
+              className="w-full rounded-2xl border border-white/10 bg-[#030712] px-5 py-4 text-slate-100 outline-none transition focus:border-blue-300/50"
+            >
+              <option value="all">Всі</option>
+              <option value="new">Нові</option>
+              <option value="contacted">Звʼязались</option>
+              <option value="rejected">Відхилені</option>
+              <option value="approved">Схвалені</option>
+            </select>
+
+            <button
+              type="button"
+              onClick={loadSubmissions}
+              className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              Оновити
+            </button>
+          </div>
+
+          {submissionsLoading && (
+            <div className="rounded-2xl border border-white/10 bg-black/30 p-6 text-sm text-slate-300">
+              Завантажуємо пропозиції...
+            </div>
+          )}
+
+          {submissionsError && (
+            <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-6 text-sm text-red-100">
+              {submissionsError}
+            </div>
+          )}
+
+          {!submissionsLoading &&
+            !submissionsError &&
+            filteredSubmissions.length === 0 && (
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-8 text-center">
+                <h3 className="text-xl font-bold text-white">
+                  Пропозицій поки немає
+                </h3>
+                <p className="mt-2 text-sm text-slate-400">
+                  Коли власник запропонує обʼєкт, заявка зʼявиться тут.
+                </p>
+              </div>
+            )}
+
+          {!submissionsLoading &&
+            !submissionsError &&
+            filteredSubmissions.length > 0 && (
+              <>
+                <div className="hidden overflow-hidden rounded-2xl border border-white/10 xl:block">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-white/[0.04] text-xs uppercase tracking-[0.18em] text-slate-400">
+                      <tr>
+                        <th className="px-4 py-4">Дата</th>
+                        <th className="px-4 py-4">ПІБ</th>
+                        <th className="px-4 py-4">Телефон</th>
+                        <th className="px-4 py-4">Тип</th>
+                        <th className="px-4 py-4">Адреса</th>
+                        <th className="px-4 py-4">Площа</th>
+                        <th className="px-4 py-4">Ціна</th>
+                        <th className="px-4 py-4">Кадастр</th>
+                        <th className="px-4 py-4">Статус</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/10">
+                      {filteredSubmissions.map((submission) => (
+                        <tr
+                          key={submission.id}
+                          onClick={() => setSelectedSubmission(submission)}
+                          className="cursor-pointer bg-black/20 transition hover:bg-white/[0.04]"
+                        >
+                          <td className="px-4 py-4 text-slate-300">
+                            {formatLeadDate(submission.created_at)}
+                          </td>
+                          <td className="px-4 py-4 font-semibold text-white">
+                            {submission.full_name}
+                          </td>
+                          <td className="px-4 py-4 text-[#d8ba68]">
+                            {submission.phone}
+                          </td>
+                          <td className="px-4 py-4 text-slate-300">
+                            {submission.object_type}
+                          </td>
+                          <td className="max-w-[220px] px-4 py-4 text-slate-300">
+                            <span className="line-clamp-2">
+                              {submission.address}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4 text-slate-300">
+                            {submission.area}
+                          </td>
+                          <td className="px-4 py-4 text-slate-300">
+                            {submission.price}
+                          </td>
+                          <td className="px-4 py-4 text-slate-300">
+                            {submission.cadastral_number}
+                          </td>
+                          <td className="px-4 py-4 text-slate-300">
+                            {submissionStatusLabels[submission.status]}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="grid gap-3 xl:hidden">
+                  {filteredSubmissions.map((submission) => (
+                    <button
+                      key={submission.id}
+                      type="button"
+                      onClick={() => setSelectedSubmission(submission)}
+                      className="rounded-2xl border border-white/10 bg-black/30 p-4 text-left transition hover:border-[#b89652]/45"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-base font-bold text-white">
+                            {submission.full_name}
+                          </p>
+                          <p className="mt-1 text-sm text-[#d8ba68]">
+                            {submission.phone}
+                          </p>
+                        </div>
+                        <span className="shrink-0 rounded-full border border-white/10 px-3 py-1 text-[11px] text-slate-300">
+                          {submissionStatusLabels[submission.status]}
+                        </span>
+                      </div>
+                      <p className="mt-3 text-sm text-slate-300">
+                        {submission.object_type} · {submission.area} · {submission.price}
+                      </p>
+                      <p className="mt-2 line-clamp-2 text-sm text-slate-400">
+                        {submission.address}
+                      </p>
+                      <p className="mt-2 text-xs text-slate-500">
+                        Кадастр: {submission.cadastral_number}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+
+          {selectedSubmission && (
+            <div className="fixed inset-0 z-[80] overflow-y-auto bg-black/80 px-4 py-6 backdrop-blur-xl">
+              <button
+                type="button"
+                aria-label="Закрити"
+                onClick={() => setSelectedSubmission(null)}
+                className="fixed inset-0 cursor-default"
+              />
+
+              <div className="relative mx-auto max-w-5xl rounded-3xl border border-[#b89652]/30 bg-[#070707] p-5 text-white shadow-[0_24px_90px_rgba(0,0,0,0.65)]">
+                <div className="mb-5 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.28em] text-[#b89652]">
+                      Деталі пропозиції
+                    </p>
+                    <h3 className="mt-2 text-2xl font-black">
+                      {selectedSubmission.object_type} · {selectedSubmission.address}
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSubmission(null)}
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-xl"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
+                  <div className="min-w-0">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {selectedSubmission.photos.map((photo, index) => (
+                        <Image
+                          key={`${photo}-${index}`}
+                          src={photo}
+                          alt={`Фото пропозиції ${index + 1}`}
+                          width={640}
+                          height={420}
+                          sizes="(min-width: 1024px) 50vw, 100vw"
+                          unoptimized
+                          className="h-52 w-full rounded-2xl object-cover"
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                    <div className="grid gap-3 text-sm">
+                      <p><span className="text-white/45">Дата:</span> {formatLeadDate(selectedSubmission.created_at)}</p>
+                      <p><span className="text-white/45">ПІБ:</span> {selectedSubmission.full_name}</p>
+                      <p><span className="text-white/45">Телефон:</span> {selectedSubmission.phone}</p>
+                      <p><span className="text-white/45">Telegram:</span> {selectedSubmission.telegram || "Не вказано"}</p>
+                      <p><span className="text-white/45">Тип:</span> {selectedSubmission.object_type}</p>
+                      <p><span className="text-white/45">Площа:</span> {selectedSubmission.area}</p>
+                      <p><span className="text-white/45">Ціна:</span> {selectedSubmission.price}</p>
+                      <p><span className="text-white/45">Кадастр:</span> {selectedSubmission.cadastral_number}</p>
+                      <p><span className="text-white/45">Опис:</span> {selectedSubmission.description || "Не вказано"}</p>
+                    </div>
+
+                    <div className="mt-5 grid gap-2">
+                      <a
+                        href={`tel:${selectedSubmission.phone}`}
+                        className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-[#b89652]/45 bg-[#b89652]/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#b89652] hover:text-black"
+                      >
+                        Зателефонувати
+                      </a>
+                      {selectedSubmission.telegram && (
+                        <a
+                          href={`https://t.me/${selectedSubmission.telegram.replace(/^@/, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#b89652]/45 hover:text-[#d8ba68]"
+                        >
+                          Відкрити Telegram
+                        </a>
+                      )}
+
+                      <select
+                        value={selectedSubmission.status}
+                        onChange={(e) =>
+                          updateSubmissionStatus(
+                            selectedSubmission.id,
+                            e.target.value as SubmissionStatus
+                          )
+                        }
+                        className="min-h-11 rounded-2xl border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none"
+                      >
+                        <option value="new">Нові</option>
+                        <option value="contacted">Звʼязались</option>
+                        <option value="rejected">Відхилені</option>
+                        <option value="approved">Схвалені</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
         </section>
       )}

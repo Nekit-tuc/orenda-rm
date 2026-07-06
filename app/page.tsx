@@ -6,6 +6,7 @@ import { getHomepageSettings } from "@/lib/homepageSettings";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { MessageIcon, ObjectsIcon } from "@/components/PremiumIcons";
+import SubmitPropertyButton from "@/components/SubmitPropertyButton";
 
 export const dynamic = "force-dynamic";
 
@@ -98,6 +99,8 @@ export default async function Home() {
                 <MessageIcon />
                 Звʼязатись
               </a>
+
+              <SubmitPropertyButton className="inline-flex items-center justify-center rounded-2xl border border-[#b89652]/35 bg-black/35 px-5 py-2.5 text-center text-[13px] font-bold text-white shadow-[0_0_20px_rgba(184,150,82,0.12)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652]/12 hover:text-[#d8ba68] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] md:px-7 md:py-3.5 md:text-sm" />
             </div>
           </div>
 
@@ -191,6 +194,8 @@ export default async function Home() {
                 <ObjectsIcon />
                 Переглянути обʼєкти
               </a>
+
+              <SubmitPropertyButton className="inline-flex items-center justify-center rounded-2xl border border-[#b89652]/35 bg-black/25 px-5 py-2.5 text-center text-[13px] font-bold text-white shadow-[0_0_20px_rgba(184,150,82,0.12)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652]/12 hover:text-[#d8ba68] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] sm:text-sm" />
             </div>
           </div>
         </div>
