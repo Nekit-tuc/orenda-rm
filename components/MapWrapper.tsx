@@ -26,5 +26,9 @@ type MapWrapperProps = {
 };
 
 export default function MapWrapper({ properties }: MapWrapperProps) {
-  return <MapClient properties={properties} />;
+  return (
+    <div className="w-full max-w-full min-w-0 overflow-hidden">
+      <MapClient properties={properties} />
+    </div>
+  );
 }

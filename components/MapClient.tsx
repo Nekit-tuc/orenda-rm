@@ -175,12 +175,12 @@ export default function Map({ properties }: { properties: MapProperty[] }) {
     <div
       className={
         isExpanded
-          ? "fixed inset-0 z-[100] overflow-auto bg-black p-3"
-          : "relative"
+          ? "fixed inset-0 z-[100] max-w-full overflow-auto bg-black p-3"
+          : "relative w-full max-w-full min-w-0 overflow-hidden"
       }
     >
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <p className="text-sm text-white/50 md:hidden">
+      <div className="mb-4 flex min-w-0 max-w-full items-center justify-between gap-3">
+        <p className="min-w-0 text-sm text-white/50 md:hidden">
           Натисніть на мітку, щоб відкрити обʼєкт.
         </p>
 
@@ -194,7 +194,7 @@ export default function Map({ properties }: { properties: MapProperty[] }) {
         </button>
       </div>
 
-      <div className="mb-4 flex gap-2 overflow-x-auto pb-2 md:mb-6 md:flex-wrap md:gap-3 md:overflow-visible md:pb-0">
+      <div className="mb-4 flex max-w-full min-w-0 gap-2 overflow-x-auto overscroll-x-contain pb-2 md:mb-6 md:flex-wrap md:gap-3 md:overflow-visible md:pb-0">
         {propertyTypeFilters.map((filter) => (
           <button
             key={filter}
@@ -211,13 +211,13 @@ export default function Map({ properties }: { properties: MapProperty[] }) {
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-[1.25rem] border border-[#b89652]/20 bg-black p-1.5 md:rounded-[1.5rem] md:p-2">
+      <div className="w-full max-w-full min-w-0 overflow-hidden rounded-[1.25rem] border border-[#b89652]/20 bg-black p-1.5 md:rounded-[1.5rem] md:p-2">
         <MapContainer
           key={isExpanded ? "expanded" : "normal"}
           center={[50.2547, 28.6587]}
           zoom={isExpanded ? 14 : 13}
           scrollWheelZoom={false}
-          className={`z-0 w-full rounded-2xl ${
+          className={`z-0 w-full max-w-full overflow-hidden rounded-2xl ${
             isExpanded ? "h-[calc(100dvh-132px)]" : "h-[430px] md:h-[600px]"
           }`}
         >

@@ -42,7 +42,7 @@ export default async function Home() {
   ]);
 
   return (
-    <main className="min-h-screen overflow-x-clip bg-[#020202] text-white">
+    <main className="min-h-screen max-w-full overflow-x-hidden bg-[#020202] text-white">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute left-1/2 top-0 h-[520px] w-[min(820px,100vw)] -translate-x-1/2 rounded-full bg-[#b89652]/10 blur-3xl" />
         <div className="absolute bottom-0 right-[-12rem] h-[420px] w-[420px] rounded-full bg-white/5 blur-3xl" />
@@ -127,7 +127,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <div className="relative flex flex-col md:block">
+      <div className="relative flex w-full max-w-full min-w-0 flex-col overflow-hidden md:block">
       <section className="relative order-5 mx-auto max-w-7xl px-4 py-5 sm:px-6 md:order-none md:py-8">
         <div className="grid gap-4 overflow-hidden rounded-3xl border border-[#b89652]/30 bg-[radial-gradient(circle_at_top_right,rgba(184,150,82,0.18),transparent_32%),rgba(255,255,255,0.035)] p-4 shadow-[0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-5 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:p-6">
           <div className="grid h-12 w-12 place-items-center rounded-2xl border border-[#b89652]/35 bg-black/35 text-[#d8ba68] shadow-[0_0_24px_rgba(184,150,82,0.14)] sm:h-14 sm:w-14">
@@ -259,9 +259,9 @@ export default async function Home() {
       />
       </div>
 
-      <section id="map" className="order-5 mx-auto max-w-7xl px-4 pb-16 sm:px-6 md:order-none md:pb-24">
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
+      <section id="map" className="order-5 mx-auto w-full max-w-7xl min-w-0 overflow-hidden px-4 pb-16 sm:px-6 md:order-none md:pb-24">
+        <div className="mb-8 flex min-w-0 max-w-full flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="min-w-0">
             <p className="text-sm uppercase tracking-[0.3em] text-[#b89652]">
               Географія обʼєктів
             </p>
@@ -277,7 +277,7 @@ export default async function Home() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-[#070707] p-2 shadow-[0_0_40px_rgba(184,150,82,0.08)] md:rounded-[2rem] md:p-4">
+        <div className="w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-[#070707] p-2 shadow-[0_0_40px_rgba(184,150,82,0.08)] md:rounded-[2rem] md:p-4">
           <MapWrapper properties={properties} />
         </div>
       </section>

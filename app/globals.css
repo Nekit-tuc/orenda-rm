@@ -70,6 +70,18 @@ body {
   display: none;
 }
 
+.leaflet-container {
+  max-width: 100% !important;
+  overflow: hidden;
+  width: 100% !important;
+}
+
+.leaflet-pane,
+.leaflet-map-pane,
+.leaflet-tile-pane {
+  max-width: 100%;
+}
+
 .orenda-map-popup.leaflet-popup {
   max-width: calc(100vw - 32px) !important;
   animation: orenda-popup-in 250ms ease-out both;
