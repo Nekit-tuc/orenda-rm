@@ -45,11 +45,13 @@ type PropertySubmission = {
   full_name: string;
   phone: string;
   telegram: string | null;
-  object_type: "Земля" | "Комерція" | "Будинок";
+  email: string | null;
+  property_type: "Земля" | "Комерція" | "Будинок";
   address: string;
   area: string;
   price: string;
-  cadastral_number: string;
+  cadastral_number: string | null;
+  cadastral_photo: string | null;
   description: string | null;
   photos: string[];
   status: SubmissionStatus;
@@ -651,7 +653,7 @@ export default function AdminPage() {
       submission.full_name.toLowerCase().includes(searchValue) ||
       submission.phone.toLowerCase().includes(searchValue) ||
       submission.address.toLowerCase().includes(searchValue) ||
-      submission.cadastral_number.toLowerCase().includes(searchValue);
+      (submission.cadastral_number || "").toLowerCase().includes(searchValue);
 
     return statusMatch && searchMatch;
   });
@@ -675,11 +677,11 @@ export default function AdminPage() {
         submission.full_name,
         submission.phone,
         submission.telegram || "",
-        submission.object_type,
+        submission.property_type,
         submission.address,
         submission.area,
         submission.price,
-        submission.cadastral_number,
+        submission.cadastral_number || "",
         submissionStatusLabels[submission.status],
       ]),
     ];
@@ -1419,7 +1421,7 @@ export default function AdminPage() {
                             {submission.phone}
                           </td>
                           <td className="px-4 py-4 text-slate-300">
-                            {submission.object_type}
+                            {submission.property_type}
                           </td>
                           <td className="max-w-[220px] px-4 py-4 text-slate-300">
                             <span className="line-clamp-2">
@@ -1433,7 +1435,7 @@ export default function AdminPage() {
                             {submission.price}
                           </td>
                           <td className="px-4 py-4 text-slate-300">
-                            {submission.cadastral_number}
+                            {submission.cadastral_number || "Не вказано"}
                           </td>
                           <td className="px-4 py-4 text-slate-300">
                             {submissionStatusLabels[submission.status]}
@@ -1466,13 +1468,13 @@ export default function AdminPage() {
                         </span>
                       </div>
                       <p className="mt-3 text-sm text-slate-300">
-                        {submission.object_type} · {submission.area} · {submission.price}
+                        {submission.property_type} · {submission.area} · {submission.price}
                       </p>
                       <p className="mt-2 line-clamp-2 text-sm text-slate-400">
                         {submission.address}
                       </p>
                       <p className="mt-2 text-xs text-slate-500">
-                        Кадастр: {submission.cadastral_number}
+                        Кадастр: {submission.cadastral_number || "не вказано"}
                       </p>
                     </button>
                   ))}
@@ -1496,7 +1498,7 @@ export default function AdminPage() {
                       Деталі пропозиції
                     </p>
                     <h3 className="mt-2 text-2xl font-black">
-                      {selectedSubmission.object_type} · {selectedSubmission.address}
+                      {selectedSubmission.property_type} · {selectedSubmission.address}
                     </h3>
                   </div>
                   <button
@@ -1510,6 +1512,23 @@ export default function AdminPage() {
 
                 <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
                   <div className="min-w-0">
+                    {selectedSubmission.cadastral_photo && (
+                      <div className="mb-4 rounded-2xl border border-[#b89652]/30 bg-[#b89652]/10 p-3">
+                        <p className="mb-3 text-sm font-semibold text-[#d8ba68]">
+                          Кадастрове фото
+                        </p>
+                        <Image
+                          src={selectedSubmission.cadastral_photo}
+                          alt="Кадастровий план"
+                          width={960}
+                          height={520}
+                          sizes="(min-width: 1024px) 60vw, 100vw"
+                          unoptimized
+                          className="h-64 w-full rounded-2xl object-cover"
+                        />
+                      </div>
+                    )}
+
                     <div className="grid gap-3 sm:grid-cols-2">
                       {selectedSubmission.photos.map((photo, index) => (
                         <Image
@@ -1532,10 +1551,11 @@ export default function AdminPage() {
                       <p><span className="text-white/45">ПІБ:</span> {selectedSubmission.full_name}</p>
                       <p><span className="text-white/45">Телефон:</span> {selectedSubmission.phone}</p>
                       <p><span className="text-white/45">Telegram:</span> {selectedSubmission.telegram || "Не вказано"}</p>
-                      <p><span className="text-white/45">Тип:</span> {selectedSubmission.object_type}</p>
+                      <p><span className="text-white/45">Тип:</span> {selectedSubmission.property_type}</p>
                       <p><span className="text-white/45">Площа:</span> {selectedSubmission.area}</p>
                       <p><span className="text-white/45">Ціна:</span> {selectedSubmission.price}</p>
-                      <p><span className="text-white/45">Кадастр:</span> {selectedSubmission.cadastral_number}</p>
+                      <p><span className="text-white/45">Email:</span> {selectedSubmission.email || "Не вказано"}</p>
+                      <p><span className="text-white/45">Кадастр:</span> {selectedSubmission.cadastral_number || "Не вказано"}</p>
                       <p><span className="text-white/45">Опис:</span> {selectedSubmission.description || "Не вказано"}</p>
                     </div>
 

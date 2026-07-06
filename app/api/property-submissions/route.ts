@@ -39,26 +39,40 @@ export async function POST(request: Request) {
   const fullName = textValue(formData, "fullName");
   const phone = textValue(formData, "phone");
   const telegram = textValue(formData, "telegram");
-  const objectType = textValue(formData, "objectType");
+  const email = textValue(formData, "email");
+  const propertyType = textValue(formData, "propertyType");
   const address = textValue(formData, "address");
   const area = textValue(formData, "area");
   const price = textValue(formData, "price");
   const cadastralNumber = textValue(formData, "cadastralNumber");
   const description = textValue(formData, "description");
+  const cadastralPhotos = formData
+    .getAll("cadastralPhoto")
+    .filter((item): item is File => item instanceof File && item.size > 0);
   const photos = formData
     .getAll("photos")
     .filter((item): item is File => item instanceof File && item.size > 0);
 
-  if (!fullName || !phone || !address || !area || !price || !cadastralNumber) {
+  if (!fullName || !phone || !address || !area || !price) {
     return Response.json(
       { ok: false, message: "Заповніть усі обовʼязкові поля." },
       { status: 400 }
     );
   }
 
-  if (!isAllowedObjectType(objectType)) {
+  if (!isAllowedObjectType(propertyType)) {
     return Response.json(
       { ok: false, message: "Можна запропонувати тільки землю, комерцію або будинок." },
+      { status: 400 }
+    );
+  }
+
+  if (propertyType === "Земля" && (!cadastralNumber || cadastralPhotos.length < 1)) {
+    return Response.json(
+      {
+        ok: false,
+        message: "Для землі кадастровий номер і фото кадастрового плану обовʼязкові.",
+      },
       { status: 400 }
     );
   }
@@ -77,7 +91,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const invalidPhoto = photos.find(
+  const allFiles = [...photos, ...cadastralPhotos];
+  const invalidPhoto = allFiles.find(
     (file) => !allowedFileTypes.includes(file.type) || file.size > maxFileSize
   );
 
@@ -95,11 +110,12 @@ export async function POST(request: Request) {
       full_name: fullName,
       phone,
       telegram: telegram || null,
-      object_type: objectType,
+      email: email || null,
+      property_type: propertyType,
       address,
       area,
       price,
-      cadastral_number: cadastralNumber,
+      cadastral_number: cadastralNumber || null,
       description: description || null,
     })
     .select("id")
@@ -115,9 +131,37 @@ export async function POST(request: Request) {
   }
 
   const uploadedUrls: string[] = [];
+  let cadastralPhotoUrl: string | null = null;
+
+  for (const [index, file] of cadastralPhotos.entries()) {
+    const path = `${submission.id}/cadastral-${safeFileName(file, index)}`;
+    const { error: uploadError } = await supabase.storage
+      .from(bucketName)
+      .upload(path, file, {
+        cacheControl: "31536000",
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("PROPERTY SUBMISSION CADASTRAL PHOTO UPLOAD ERROR:", uploadError);
+      await supabase.from("property_submissions").delete().eq("id", submission.id);
+
+      return Response.json(
+        {
+          ok: false,
+          message: "Не вдалося завантажити кадастрове фото.",
+        },
+        { status: 500 }
+      );
+    }
+
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(path);
+    cadastralPhotoUrl = data.publicUrl;
+  }
 
   for (const [index, file] of photos.entries()) {
-    const path = `${submission.id}/${safeFileName(file, index)}`;
+    const path = `${submission.id}/photos/${safeFileName(file, index)}`;
     const { error: uploadError } = await supabase.storage
       .from(bucketName)
       .upload(path, file, {
@@ -145,7 +189,7 @@ export async function POST(request: Request) {
 
   const { error: updateError } = await supabase
     .from("property_submissions")
-    .update({ photos: uploadedUrls })
+    .update({ photos: uploadedUrls, cadastral_photo: cadastralPhotoUrl })
     .eq("id", submission.id);
 
   if (updateError) {
