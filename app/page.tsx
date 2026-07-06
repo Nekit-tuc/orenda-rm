@@ -127,7 +127,8 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="relative mx-auto max-w-7xl px-4 py-5 sm:px-6 md:py-8">
+      <div className="relative flex flex-col md:block">
+      <section className="relative order-5 mx-auto max-w-7xl px-4 py-5 sm:px-6 md:order-none md:py-8">
         <div className="grid gap-4 overflow-hidden rounded-3xl border border-[#b89652]/30 bg-[radial-gradient(circle_at_top_right,rgba(184,150,82,0.18),transparent_32%),rgba(255,255,255,0.035)] p-4 shadow-[0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-5 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:p-6">
           <div className="grid h-12 w-12 place-items-center rounded-2xl border border-[#b89652]/35 bg-black/35 text-[#d8ba68] shadow-[0_0_24px_rgba(184,150,82,0.14)] sm:h-14 sm:w-14">
             <BuyoutIcon className="h-7 w-7" />
@@ -153,7 +154,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="relative mx-auto max-w-7xl px-4 pb-10 sm:px-6 md:pb-14">
+      <section className="relative order-4 mx-auto max-w-7xl px-4 pb-10 sm:px-6 md:order-none md:pb-14">
         <div className="overflow-hidden rounded-3xl border border-[#b89652]/30 bg-[radial-gradient(circle_at_80%_35%,rgba(184,150,82,0.22),transparent_28%),linear-gradient(135deg,rgba(184,150,82,0.16),rgba(255,255,255,0.035))] p-5 shadow-[0_26px_90px_rgba(0,0,0,0.32)] sm:p-6 md:p-8">
           <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
             <div>
@@ -187,7 +188,8 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 md:py-12">
+      <section className="relative order-1 mx-auto flex max-w-7xl flex-col px-4 py-8 sm:px-6 md:order-none md:py-12">
+        <div className="order-2 md:order-1">
         <div className="mb-6">
           <h2 className="text-xl font-extrabold sm:text-2xl">Новини ринку нерухомості</h2>
         </div>
@@ -225,7 +227,9 @@ export default async function Home() {
           ))}
         </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/[0.035] p-2 sm:mt-7 sm:grid-cols-2 sm:gap-0 sm:overflow-hidden sm:p-0 lg:grid-cols-4">
+        </div>
+
+        <div className="order-1 mb-6 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/[0.035] p-2 sm:grid-cols-2 sm:gap-0 sm:overflow-hidden sm:p-0 md:order-2 md:mb-0 md:mt-7 lg:grid-cols-4">
           {benefits.map((item) => (
             <div
               key={item.title}
@@ -247,13 +251,15 @@ export default async function Home() {
         </div>
       </section>
 
+      <div className="order-3 md:contents">
       <PropertiesSection
         properties={properties}
         sectionTitle={homepageSettings.sectionTitle}
         sectionSubtitle={homepageSettings.sectionSubtitle}
       />
+      </div>
 
-      <section id="map" className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 md:pb-24">
+      <section id="map" className="order-5 mx-auto max-w-7xl px-4 pb-16 sm:px-6 md:order-none md:pb-24">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.3em] text-[#b89652]">
@@ -277,6 +283,7 @@ export default async function Home() {
       </section>
 
       <div id="contacts" />
+      </div>
       <Footer />
     </main>
   );
