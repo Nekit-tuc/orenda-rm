@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 
 export type HomepageSettings = {
   heroTitle: string;
@@ -160,33 +160,29 @@ export function rowToSettings(row: HomepageSettingsRow | null): HomepageSettings
 }
 
 export async function getHomepageSettings(): Promise<HomepageSettings> {
-  const baseSelect =
-    "id, hero_title, hero_subtitle, hero_button_text, hero_button_url, section_title, section_subtitle, telegram_title, telegram_text, telegram_button_text, telegram_url, real_estate_blocks";
+  const noStoreSupabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      global: {
+        fetch: (input, init) =>
+          fetch(input, {
+            ...init,
+            cache: "no-store",
+          }),
+      },
+    }
+  );
 
-  const { data, error } = await supabase
+  const { data, error } = await noStoreSupabase
     .from("homepage_settings")
-    .select(`${baseSelect}, show_quick_search`)
+    .select(
+      "id, hero_title, hero_subtitle, hero_button_text, hero_button_url, section_title, section_subtitle, telegram_title, telegram_text, telegram_button_text, telegram_url, show_quick_search, real_estate_blocks"
+    )
     .eq("id", 1)
     .maybeSingle();
 
   if (error) {
-    const retry = await supabase
-      .from("homepage_settings")
-      .select(baseSelect)
-      .eq("id", 1)
-      .maybeSingle();
-
-    if (!retry.error) {
-      if (!retry.data) {
-        return defaultHomepageSettings;
-      }
-
-      return rowToSettings({
-        ...(retry.data as Omit<HomepageSettingsRow, "show_quick_search">),
-        show_quick_search: true,
-      });
-    }
-
     console.error("Homepage settings error:", error);
     return defaultHomepageSettings;
   }
