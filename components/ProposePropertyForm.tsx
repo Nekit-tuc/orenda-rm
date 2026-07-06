@@ -105,26 +105,26 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
 
   if (step === "rules") {
     return (
-      <div className="rounded-3xl border border-[#b89652]/30 bg-white/[0.035] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.4)] backdrop-blur-xl sm:p-6 md:p-8">
+      <div className="rounded-3xl border border-[#b89652]/30 bg-white/[0.035] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.4)] backdrop-blur-xl sm:p-5 md:p-6">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#b89652]">
             Правила
           </p>
-          <h2 className="mt-3 text-2xl font-black leading-tight">
+          <h2 className="mt-2 text-xl font-black leading-tight sm:text-2xl">
             Перед додаванням обʼєкта
           </h2>
-          <p className="mt-3 text-sm leading-6 text-white/62">
+          <p className="mt-2 text-sm leading-5 text-white/62">
             Будь ласка, уважно ознайомтеся з обовʼязковими умовами.
           </p>
         </div>
 
-        <div className="mt-6 grid gap-3">
+        <div className="mt-4 grid gap-2.5">
           {rules.map((rule, index) => (
             <div
               key={rule}
-              className="rounded-2xl border border-white/10 bg-black/35 p-4"
+              className="rounded-2xl border border-white/10 bg-black/35 p-3"
             >
-              <p className="text-sm leading-6 text-white/72">
+              <p className="text-[13px] leading-5 text-white/72 sm:text-sm">
                 <span className="mr-2 font-black text-[#d8ba68]">
                   {index + 1}.
                 </span>
@@ -134,14 +134,14 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
           ))}
         </div>
 
-        <label className="mt-6 flex gap-3 rounded-2xl border border-[#b89652]/30 bg-[#b89652]/10 p-4">
+        <label className="mt-4 flex gap-2.5 rounded-2xl border border-[#b89652]/30 bg-[#b89652]/10 p-3">
           <input
             type="checkbox"
             checked={acceptedRules}
             onChange={(event) => setAcceptedRules(event.target.checked)}
             className="mt-1 h-5 w-5 shrink-0 accent-[#b89652]"
           />
-          <span className="text-sm leading-6 text-white/78">
+          <span className="text-[13px] leading-5 text-white/78 sm:text-sm">
             Я уважно ознайомився(лася) з правилами та підтверджую, що надана
             мною інформація є достовірною.
           </span>
@@ -151,7 +151,7 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
           type="button"
           disabled={!acceptedRules}
           onClick={() => setStep("form")}
-          className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-2xl border border-[#d4af37]/55 bg-[#b89652] px-5 py-3 text-base font-black text-black shadow-[0_0_30px_rgba(184,150,82,0.28)] transition-all duration-300 hover:bg-[#d4af37] disabled:cursor-not-allowed disabled:opacity-45"
+          className="mt-4 inline-flex min-h-[50px] w-full items-center justify-center rounded-2xl border border-[#d4af37]/55 bg-[#b89652] px-4 py-2.5 text-base font-black text-black shadow-[0_0_30px_rgba(184,150,82,0.28)] transition-all duration-300 hover:bg-[#d4af37] disabled:cursor-not-allowed disabled:opacity-45"
         >
           Продовжити
         </button>
@@ -163,17 +163,17 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="rounded-3xl border border-[#b89652]/30 bg-white/[0.035] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.4)] backdrop-blur-xl sm:p-6 md:p-8"
+      className="rounded-3xl border border-[#b89652]/30 bg-white/[0.035] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.4)] backdrop-blur-xl sm:p-5 md:p-6"
     >
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="mb-4 flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#b89652]">
             Форма
           </p>
-          <h2 className="mt-3 text-2xl font-black leading-tight">
+          <h2 className="mt-2 text-xl font-black leading-tight sm:text-2xl">
             Дані обʼєкта
           </h2>
-          <p className="mt-3 text-sm leading-6 text-white/62">
+          <p className="mt-2 text-sm leading-5 text-white/62">
             Заповніть поля та додайте фото. Обʼєкт не буде опублікований без перевірки.
           </p>
         </div>
@@ -181,31 +181,31 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
         <button
           type="button"
           onClick={() => setStep("rules")}
-          className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#b89652]/45 hover:text-[#d8ba68]"
+          className="rounded-2xl border border-white/10 bg-black/30 px-3.5 py-2.5 text-sm font-semibold text-white transition hover:border-[#b89652]/45 hover:text-[#d8ba68]"
         >
           Назад до правил
         </button>
       </div>
 
-      <div className="grid gap-5">
-        <section className="rounded-3xl border border-white/10 bg-black/30 p-4 sm:p-5">
-          <h3 className="text-lg font-black">Контактні дані</h3>
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            <input required name="fullName" placeholder="ПІБ *" className="min-h-12 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 outline-none placeholder:text-white/30 focus:border-[#d4af37]/70" />
-            <input required name="phone" placeholder="Телефон *" inputMode="tel" className="min-h-12 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 outline-none placeholder:text-white/30 focus:border-[#d4af37]/70" />
-            <input name="telegram" placeholder="Telegram" className="min-h-12 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 outline-none placeholder:text-white/30 focus:border-[#d4af37]/70" />
-            <input name="email" type="email" placeholder="Email" className="min-h-12 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 outline-none placeholder:text-white/30 focus:border-[#d4af37]/70" />
+      <div className="grid gap-3.5">
+        <section className="rounded-3xl border border-white/10 bg-black/30 p-3.5 sm:p-4">
+          <h3 className="text-base font-black sm:text-lg">Контактні дані</h3>
+          <div className="mt-3 grid gap-2.5 md:grid-cols-2">
+            <input required name="fullName" placeholder="ПІБ *" className="min-h-[50px] rounded-2xl border border-white/10 bg-black/45 px-3.5 py-2.5 text-[15px] outline-none placeholder:text-white/38 focus:border-[#d4af37]/70" />
+            <input required name="phone" placeholder="Телефон *" inputMode="tel" className="min-h-[50px] rounded-2xl border border-white/10 bg-black/45 px-3.5 py-2.5 text-[15px] outline-none placeholder:text-white/38 focus:border-[#d4af37]/70" />
+            <input name="telegram" placeholder="Telegram" className="min-h-[50px] rounded-2xl border border-white/10 bg-black/45 px-3.5 py-2.5 text-[15px] outline-none placeholder:text-white/38 focus:border-[#d4af37]/70" />
+            <input name="email" type="email" placeholder="Email" className="min-h-[50px] rounded-2xl border border-white/10 bg-black/45 px-3.5 py-2.5 text-[15px] outline-none placeholder:text-white/38 focus:border-[#d4af37]/70" />
           </div>
         </section>
 
-        <section className="rounded-3xl border border-white/10 bg-black/30 p-4 sm:p-5">
-          <h3 className="text-lg font-black">Інформація про обʼєкт</h3>
-          <div className="mt-4 grid gap-3">
+        <section className="rounded-3xl border border-white/10 bg-black/30 p-3.5 sm:p-4">
+          <h3 className="text-base font-black sm:text-lg">Інформація про обʼєкт</h3>
+          <div className="mt-3 grid gap-2.5">
             <div className="grid gap-2 sm:grid-cols-3">
               {propertyTypes.map((type) => (
                 <label
                   key={type}
-                  className={`flex min-h-12 items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+                  className={`flex min-h-[50px] items-center gap-2.5 rounded-2xl border px-3.5 py-2.5 text-sm font-semibold transition ${
                     propertyType === type
                       ? "border-[#d4af37] bg-[#b89652]/15 text-[#d8ba68]"
                       : "border-white/10 bg-black/30 text-white/72"
@@ -223,26 +223,26 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
               ))}
             </div>
 
-            <input required name="address" placeholder="Адреса *" className="min-h-12 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 outline-none placeholder:text-white/30 focus:border-[#d4af37]/70" />
-            <div className="grid gap-3 md:grid-cols-2">
-              <input required name="area" placeholder="Площа *" className="min-h-12 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 outline-none placeholder:text-white/30 focus:border-[#d4af37]/70" />
-              <input required name="price" placeholder="Ціна *" className="min-h-12 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 outline-none placeholder:text-white/30 focus:border-[#d4af37]/70" />
+            <input required name="address" placeholder="Адреса *" className="min-h-[50px] rounded-2xl border border-white/10 bg-black/45 px-3.5 py-2.5 text-[15px] outline-none placeholder:text-white/38 focus:border-[#d4af37]/70" />
+            <div className="grid gap-2.5 md:grid-cols-2">
+              <input required name="area" placeholder="Площа *" className="min-h-[50px] rounded-2xl border border-white/10 bg-black/45 px-3.5 py-2.5 text-[15px] outline-none placeholder:text-white/38 focus:border-[#d4af37]/70" />
+              <input required name="price" placeholder="Ціна *" className="min-h-[50px] rounded-2xl border border-white/10 bg-black/45 px-3.5 py-2.5 text-[15px] outline-none placeholder:text-white/38 focus:border-[#d4af37]/70" />
             </div>
-            <textarea name="description" placeholder="Опис" className="min-h-28 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 outline-none placeholder:text-white/30 focus:border-[#d4af37]/70" />
+            <textarea name="description" placeholder="Опис" className="min-h-24 rounded-2xl border border-white/10 bg-black/45 px-3.5 py-2.5 text-[15px] outline-none placeholder:text-white/38 focus:border-[#d4af37]/70" />
           </div>
         </section>
 
-        <section className="rounded-3xl border border-white/10 bg-black/30 p-4 sm:p-5">
-          <h3 className="text-lg font-black">Кадастр</h3>
-          <p className="mt-2 text-sm leading-6 text-white/52">{cadastralHelp}</p>
-          <div className="mt-4 grid gap-3">
+        <section className="rounded-3xl border border-white/10 bg-black/30 p-3.5 sm:p-4">
+          <h3 className="text-base font-black sm:text-lg">Кадастр</h3>
+          <p className="mt-1.5 text-[13px] leading-5 text-white/52 sm:text-sm">{cadastralHelp}</p>
+          <div className="mt-3 grid gap-2.5">
             <input
               required={isLand}
               name="cadastralNumber"
               placeholder={`Кадастровий номер${isLand ? " *" : ""}`}
-              className="min-h-12 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 outline-none placeholder:text-white/30 focus:border-[#d4af37]/70"
+              className="min-h-[50px] rounded-2xl border border-white/10 bg-black/45 px-3.5 py-2.5 text-[15px] outline-none placeholder:text-white/38 focus:border-[#d4af37]/70"
             />
-            <label className="grid gap-2 rounded-2xl border border-dashed border-[#b89652]/35 bg-black/45 p-4">
+            <label className="grid gap-2 rounded-2xl border border-dashed border-[#b89652]/35 bg-black/45 p-3">
               <span className="text-sm font-semibold text-white/78">
                 Фото кадастрового плану{isLand ? " *" : ""}
               </span>
@@ -251,18 +251,18 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
                 name="cadastralPhoto"
                 type="file"
                 accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                className="text-sm file:mr-3 file:rounded-xl file:border-0 file:bg-[#b89652] file:px-4 file:py-2 file:font-bold file:text-black"
+                className="text-sm file:mr-3 file:rounded-xl file:border-0 file:bg-[#b89652] file:px-3.5 file:py-2 file:font-bold file:text-black"
               />
             </label>
           </div>
         </section>
 
-        <section className="rounded-3xl border border-white/10 bg-black/30 p-4 sm:p-5">
-          <h3 className="text-lg font-black">Фото обʼєкта</h3>
-          <p className="mt-2 text-sm leading-6 text-white/52">
+        <section className="rounded-3xl border border-white/10 bg-black/30 p-3.5 sm:p-4">
+          <h3 className="text-base font-black sm:text-lg">Фото обʼєкта</h3>
+          <p className="mt-1.5 text-[13px] leading-5 text-white/52 sm:text-sm">
             Додайте від 1 до 15 фото. JPG, JPEG, PNG або WEBP до 10MB.
           </p>
-          <label className="mt-4 grid gap-2 rounded-2xl border border-dashed border-[#b89652]/35 bg-black/45 p-4">
+          <label className="mt-3 grid gap-2 rounded-2xl border border-dashed border-[#b89652]/35 bg-black/45 p-3">
             <span className="text-sm font-semibold text-white/78">
               Додати фото *
             </span>
@@ -272,7 +272,7 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
               type="file"
               multiple
               accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-              className="text-sm file:mr-3 file:rounded-xl file:border-0 file:bg-[#b89652] file:px-4 file:py-2 file:font-bold file:text-black"
+              className="text-sm file:mr-3 file:rounded-xl file:border-0 file:bg-[#b89652] file:px-3.5 file:py-2 file:font-bold file:text-black"
             />
           </label>
         </section>
@@ -280,7 +280,7 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
 
       {message && (
         <p
-          className={`mt-5 rounded-2xl border px-4 py-3 text-sm leading-5 ${
+          className={`mt-4 rounded-2xl border px-3.5 py-2.5 text-sm leading-5 ${
             isSuccess
               ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
               : "border-red-400/25 bg-red-500/10 text-red-100"
@@ -293,7 +293,7 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-2xl border border-[#d4af37]/55 bg-[#b89652] px-5 py-3 text-base font-black text-black shadow-[0_0_30px_rgba(184,150,82,0.28)] transition-all duration-300 hover:bg-[#d4af37] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-4 inline-flex min-h-[50px] w-full items-center justify-center rounded-2xl border border-[#d4af37]/55 bg-[#b89652] px-4 py-2.5 text-base font-black text-black shadow-[0_0_30px_rgba(184,150,82,0.28)] transition-all duration-300 hover:bg-[#d4af37] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? "Надсилаємо..." : "Надіслати на перевірку"}
       </button>

@@ -5,7 +5,7 @@ import { getProperties } from "@/lib/getProperties";
 import { getHomepageSettings } from "@/lib/homepageSettings";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { MessageIcon, ObjectsIcon } from "@/components/PremiumIcons";
+import { BuyoutIcon, MessageIcon, ObjectsIcon } from "@/components/PremiumIcons";
 import SubmitPropertyButton from "@/components/SubmitPropertyButton";
 
 export const dynamic = "force-dynamic";
@@ -100,7 +100,6 @@ export default async function Home() {
                 Звʼязатись
               </a>
 
-              <SubmitPropertyButton className="inline-flex items-center justify-center rounded-2xl border border-[#b89652]/35 bg-black/35 px-5 py-2.5 text-center text-[13px] font-bold text-white shadow-[0_0_20px_rgba(184,150,82,0.12)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652]/12 hover:text-[#d8ba68] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] md:px-7 md:py-3.5 md:text-sm" />
             </div>
           </div>
 
@@ -135,6 +134,33 @@ export default async function Home() {
         </div>
       </section>
 
+      <section className="relative mx-auto max-w-7xl px-4 py-5 sm:px-6 md:py-8">
+        <div className="grid gap-4 overflow-hidden rounded-3xl border border-[#b89652]/30 bg-[radial-gradient(circle_at_top_right,rgba(184,150,82,0.18),transparent_32%),rgba(255,255,255,0.035)] p-4 shadow-[0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-5 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:p-6">
+          <div className="grid h-12 w-12 place-items-center rounded-2xl border border-[#b89652]/35 bg-black/35 text-[#d8ba68] shadow-[0_0_24px_rgba(184,150,82,0.14)] sm:h-14 sm:w-14">
+            <BuyoutIcon className="h-7 w-7" />
+          </div>
+
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#b89652]">
+              Пропозиція власникам
+            </p>
+            <h2 className="mt-1.5 text-xl font-extrabold text-white sm:text-2xl">
+              Викуп обʼєктів
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-white/64">
+              Ми також розглядаємо обʼєкти для викупу: землю, комерційну нерухомість та будинки.
+              Надішліть інформацію про свій обʼєкт — ми ознайомимось із пропозицією та звʼяжемося з вами.
+            </p>
+          </div>
+
+          <SubmitPropertyButton
+            label="Запропонувати"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#b89652]/45 bg-[#b89652]/10 px-5 py-2.5 text-center text-sm font-bold text-white shadow-[0_0_24px_rgba(184,150,82,0.16)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_34px_rgba(212,175,55,0.3)] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] md:w-auto"
+          />
+        </div>
+      </section>
+
+      {homepageSettings.showQuickSearch && (
       <section className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 md:py-12">
         <div className="flex items-end justify-between gap-4">
           <div>
@@ -164,6 +190,7 @@ export default async function Home() {
           ))}
         </div>
       </section>
+      )}
 
       <section className="relative mx-auto max-w-7xl px-4 pb-10 sm:px-6 md:pb-14">
         <div className="overflow-hidden rounded-3xl border border-[#b89652]/30 bg-[radial-gradient(circle_at_80%_35%,rgba(184,150,82,0.22),transparent_28%),linear-gradient(135deg,rgba(184,150,82,0.16),rgba(255,255,255,0.035))] p-5 shadow-[0_26px_90px_rgba(0,0,0,0.32)] sm:p-6 md:p-8">
@@ -194,8 +221,6 @@ export default async function Home() {
                 <ObjectsIcon />
                 Переглянути обʼєкти
               </a>
-
-              <SubmitPropertyButton className="inline-flex items-center justify-center rounded-2xl border border-[#b89652]/35 bg-black/25 px-5 py-2.5 text-center text-[13px] font-bold text-white shadow-[0_0_20px_rgba(184,150,82,0.12)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652]/12 hover:text-[#d8ba68] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] sm:text-sm" />
             </div>
           </div>
         </div>

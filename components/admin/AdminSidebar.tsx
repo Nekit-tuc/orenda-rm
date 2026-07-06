@@ -1,8 +1,8 @@
 type AdminSidebarProps = {
   isOpen: boolean;
   onClose: () => void;
-  activeSection: "overview" | "objects" | "homepage" | "leads" | "submissions";
-  onSectionChange: (section: "overview" | "objects" | "homepage" | "leads" | "submissions") => void;
+  activeSection: "overview" | "objects" | "homepage" | "blocks" | "leads" | "submissions";
+  onSectionChange: (section: "overview" | "objects" | "homepage" | "blocks" | "leads" | "submissions") => void;
 };
 
 const navItems = [
@@ -11,6 +11,7 @@ const navItems = [
   { id: "leads" as const, label: "Клієнти / Ліди", short: "Л" },
   { id: "submissions" as const, label: "Пропозиції", short: "П" },
   { id: "homepage" as const, label: "Контент головної", short: "К" },
+  { id: "blocks" as const, label: "Налаштування блоків", short: "Б" },
 ];
 
 export default function AdminSidebar({

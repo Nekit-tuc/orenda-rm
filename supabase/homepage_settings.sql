@@ -85,6 +85,9 @@ alter table public.homepage_settings
     }
   ]'::jsonb;
 
+alter table public.homepage_settings
+  add column if not exists show_quick_search boolean default true;
+
 insert into public.homepage_settings (
   id,
   hero_title,
