@@ -12,15 +12,6 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
-const quickCategories = [
-  { icon: "▦", title: "Офіси" },
-  { icon: "▤", title: "Склади" },
-  { icon: "⌂", title: "Квартири" },
-  { icon: "▱", title: "Комерція" },
-  { icon: "◌", title: "Оренда" },
-  { icon: "◇", title: "Продаж" },
-];
-
 const benefits = [
   {
     icon: "▥",
@@ -161,38 +152,6 @@ export default async function Home() {
           />
         </div>
       </section>
-
-      {homepageSettings.showQuickSearch && (
-      <section className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 md:py-12">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.28em] text-[#b89652]">
-              Швидкий пошук
-            </p>
-            <h2 className="mt-2 text-xl font-extrabold sm:text-2xl md:text-3xl">
-              Популярні <span className="text-[#b89652]">категорії</span>
-            </h2>
-          </div>
-        </div>
-
-        <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 lg:gap-4">
-          {quickCategories.map((category) => (
-            <a
-              key={category.title}
-              href="#objects"
-              className="group rounded-2xl border border-white/10 bg-[linear-gradient(145deg,rgba(255,255,255,0.075),rgba(255,255,255,0.025))] p-3.5 text-center shadow-[inset_0_-28px_44px_rgba(184,150,82,0.06)] transition hover:-translate-y-1 hover:border-[#b89652]/55 focus:outline-none focus:ring-2 focus:ring-[#b89652] sm:p-5 md:rounded-3xl md:p-6"
-            >
-              <span className="mx-auto grid h-10 w-10 place-items-center rounded-2xl bg-[#b89652]/12 text-xl text-[#d8ba68] transition group-hover:bg-[#b89652]/20 sm:h-12 sm:w-12 sm:text-2xl">
-                {category.icon}
-              </span>
-              <span className="mt-2.5 block text-sm font-bold sm:text-base">
-                {category.title}
-              </span>
-            </a>
-          ))}
-        </div>
-      </section>
-      )}
 
       <section className="relative mx-auto max-w-7xl px-4 pb-10 sm:px-6 md:pb-14">
         <div className="overflow-hidden rounded-3xl border border-[#b89652]/30 bg-[radial-gradient(circle_at_80%_35%,rgba(184,150,82,0.22),transparent_28%),linear-gradient(135deg,rgba(184,150,82,0.16),rgba(255,255,255,0.035))] p-5 shadow-[0_26px_90px_rgba(0,0,0,0.32)] sm:p-6 md:p-8">

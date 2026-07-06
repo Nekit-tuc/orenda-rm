@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 type HomepageSettingsPayload = Partial<HomepageSettings>;
 
 const homepageSettingsSelect =
-  "id, hero_title, hero_subtitle, hero_button_text, hero_button_url, section_title, section_subtitle, telegram_title, telegram_text, telegram_button_text, telegram_url, show_quick_search, real_estate_blocks";
+  "id, hero_title, hero_subtitle, hero_button_text, hero_button_url, section_title, section_subtitle, telegram_title, telegram_text, telegram_button_text, telegram_url, real_estate_blocks";
 
 async function isAdminSession() {
   const cookieStore = await cookies();
@@ -32,7 +32,6 @@ function settingsToRow(data: HomepageSettingsPayload) {
     telegram_text: data.telegramText,
     telegram_button_text: data.telegramButtonText,
     telegram_url: data.telegramUrl,
-    show_quick_search: data.showQuickSearch ?? true,
     real_estate_blocks: data.realEstateBlocks,
     updated_at: new Date().toISOString(),
   };

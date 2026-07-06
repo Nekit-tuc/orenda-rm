@@ -11,7 +11,6 @@ export type HomepageSettings = {
   telegramText: string;
   telegramButtonText: string;
   telegramUrl: string;
-  showQuickSearch: boolean;
   realEstateBlocks: RealEstateBlockSettings[];
 };
 
@@ -36,7 +35,6 @@ export type HomepageSettingsRow = {
   telegram_text: string | null;
   telegram_button_text: string | null;
   telegram_url: string | null;
-  show_quick_search: boolean | null;
   real_estate_blocks: RealEstateBlockSettings[] | null;
 };
 
@@ -92,7 +90,6 @@ export const defaultHomepageSettings: HomepageSettings = {
     "Напишіть нам у Telegram, щоб уточнити деталі, домовитися про перегляд або запропонувати свій об'єкт.",
   telegramButtonText: "Зв'язатися",
   telegramUrl: "https://t.me/zt_space",
-  showQuickSearch: true,
   realEstateBlocks: defaultRealEstateBlocks,
 };
 
@@ -154,7 +151,6 @@ export function rowToSettings(row: HomepageSettingsRow | null): HomepageSettings
     telegramButtonText:
       row.telegram_button_text || defaultHomepageSettings.telegramButtonText,
     telegramUrl: row.telegram_url || defaultHomepageSettings.telegramUrl,
-    showQuickSearch: row.show_quick_search ?? true,
     realEstateBlocks: normalizeRealEstateBlocks(row.real_estate_blocks),
   };
 }
@@ -177,7 +173,7 @@ export async function getHomepageSettings(): Promise<HomepageSettings> {
   const { data, error } = await noStoreSupabase
     .from("homepage_settings")
     .select(
-      "id, hero_title, hero_subtitle, hero_button_text, hero_button_url, section_title, section_subtitle, telegram_title, telegram_text, telegram_button_text, telegram_url, show_quick_search, real_estate_blocks"
+      "id, hero_title, hero_subtitle, hero_button_text, hero_button_url, section_title, section_subtitle, telegram_title, telegram_text, telegram_button_text, telegram_url, real_estate_blocks"
     )
     .eq("id", 1)
     .maybeSingle();

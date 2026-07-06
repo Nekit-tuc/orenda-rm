@@ -22,7 +22,7 @@ import {
   type RealEstateBlockSettings,
 } from "@/lib/homepageSettings";
 
-type AdminSection = "overview" | "objects" | "homepage" | "blocks" | "leads" | "submissions";
+type AdminSection = "overview" | "objects" | "homepage" | "leads" | "submissions";
 
 type PropertyLead = {
   id: string;
@@ -78,8 +78,6 @@ export default function AdminPage() {
   );
   const [homepageMessage, setHomepageMessage] = useState("");
   const [homepageSaving, setHomepageSaving] = useState(false);
-  const [blocksMessage, setBlocksMessage] = useState("");
-  const [blocksSaving, setBlocksSaving] = useState(false);
   const [leads, setLeads] = useState<PropertyLead[]>([]);
   const [leadsSearch, setLeadsSearch] = useState("");
   const [leadsLoading, setLeadsLoading] = useState(false);
@@ -863,27 +861,6 @@ export default function AdminPage() {
       setHomepageMessage("Контент головної сторінки оновлено");
     }
 
-    async function saveBlockSettings(e: React.FormEvent) {
-      e.preventDefault();
-      setBlocksSaving(true);
-      setBlocksMessage("");
-
-      try {
-        const savedSettings = await saveHomepageSettingsFromAdmin();
-        setHomepageContent(savedSettings);
-      } catch (error) {
-        console.error("Block settings save error:", error);
-        setBlocksMessage(
-          error instanceof Error ? error.message : "Помилка при збереженні."
-        );
-        setBlocksSaving(false);
-        return;
-      }
-
-      setBlocksSaving(false);
-      setBlocksMessage("Налаштування блоків оновлено");
-    }
-
     function updateRealEstateBlock(
       index: number,
       field: keyof RealEstateBlockSettings,
@@ -1230,65 +1207,6 @@ export default function AdminPage() {
 
             {homepageMessage && (
               <p className="text-sm text-white/60">{homepageMessage}</p>
-            )}
-          </div>
-        </form>
-      )}
-
-      {activeSection === "blocks" && (
-        <form
-          onSubmit={saveBlockSettings}
-          className="mb-8 rounded-2xl border border-blue-400/20 bg-white/[0.04] p-5 shadow-2xl shadow-blue-950/10 backdrop-blur-xl sm:p-6"
-        >
-          <div className="mb-6">
-            <p className="text-xs uppercase tracking-[0.28em] text-blue-300">
-              Блоки сторінки
-            </p>
-            <h2 className="mt-3 text-3xl font-bold text-white">
-              Налаштування блоків
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-              Керуйте видимістю окремих блоків на головній сторінці без зміни коду.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-[#030712]/70 p-4 sm:p-5">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
-                <h3 className="text-lg font-bold text-white">Швидкий пошук</h3>
-                <p className="mt-1 text-sm leading-6 text-slate-400">
-                  Блок з популярними категоріями на головній сторінці.
-                </p>
-              </div>
-
-              <label className="flex min-h-12 cursor-pointer items-center justify-between gap-3 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#b89652]/45 sm:min-w-64">
-                <span>Показувати на сайті</span>
-                <input
-                  type="checkbox"
-                  checked={homepageContent.showQuickSearch}
-                  onChange={(e) =>
-                    setHomepageContent({
-                      ...homepageContent,
-                      showQuickSearch: e.target.checked,
-                    })
-                  }
-                  className="h-5 w-5 accent-[#b89652]"
-                />
-              </label>
-            </div>
-          </div>
-
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <button
-              type="submit"
-              disabled={blocksSaving}
-              className="rounded-2xl bg-blue-500 px-6 py-4 font-medium text-white shadow-lg shadow-blue-500/25 transition hover:bg-blue-400 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {blocksSaving ? "Збереження..." : "Зберегти зміни"}
-            </button>
-
-            {blocksMessage && (
-              <p className="text-sm text-white/60">{blocksMessage}</p>
             )}
           </div>
         </form>

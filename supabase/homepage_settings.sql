@@ -86,7 +86,7 @@ alter table public.homepage_settings
   ]'::jsonb;
 
 alter table public.homepage_settings
-  add column if not exists show_quick_search boolean default true;
+  drop column if exists show_quick_search;
 
 alter table public.homepage_settings enable row level security;
 
