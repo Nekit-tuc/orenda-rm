@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import type { Property } from "@/types/property";
@@ -24,7 +24,19 @@ import {
   updateHomepageSettings,
 } from "@/lib/homepageSettings";
 
-type AdminSection = "overview" | "objects" | "homepage";
+type AdminSection = "overview" | "objects" | "homepage" | "leads";
+
+type PropertyLead = {
+  id: string;
+  full_name: string;
+  phone: string;
+  property_id: number | null;
+  property_title: string | null;
+  property_slug: string | null;
+  source: string | null;
+  user_agent: string | null;
+  created_at: string;
+};
 
 export default function AdminPage() {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -41,6 +53,10 @@ export default function AdminPage() {
   );
   const [homepageMessage, setHomepageMessage] = useState("");
   const [homepageSaving, setHomepageSaving] = useState(false);
+  const [leads, setLeads] = useState<PropertyLead[]>([]);
+  const [leadsSearch, setLeadsSearch] = useState("");
+  const [leadsLoading, setLeadsLoading] = useState(false);
+  const [leadsError, setLeadsError] = useState("");
 
   const [formData, setFormData] = useState({
     title: "",
@@ -111,6 +127,30 @@ export default function AdminPage() {
     setLoading(false);
   }
 
+  const loadLeads = useCallback(async function loadLeads() {
+    setLeadsLoading(true);
+    setLeadsError("");
+
+    const response = await fetch("/api/admin/leads", {
+      cache: "no-store",
+    });
+
+    const result = (await response.json().catch(() => null)) as {
+      ok?: boolean;
+      leads?: PropertyLead[];
+      message?: string;
+    } | null;
+
+    if (!response.ok || !result?.ok) {
+      setLeadsError(result?.message || "Не вдалося завантажити ліди.");
+      setLeads([]);
+    } else {
+      setLeads(result.leads || []);
+    }
+
+    setLeadsLoading(false);
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -144,6 +184,16 @@ export default function AdminPage() {
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (activeSection === "leads") {
+      const timeoutId = window.setTimeout(() => {
+        void loadLeads();
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
+    }
+  }, [activeSection, loadLeads]);
         
         async function geocodeAddress() {
         if (!formData.address.trim()) {
@@ -470,6 +520,60 @@ export default function AdminPage() {
     return typeMatch && statusMatch && searchMatch;
   });
 
+  const filteredLeads = leads.filter((lead) => {
+    const searchValue = leadsSearch.toLowerCase().trim();
+
+    if (!searchValue) {
+      return true;
+    }
+
+    return (
+      lead.full_name.toLowerCase().includes(searchValue) ||
+      lead.phone.toLowerCase().includes(searchValue) ||
+      (lead.property_title || "").toLowerCase().includes(searchValue)
+    );
+  });
+
+  function formatLeadDate(value: string) {
+    return new Intl.DateTimeFormat("uk-UA", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(new Date(value));
+  }
+
+  function escapeCsvValue(value: string | number | null | undefined) {
+    const normalized = String(value ?? "").replace(/"/g, '""');
+
+    return `"${normalized}"`;
+  }
+
+  function downloadLeadsCsv() {
+    const rows = [
+      ["Дата", "ПІБ", "Телефон", "Об'єкт", "Slug", "Джерело"],
+      ...leads.map((lead) => [
+        formatLeadDate(lead.created_at),
+        lead.full_name,
+        lead.phone,
+        lead.property_title || "",
+        lead.property_slug || "",
+        lead.source || "",
+      ]),
+    ];
+
+    const csv = rows
+      .map((row) => row.map((value) => escapeCsvValue(value)).join(","))
+      .join("\n");
+    const blob = new Blob([`\uFEFF${csv}`], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `orendarm-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
     async function copyPropertyLink(property: Property) {
       const slug = getPropertySlug(property);
       const url = `${window.location.origin}/objects/${slug}`;
@@ -636,7 +740,7 @@ export default function AdminPage() {
             />
           </div>
 
-          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          <div className="mt-6 grid gap-4 lg:grid-cols-4">
             <button
               type="button"
               onClick={() => setActiveSection("objects")}
@@ -673,6 +777,19 @@ export default function AdminPage() {
               </span>
               <span className="mt-2 block text-sm text-slate-400">
                 Редагування головного заголовка та підзаголовка.
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveSection("leads")}
+              className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-blue-300/40 hover:bg-white/[0.06] focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              <span className="text-sm font-semibold text-white">
+                Клієнти / Ліди
+              </span>
+              <span className="mt-2 block text-sm text-slate-400">
+                Заявки з карток обʼєктів та сторінок перегляду.
               </span>
             </button>
           </div>
@@ -891,6 +1008,143 @@ export default function AdminPage() {
             )}
           </div>
         </form>
+      )}
+
+      {activeSection === "leads" && (
+        <section className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-blue-950/10 backdrop-blur-xl">
+          <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.28em] text-blue-300">
+                CRM
+              </p>
+              <h2 className="mt-3 text-3xl font-bold text-white">
+                Клієнти / Ліди
+              </h2>
+              <p className="mt-2 text-sm text-slate-400">
+                Заявки від користувачів, які запросили доступ до ціни та деталей.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={downloadLeadsCsv}
+              disabled={leads.length === 0}
+              className="w-full rounded-2xl border border-[#b89652]/45 bg-[#b89652]/10 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_22px_rgba(184,150,82,0.14)] transition hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black disabled:cursor-not-allowed disabled:opacity-50 lg:w-auto"
+            >
+              Скачати CSV
+            </button>
+          </div>
+
+          <div className="mb-5 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+            <input
+              type="text"
+              placeholder="Пошук: імʼя, телефон, назва обʼєкта..."
+              value={leadsSearch}
+              onChange={(e) => setLeadsSearch(e.target.value)}
+              className="w-full rounded-2xl border border-white/10 bg-[#030712] px-5 py-4 outline-none transition placeholder:text-slate-500 focus:border-blue-300/50"
+            />
+
+            <button
+              type="button"
+              onClick={loadLeads}
+              className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              Оновити
+            </button>
+          </div>
+
+          {leadsLoading && (
+            <div className="rounded-2xl border border-white/10 bg-black/30 p-6 text-sm text-slate-300">
+              Завантажуємо ліди...
+            </div>
+          )}
+
+          {leadsError && (
+            <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-6 text-sm text-red-100">
+              {leadsError}
+            </div>
+          )}
+
+          {!leadsLoading && !leadsError && filteredLeads.length === 0 && (
+            <div className="rounded-2xl border border-white/10 bg-black/30 p-8 text-center">
+              <h3 className="text-xl font-bold text-white">
+                Лідів поки немає
+              </h3>
+              <p className="mt-2 text-sm text-slate-400">
+                Коли користувач залишить контакти перед переглядом ціни, заявка зʼявиться тут.
+              </p>
+            </div>
+          )}
+
+          {!leadsLoading && !leadsError && filteredLeads.length > 0 && (
+            <>
+              <div className="hidden overflow-hidden rounded-2xl border border-white/10 lg:block">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-white/[0.04] text-xs uppercase tracking-[0.18em] text-slate-400">
+                    <tr>
+                      <th className="px-4 py-4">Дата</th>
+                      <th className="px-4 py-4">ПІБ</th>
+                      <th className="px-4 py-4">Телефон</th>
+                      <th className="px-4 py-4">Обʼєкт</th>
+                      <th className="px-4 py-4">Джерело</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {filteredLeads.map((lead) => (
+                      <tr key={lead.id} className="bg-black/20">
+                        <td className="px-4 py-4 text-slate-300">
+                          {formatLeadDate(lead.created_at)}
+                        </td>
+                        <td className="px-4 py-4 font-semibold text-white">
+                          {lead.full_name}
+                        </td>
+                        <td className="px-4 py-4 text-[#d8ba68]">
+                          {lead.phone}
+                        </td>
+                        <td className="px-4 py-4 text-slate-300">
+                          {lead.property_title || "Не вказано"}
+                        </td>
+                        <td className="px-4 py-4 text-slate-400">
+                          {lead.source || "property_card"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="grid gap-3 lg:hidden">
+                {filteredLeads.map((lead) => (
+                  <article
+                    key={lead.id}
+                    className="rounded-2xl border border-white/10 bg-black/30 p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-base font-bold text-white">
+                          {lead.full_name}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-[#d8ba68]">
+                          {lead.phone}
+                        </p>
+                      </div>
+                      <span className="shrink-0 rounded-full border border-white/10 px-3 py-1 text-[11px] text-slate-400">
+                        {lead.source || "property_card"}
+                      </span>
+                    </div>
+
+                    <p className="mt-3 line-clamp-2 text-sm text-slate-300">
+                      {lead.property_title || "Обʼєкт не вказано"}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      {formatLeadDate(lead.created_at)}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </>
+          )}
+        </section>
       )}
 
       {activeSection === "objects" && (

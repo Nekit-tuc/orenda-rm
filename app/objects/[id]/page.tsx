@@ -11,6 +11,7 @@ import SharePropertyButton from "@/components/SharePropertyButton";
 import { getPropertySlug } from "@/lib/getPropertySlug";
 import Header from "@/components/Header";
 import { BackIcon, MessageIcon, RouteIcon } from "@/components/PremiumIcons";
+import PropertyPageAccessGate from "@/components/PropertyPageAccessGate";
 
 const baseUrl = "https://orenda-rm.vercel.app";
 
@@ -95,6 +96,11 @@ const baseUrl = "https://orenda-rm.vercel.app";
         currentViews={property.views}
       />
       <Header />
+      <PropertyPageAccessGate
+        propertyId={property.id}
+        propertyTitle={property.title}
+        propertySlug={propertySlug}
+      />
 
       <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:py-10">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)] lg:gap-8">
@@ -147,15 +153,11 @@ const baseUrl = "https://orenda-rm.vercel.app";
 
             <div className="mt-6 rounded-2xl border border-[#b89652]/25 bg-[#b89652]/8 px-4 py-3">
               <div className="break-words text-2xl font-extrabold text-[#d8ba68] md:text-3xl">
-                {property.dealType === "Оренда"
-                  ? property.pricePerMeter
-                  : property.priceTotal}
+                {property.pricePerMeter}
               </div>
 
               <p className="mt-1 break-words text-sm text-white/42">
-                {property.dealType === "Оренда"
-                  ? property.priceTotal
-                  : property.pricePerMeter}
+                Ціна за м² після заявки
               </p>
             </div>
 

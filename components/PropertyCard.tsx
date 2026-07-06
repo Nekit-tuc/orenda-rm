@@ -3,12 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { KeyboardEvent, MouseEvent } from "react";
+import { useEffect, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { toggleFavoriteId, useFavoriteIds } from "@/lib/favorites";
 import { getRouteUrl } from "@/lib/getRouteUrl";
 import { getPropertySlug } from "@/lib/getPropertySlug";
 import SharePropertyButton from "@/components/SharePropertyButton";
 import { DetailsIcon, FavoriteIcon, RouteIcon } from "@/components/PremiumIcons";
+import PropertyLeadModal from "@/components/PropertyLeadModal";
+import { hasPropertyLeadAccess } from "@/lib/propertyLeadAccess";
 
 type PropertyCardProps = {
   id: number;
@@ -32,7 +34,6 @@ export default function PropertyCard({
   title,
   type,
   dealType,
-  priceTotal,
   pricePerMeter,
   area,
   address,
@@ -47,7 +48,17 @@ export default function PropertyCard({
   const routeUrl = getRouteUrl({ address, lat, lng });
   const propertySlug = getPropertySlug({ id, title, slug });
   const propertyUrl = `/objects/${propertySlug}`;
-  const shareText = `${description} ${priceTotal}`.trim();
+  const shareText = `${description} ${pricePerMeter}`.trim();
+  const [hasLeadAccess, setHasLeadAccess] = useState(false);
+  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setHasLeadAccess(hasPropertyLeadAccess());
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   function isMobileCardNavigationEnabled() {
     return window.matchMedia("(max-width: 1024px)").matches;
@@ -66,6 +77,17 @@ export default function PropertyCard({
   }
 
   function openPropertyFromCard() {
+    if (!hasLeadAccess) {
+      setIsLeadModalOpen(true);
+      return;
+    }
+
+    router.push(propertyUrl);
+  }
+
+  function handleLeadSuccess() {
+    setHasLeadAccess(true);
+    setIsLeadModalOpen(false);
     router.push(propertyUrl);
   }
 
@@ -155,19 +177,28 @@ export default function PropertyCard({
 
         <div className="mt-auto pt-4 md:pt-6">
           <div className="rounded-2xl border border-[#b89652]/45 bg-[#b89652]/10 p-3 md:border-0 md:bg-transparent md:p-0">
-            <p className="break-words text-2xl font-black text-[#d2aa4f] md:text-3xl">
-              {dealType === "Оренда" ? priceTotal : priceTotal}
+            <p className="break-words text-xl font-black text-[#d2aa4f] md:text-2xl">
+              {hasLeadAccess ? pricePerMeter : "Ціна за запитом"}
             </p>
 
             <p className="mt-1 break-words text-sm text-white/45">
-              {dealType === "Оренда" ? pricePerMeter : pricePerMeter}
+              {hasLeadAccess
+                ? "Ціна за м²"
+                : "Залиште контакти для перегляду"}
             </p>
           </div>
 
           <div className="mt-3 grid grid-cols-2 gap-2 md:mt-5 md:flex md:flex-wrap md:gap-3">
             <Link
               href={propertyUrl}
-              onClick={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+
+                if (!hasLeadAccess) {
+                  event.preventDefault();
+                  setIsLeadModalOpen(true);
+                }
+              }}
               className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#b89652]/50 bg-[#b89652]/5 px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-[#b89652] hover:text-black md:min-h-0 md:w-auto md:px-5 md:py-3 md:text-sm [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
             >
               <DetailsIcon />
@@ -232,6 +263,16 @@ export default function PropertyCard({
           </button>
         </div>
       </div>
+
+      <PropertyLeadModal
+        isOpen={isLeadModalOpen}
+        propertyId={id}
+        propertyTitle={title}
+        propertySlug={propertySlug}
+        source="property_card"
+        onClose={() => setIsLeadModalOpen(false)}
+        onSuccess={handleLeadSuccess}
+      />
     </article>
   );
 }

@@ -1,13 +1,14 @@
 type AdminSidebarProps = {
   isOpen: boolean;
   onClose: () => void;
-  activeSection: "overview" | "objects" | "homepage";
-  onSectionChange: (section: "overview" | "objects" | "homepage") => void;
+  activeSection: "overview" | "objects" | "homepage" | "leads";
+  onSectionChange: (section: "overview" | "objects" | "homepage" | "leads") => void;
 };
 
 const navItems = [
   { id: "overview" as const, label: "Огляд", short: "О" },
   { id: "objects" as const, label: "Об'єкти", short: "ОБ" },
+  { id: "leads" as const, label: "Клієнти / Ліди", short: "Л" },
   { id: "homepage" as const, label: "Контент головної", short: "К" },
 ];
 

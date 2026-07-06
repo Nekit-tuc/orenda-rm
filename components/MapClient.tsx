@@ -4,10 +4,11 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import Image from "next/image";
 import Link from "next/link";
 import L from "leaflet";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { propertyTypeFilters } from "@/lib/propertyCategories";
 import { getRouteUrl } from "@/lib/getRouteUrl";
 import { getPropertySlug } from "@/lib/getPropertySlug";
+import { hasPropertyLeadAccess } from "@/lib/propertyLeadAccess";
 import {
   CloseIcon,
   DetailsIcon,
@@ -59,10 +60,15 @@ function PropertyMarker({ property }: { property: MappableProperty }) {
     address: property.address,
   });
   const propertyUrl = `/objects/${getPropertySlug(property)}`;
-  const mainPrice =
-    property.dealType === "Оренда"
-      ? property.pricePerMeter
-      : property.priceTotal;
+  const [hasLeadAccess, setHasLeadAccess] = useState(false);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setHasLeadAccess(hasPropertyLeadAccess());
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   return (
     <Marker
@@ -117,7 +123,7 @@ function PropertyMarker({ property }: { property: MappableProperty }) {
                 {property.address || "Житомир"}
               </span>
               <span className="font-black text-[#d8ba68]">
-                <span className="text-[#d8ba68]">₴</span> {mainPrice}
+                {hasLeadAccess ? property.pricePerMeter : "Ціна за запитом"}
               </span>
             </div>
           </div>
