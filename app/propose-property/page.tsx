@@ -20,12 +20,12 @@ const rules = [
 
 export default function ProposePropertyPage() {
   return (
-    <main className="min-h-screen overflow-x-clip bg-[#020202] text-white">
+    <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#020202] text-white">
       <Header />
 
-      <section className="relative overflow-hidden border-b border-white/10 px-4 py-7 sm:px-6 md:py-10">
+      <section className="relative w-full max-w-full min-w-0 overflow-hidden border-b border-white/10 px-4 py-7 sm:px-6 md:py-10">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(184,150,82,0.2),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.04),transparent)]" />
-        <div className="relative mx-auto max-w-5xl">
+        <div className="relative mx-auto w-full max-w-5xl min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#b89652]">
             Orenda RM
           </p>
@@ -39,7 +39,7 @@ export default function ProposePropertyPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-5 sm:px-6 md:py-8">
+      <section className="mx-auto w-full max-w-5xl min-w-0 overflow-x-hidden px-4 py-5 sm:px-6 md:py-8">
         <ProposePropertyForm rules={rules} />
       </section>
 

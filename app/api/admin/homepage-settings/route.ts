@@ -1,10 +1,17 @@
 import { cookies } from "next/headers";
 import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
-import type { HomepageSettings } from "@/lib/homepageSettings";
+import {
+  rowToSettings,
+  type HomepageSettings,
+  type HomepageSettingsRow,
+} from "@/lib/homepageSettings";
 
 export const dynamic = "force-dynamic";
 
 type HomepageSettingsPayload = Partial<HomepageSettings>;
+
+const homepageSettingsSelect =
+  "id, hero_title, hero_subtitle, hero_button_text, hero_button_url, section_title, section_subtitle, telegram_title, telegram_text, telegram_button_text, telegram_url, show_quick_search, real_estate_blocks";
 
 async function isAdminSession() {
   const cookieStore = await cookies();
@@ -31,6 +38,48 @@ function settingsToRow(data: HomepageSettingsPayload) {
   };
 }
 
+async function loadHomepageSettings() {
+  if (!(await isAdminSession())) {
+    return Response.json({ ok: false, message: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const supabase = createSupabaseAdminClient();
+    const { data, error } = await supabase
+      .from("homepage_settings")
+      .select(homepageSettingsSelect)
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (error) {
+      console.error("HOMEPAGE SETTINGS LOAD ERROR:", error);
+
+      return Response.json(
+        { ok: false, message: error.message },
+        { status: 500 }
+      );
+    }
+
+    return Response.json({
+      ok: true,
+      settings: rowToSettings(data as HomepageSettingsRow | null),
+    });
+  } catch (error) {
+    console.error("HOMEPAGE SETTINGS LOAD API ERROR:", error);
+
+    return Response.json(
+      {
+        ok: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Не вдалося завантажити налаштування головної сторінки.",
+      },
+      { status: 500 }
+    );
+  }
+}
+
 async function saveHomepageSettings(request: Request) {
   if (!(await isAdminSession())) {
     return Response.json({ ok: false, message: "Unauthorized" }, { status: 401 });
@@ -49,9 +98,11 @@ async function saveHomepageSettings(request: Request) {
 
   try {
     const supabase = createSupabaseAdminClient();
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("homepage_settings")
-      .upsert(settingsToRow(payload), { onConflict: "id" });
+      .upsert(settingsToRow(payload), { onConflict: "id" })
+      .select(homepageSettingsSelect)
+      .single();
 
     if (error) {
       console.error("HOMEPAGE SETTINGS SAVE ERROR:", error);
@@ -61,6 +112,11 @@ async function saveHomepageSettings(request: Request) {
         { status: 500 }
       );
     }
+
+    return Response.json({
+      ok: true,
+      settings: rowToSettings(data as HomepageSettingsRow | null),
+    });
   } catch (error) {
     console.error("HOMEPAGE SETTINGS API ERROR:", error);
 
@@ -77,6 +133,10 @@ async function saveHomepageSettings(request: Request) {
   }
 
   return Response.json({ ok: true });
+}
+
+export async function GET() {
+  return loadHomepageSettings();
 }
 
 export async function PATCH(request: Request) {

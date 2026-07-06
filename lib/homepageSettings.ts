@@ -24,7 +24,7 @@ export type RealEstateBlockSettings = {
   href: string;
 };
 
-type HomepageSettingsRow = {
+export type HomepageSettingsRow = {
   id: number;
   hero_title: string | null;
   hero_subtitle: string | null;
@@ -137,7 +137,7 @@ export function createEmptyRealEstateBlock(): RealEstateBlockSettings {
   };
 }
 
-function rowToSettings(row: HomepageSettingsRow | null): HomepageSettings {
+export function rowToSettings(row: HomepageSettingsRow | null): HomepageSettings {
   if (!row) {
     return defaultHomepageSettings;
   }

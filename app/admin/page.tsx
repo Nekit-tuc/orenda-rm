@@ -18,7 +18,6 @@ import { RouteIcon } from "@/components/PremiumIcons";
 import {
   createEmptyRealEstateBlock,
   defaultHomepageSettings,
-  getHomepageSettings,
   type HomepageSettings,
   type RealEstateBlockSettings,
 } from "@/lib/homepageSettings";
@@ -92,6 +91,24 @@ export default function AdminPage() {
   const [submissionsError, setSubmissionsError] = useState("");
   const [selectedSubmission, setSelectedSubmission] = useState<PropertySubmission | null>(null);
 
+  async function loadHomepageSettingsFromAdmin() {
+    const response = await fetch("/api/admin/homepage-settings", {
+      cache: "no-store",
+    });
+
+    const result = (await response.json().catch(() => null)) as {
+      ok?: boolean;
+      settings?: HomepageSettings;
+      message?: string;
+    } | null;
+
+    if (!response.ok || !result?.ok || !result.settings) {
+      throw new Error(result?.message || "Не вдалося завантажити налаштування.");
+    }
+
+    return result.settings;
+  }
+
   async function saveHomepageSettingsFromAdmin() {
     const response = await fetch("/api/admin/homepage-settings", {
       method: "PATCH",
@@ -103,12 +120,15 @@ export default function AdminPage() {
 
     const result = (await response.json().catch(() => null)) as {
       ok?: boolean;
+      settings?: HomepageSettings;
       message?: string;
     } | null;
 
-    if (!response.ok || !result?.ok) {
+    if (!response.ok || !result?.ok || !result.settings) {
       throw new Error(result?.message || "Помилка при збереженні.");
     }
+
+    return result.settings;
   }
 
   const [formData, setFormData] = useState({
@@ -233,26 +253,35 @@ export default function AdminPage() {
     let isMounted = true;
 
     async function loadInitialData() {
-      const [{ data, error }, settings] = await Promise.all([
+      const [propertiesResult, settingsResult] = await Promise.allSettled([
         supabase
           .from("properties")
           .select("*")
           .order("created_at", { ascending: false }),
-        getHomepageSettings(),
+        loadHomepageSettingsFromAdmin(),
       ]);
 
       if (!isMounted) {
         return;
       }
 
-      if (error) {
-        console.error(error);
+      const propertyResponse =
+        propertiesResult.status === "fulfilled"
+          ? propertiesResult.value
+          : { data: null, error: propertiesResult.reason };
+
+      if (propertyResponse.error) {
+        console.error(propertyResponse.error);
         setLoadError("Не вдалося завантажити обʼєкти. Спробуйте оновити список.");
       } else {
-        setProperties(data || []);
+        setProperties(propertyResponse.data || []);
       }
 
-      setHomepageContent(settings);
+      if (settingsResult.status === "fulfilled") {
+        setHomepageContent(settingsResult.value);
+      } else {
+        console.error("Homepage settings load error:", settingsResult.reason);
+      }
       setLoading(false);
     }
 
@@ -819,7 +848,8 @@ export default function AdminPage() {
       setHomepageMessage("");
 
       try {
-        await saveHomepageSettingsFromAdmin();
+        const savedSettings = await saveHomepageSettingsFromAdmin();
+        setHomepageContent(savedSettings);
       } catch (error) {
         console.error("Homepage content save error:", error);
         setHomepageMessage(
@@ -839,7 +869,8 @@ export default function AdminPage() {
       setBlocksMessage("");
 
       try {
-        await saveHomepageSettingsFromAdmin();
+        const savedSettings = await saveHomepageSettingsFromAdmin();
+        setHomepageContent(savedSettings);
       } catch (error) {
         console.error("Block settings save error:", error);
         setBlocksMessage(
