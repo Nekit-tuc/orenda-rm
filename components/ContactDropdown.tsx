@@ -13,7 +13,7 @@ type ContactItem = {
 const contacts: ContactItem[] = [
   {
     label: "Telegram",
-    value: "@orenda_rm",
+    value: "@Yevheniy_Romaniuk",
     href: "https://t.me/Yevheniy_Romaniuk",
     icon: "telegram",
   },
@@ -144,15 +144,27 @@ export default function ContactDropdown() {
         Зв&apos;язатися
       </button>
 
+      <button
+        type="button"
+        aria-label="Закрити способи зв'язку"
+        tabIndex={isOpen ? 0 : -1}
+        onClick={() => setIsOpen(false)}
+        className={`fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm transition-opacity duration-200 md:hidden ${
+          isOpen
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0"
+        }`}
+      />
+
       <div
         id={dropdownId}
         role="dialog"
         aria-label="Способи зв'язку"
         aria-hidden={!isOpen}
-        className={`absolute left-0 right-0 top-[calc(100%+0.75rem)] z-40 mx-auto w-[min(340px,calc(100vw-2rem))] overflow-hidden rounded-3xl border border-[#b89652]/35 bg-[#070707]/92 p-3 text-left shadow-[0_24px_80px_rgba(0,0,0,0.58),0_0_34px_rgba(184,150,82,0.16)] backdrop-blur-2xl transition-all duration-200 sm:left-auto sm:right-0 sm:mx-0 sm:w-[340px] md:w-[360px] ${
+        className={`fixed inset-x-4 bottom-4 z-[9999] mx-auto max-h-[calc(100dvh-2rem)] w-auto max-w-[calc(100vw-32px)] overflow-y-auto overflow-x-hidden rounded-3xl border border-[#b89652]/30 bg-[#080808]/95 p-3 text-left shadow-[0_20px_80px_rgba(0,0,0,0.7),0_0_34px_rgba(184,150,82,0.16)] backdrop-blur-xl transition-all duration-200 md:absolute md:left-auto md:right-0 md:top-[calc(100%+0.75rem)] md:bottom-auto md:z-40 md:mx-0 md:w-[360px] md:max-w-none md:overflow-hidden md:border-[#b89652]/35 md:bg-[#070707]/92 md:shadow-[0_24px_80px_rgba(0,0,0,0.58),0_0_34px_rgba(184,150,82,0.16)] md:backdrop-blur-2xl ${
           isOpen
             ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
-            : "pointer-events-none -translate-y-2 scale-[0.97] opacity-0"
+            : "pointer-events-none translate-y-4 scale-[0.97] opacity-0 md:-translate-y-2"
         }`}
       >
         <div className="border-b border-white/10 px-2 pb-3">
@@ -185,7 +197,7 @@ export default function ContactDropdown() {
               }
               tabIndex={isOpen ? 0 : -1}
               onClick={() => setIsOpen(false)}
-              className="group flex min-h-12 items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-3.5 py-3 text-white transition-all duration-300 hover:scale-[1.01] hover:border-[#d4af37]/70 hover:bg-[#b89652]/10 hover:shadow-[0_0_24px_rgba(212,175,55,0.18)] focus:outline-none focus:ring-2 focus:ring-[#b89652]/70"
+              className="group flex min-h-[52px] items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-3.5 py-3 text-base text-white transition-all duration-300 hover:scale-[1.01] hover:border-[#d4af37]/70 hover:bg-[#b89652]/10 hover:shadow-[0_0_24px_rgba(212,175,55,0.18)] focus:outline-none focus:ring-2 focus:ring-[#b89652]/70 md:min-h-12 md:text-sm"
             >
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-[#b89652]/25 bg-black/35 text-white/76 transition group-hover:border-[#d4af37]/70 group-hover:text-[#d8ba68]">
                 <ContactIcon icon={contact.icon} />
