@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { BuyoutIcon, MessageIcon, ObjectsIcon } from "@/components/PremiumIcons";
 import SubmitPropertyButton from "@/components/SubmitPropertyButton";
+import ContactDropdown from "@/components/ContactDropdown";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -85,13 +86,7 @@ export default async function Home() {
                 Дивитись обʼєкти
               </a>
 
-              <a
-                href="https://t.me/Yevheniy_Romaniuk"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#b89652]/35 bg-black/35 px-5 py-2.5 text-center text-[13px] font-bold text-white shadow-[0_0_20px_rgba(184,150,82,0.12)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652]/12 hover:text-[#d8ba68] hover:shadow-[0_0_28px_rgba(212,175,55,0.22)] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] md:px-7 md:py-3.5 md:text-sm [&>svg]:text-[#d8ba68]"
-              >
-                <MessageIcon />
-                Звʼязатись
-              </a>
+              <ContactDropdown />
 
             </div>
           </div>
@@ -168,7 +163,7 @@ export default async function Home() {
 
             <div className="grid gap-3 sm:flex md:justify-end">
               <a
-                href="https://t.me/Yevheniy_Romaniuk"
+                href="https://t.me/orenda_rm"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#b89652]/45 bg-[#b89652]/10 px-5 py-2.5 text-center text-[13px] font-bold text-white shadow-[0_0_25px_rgba(184,150,82,0.18)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_35px_rgba(212,175,55,0.35)] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] sm:text-sm [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
