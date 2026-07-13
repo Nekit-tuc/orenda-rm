@@ -30,7 +30,7 @@ create table if not exists public.homepage_settings (
     {
       "tag": "Інвестиції",
       "title": "Інвестиційна нерухомість: актуальні тренди року",
-      "text": "Які обʼєкти залишаються цікавими для інвесторів у регіоні.",
+      "text": "Які обʼєкти залишаються цікавими для інвесторів.",
       "date": "25 червня 2026",
       "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop",
       "href": "/#objects"
@@ -70,7 +70,7 @@ alter table public.homepage_settings
     {
       "tag": "Інвестиції",
       "title": "Інвестиційна нерухомість: актуальні тренди року",
-      "text": "Які обʼєкти залишаються цікавими для інвесторів у регіоні.",
+      "text": "Які обʼєкти залишаються цікавими для інвесторів.",
       "date": "25 червня 2026",
       "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop",
       "href": "/#objects"
@@ -150,7 +150,7 @@ insert into public.homepage_settings (
     {
       "tag": "Інвестиції",
       "title": "Інвестиційна нерухомість: актуальні тренди року",
-      "text": "Які обʼєкти залишаються цікавими для інвесторів у регіоні.",
+      "text": "Які обʼєкти залишаються цікавими для інвесторів.",
       "date": "25 червня 2026",
       "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop",
       "href": "/#objects"
