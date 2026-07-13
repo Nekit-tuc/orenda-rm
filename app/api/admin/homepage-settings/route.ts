@@ -206,8 +206,6 @@ async function saveHomepageSettings(request: Request) {
       { status: 500 }
     );
   }
-
-  return Response.json({ ok: true });
 }
 
 export async function GET() {

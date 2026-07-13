@@ -1,5 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 
+export type RealEstateBlockSettings = {
+  tag: string;
+  title: string;
+  text: string;
+  date: string;
+  image: string;
+  href: string;
+};
+
 export type HomepageSettings = {
   heroTitle: string;
   heroSubtitle: string;
@@ -12,15 +21,6 @@ export type HomepageSettings = {
   telegramButtonText: string;
   telegramUrl: string;
   realEstateBlocks: RealEstateBlockSettings[];
-};
-
-export type RealEstateBlockSettings = {
-  tag: string;
-  title: string;
-  text: string;
-  date: string;
-  image: string;
-  href: string;
 };
 
 export type HomepageSettingsRow = {
@@ -60,7 +60,7 @@ export const defaultRealEstateBlocks: RealEstateBlockSettings[] = [
   {
     tag: "Інвестиції",
     title: "Інвестиційна нерухомість: актуальні тренди року",
-    text: "Які обʼєкти залишаються цікавими для інвесторів у регіоні.",
+    text: "Які обʼєкти залишаються цікавими для інвесторів.",
     date: "25 червня 2026",
     image:
       "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop",
@@ -93,8 +93,108 @@ export const defaultHomepageSettings: HomepageSettings = {
   realEstateBlocks: defaultRealEstateBlocks,
 };
 
-function normalizeRealEstateBlocks(
-  blocks: RealEstateBlockSettings[] | null | undefined
+const homepageSettingsSelect =
+  "id, hero_title, hero_subtitle, hero_button_text, hero_button_url, section_title, section_subtitle, telegram_title, telegram_text, telegram_button_text, telegram_url, real_estate_blocks";
+
+const legacyTextReplacements = new Map<string, string>([
+  ["OrendaRM", "Investal Estate"],
+  ["Orenda RM", "Investal Estate"],
+  ["Оренда RM", "Investal Estate"],
+  ["Нерухомість в Житомирі та області", defaultHomepageSettings.heroTitle],
+  ["Нерухомість у Житомирі та області", defaultHomepageSettings.heroTitle],
+  [
+    "Комерційні приміщення, офіси, склади, квартири та інвестиційні об'єкти в одному сучасному каталозі.",
+    defaultHomepageSettings.heroSubtitle,
+  ],
+  [
+    "Попит на оренду комерційних приміщень у Житомирі зростає",
+    "Попит на комерційні приміщення зростає",
+  ],
+  [
+    "Огляд попиту на офіси, склади та комерційні приміщення у Житомирі.",
+    "Огляд актуального попиту на офіси, склади та комерційні простори.",
+  ],
+  [
+    "Склади та виробничі приміщення в Житомирській області",
+    "Склади та виробничі приміщення для бізнесу",
+  ],
+  ["Р РёРЅРѕРє", "Ринок"],
+  ["РџРѕСЂР°РґРё", "Поради"],
+  ["Р†РЅРІРµСЃС‚РёС†С–С—", "Інвестиції"],
+  ["РћСЂРµРЅРґР°", "Оренда"],
+  ["25 С‡РµСЂРІРЅСЏ 2026", "25 червня 2026"],
+  [
+    "РџРѕРїРёС‚ РЅР° РєРѕРјРµСЂС†С–Р№РЅС– РїСЂРёРјС–С‰РµРЅРЅСЏ Р·СЂРѕСЃС‚Р°С”",
+    "Попит на комерційні приміщення зростає",
+  ],
+  [
+    "РћРіР»СЏРґ Р°РєС‚СѓР°Р»СЊРЅРѕРіРѕ РїРѕРїРёС‚Сѓ РЅР° РѕС„С–СЃРё, СЃРєР»Р°РґРё С‚Р° РєРѕРјРµСЂС†С–Р№РЅС– РїСЂРѕСЃС‚РѕСЂРё.",
+    "Огляд актуального попиту на офіси, склади та комерційні простори.",
+  ],
+  [
+    "РЇРє РїСЂР°РІРёР»СЊРЅРѕ РѕР±СЂР°С‚Рё РїСЂРёРјС–С‰РµРЅРЅСЏ РґР»СЏ РѕСЂРµРЅРґРё: 7 РІР°Р¶Р»РёРІРёС… РїРѕСЂР°Рґ",
+    "Як правильно обрати приміщення для оренди: 7 важливих порад",
+  ],
+  [
+    "РќР° С‰Рѕ Р·РІРµСЂРЅСѓС‚Рё СѓРІР°РіСѓ РїРµСЂРµРґ РїС–РґРїРёСЃР°РЅРЅСЏРј РґРѕРіРѕРІРѕСЂСѓ РѕСЂРµРЅРґРё.",
+    "На що звернути увагу перед підписанням договору оренди.",
+  ],
+  [
+    "Р†РЅРІРµСЃС‚РёС†С–Р№РЅР° РЅРµСЂСѓС…РѕРјС–СЃС‚СЊ: Р°РєС‚СѓР°Р»СЊРЅС– С‚СЂРµРЅРґРё СЂРѕРєСѓ",
+    "Інвестиційна нерухомість: актуальні тренди року",
+  ],
+  [
+    "РЇРєС– РѕР±КјС”РєС‚Рё Р·Р°Р»РёС€Р°СЋС‚СЊСЃСЏ С†С–РєР°РІРёРјРё РґР»СЏ С–РЅРІРµСЃС‚РѕСЂС–РІ.",
+    "Які обʼєкти залишаються цікавими для інвесторів.",
+  ],
+  [
+    "РЎРєР»Р°РґРё С‚Р° РІРёСЂРѕР±РЅРёС‡С– РїСЂРёРјС–С‰РµРЅРЅСЏ РґР»СЏ Р±С–Р·РЅРµСЃСѓ",
+    "Склади та виробничі приміщення для бізнесу",
+  ],
+  [
+    "РљРѕСЂРѕС‚РєРёР№ Р·СЂС–Р· РїСЂРѕРїРѕР·РёС†С–Р№ РґР»СЏ Р±С–Р·РЅРµСЃСѓ С‚Р° РІРёСЂРѕР±РЅРёС†С‚РІР°.",
+    "Короткий зріз пропозицій для бізнесу та виробництва.",
+  ],
+]);
+
+function normalizeLegacyText(value: unknown, fallback: string) {
+  if (typeof value !== "string") {
+    return fallback;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return fallback;
+  }
+
+  return legacyTextReplacements.get(trimmed) ?? trimmed;
+}
+
+function normalizeRealEstateBlock(
+  block: unknown,
+  index: number
+): RealEstateBlockSettings | null {
+  if (!block || typeof block !== "object") {
+    return null;
+  }
+
+  const item = block as Partial<RealEstateBlockSettings>;
+  const fallback =
+    defaultRealEstateBlocks[index % defaultRealEstateBlocks.length] ??
+    defaultRealEstateBlocks[0];
+
+  return {
+    tag: normalizeLegacyText(item.tag, fallback.tag),
+    title: normalizeLegacyText(item.title, fallback.title),
+    text: normalizeLegacyText(item.text, fallback.text),
+    date: normalizeLegacyText(item.date, fallback.date),
+    image: normalizeLegacyText(item.image, fallback.image),
+    href: normalizeLegacyText(item.href, fallback.href),
+  };
+}
+
+export function normalizeRealEstateBlocks(
+  blocks: unknown
 ): RealEstateBlockSettings[] {
   if (blocks === null || blocks === undefined) {
     return defaultRealEstateBlocks;
@@ -105,21 +205,57 @@ function normalizeRealEstateBlocks(
   }
 
   return blocks
-    .filter((block) => block && typeof block === "object")
-    .map((block, index) => {
-    const fallback =
-      defaultRealEstateBlocks[index] ||
-      defaultRealEstateBlocks[defaultRealEstateBlocks.length - 1];
+    .map((block, index) => normalizeRealEstateBlock(block, index))
+    .filter((block): block is RealEstateBlockSettings => Boolean(block));
+}
 
-    return {
-      tag: block.tag || fallback.tag,
-      title: normalizeBrandText(block.title || null, fallback.title),
-      text: normalizeBrandText(block.text || null, fallback.text),
-      date: block.date || fallback.date,
-      image: block.image || fallback.image,
-      href: block.href || fallback.href,
-    };
-  });
+export function rowToSettings(
+  row: HomepageSettingsRow | null | undefined
+): HomepageSettings {
+  if (!row) {
+    return defaultHomepageSettings;
+  }
+
+  return {
+    heroTitle: normalizeLegacyText(row.hero_title, defaultHomepageSettings.heroTitle),
+    heroSubtitle: normalizeLegacyText(
+      row.hero_subtitle,
+      defaultHomepageSettings.heroSubtitle
+    ),
+    heroButtonText: normalizeLegacyText(
+      row.hero_button_text,
+      defaultHomepageSettings.heroButtonText
+    ),
+    heroButtonUrl: normalizeLegacyText(
+      row.hero_button_url,
+      defaultHomepageSettings.heroButtonUrl
+    ),
+    sectionTitle: normalizeLegacyText(
+      row.section_title,
+      defaultHomepageSettings.sectionTitle
+    ),
+    sectionSubtitle: normalizeLegacyText(
+      row.section_subtitle,
+      defaultHomepageSettings.sectionSubtitle
+    ),
+    telegramTitle: normalizeLegacyText(
+      row.telegram_title,
+      defaultHomepageSettings.telegramTitle
+    ),
+    telegramText: normalizeLegacyText(
+      row.telegram_text,
+      defaultHomepageSettings.telegramText
+    ),
+    telegramButtonText: normalizeLegacyText(
+      row.telegram_button_text,
+      defaultHomepageSettings.telegramButtonText
+    ),
+    telegramUrl: normalizeLegacyText(
+      row.telegram_url,
+      defaultHomepageSettings.telegramUrl
+    ),
+    realEstateBlocks: normalizeRealEstateBlocks(row.real_estate_blocks),
+  };
 }
 
 export function createEmptyRealEstateBlock(): RealEstateBlockSettings {
@@ -132,103 +268,38 @@ export function createEmptyRealEstateBlock(): RealEstateBlockSettings {
       month: "long",
       year: "numeric",
     }).format(new Date()),
-    image:
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop",
+    image: defaultRealEstateBlocks[0].image,
     href: "/#objects",
   };
 }
 
-function normalizeBrandText(value: string | null, fallback: string): string {
-  if (!value) {
-    return fallback;
-  }
+export async function getHomepageSettings(): Promise<HomepageSettings> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  const trimmed = value.trim();
-
-  const legacyHeroLocal = "\u041d\u0435\u0440\u0443\u0445\u043e\u043c\u0456\u0441\u0442\u044c \u0432 \u0416\u0438\u0442\u043e\u043c\u0438\u0440\u0456 \u0442\u0430 \u043e\u0431\u043b\u0430\u0441\u0442\u0456";
-  const legacyHeroRegional = "\u041d\u0435\u0440\u0443\u0445\u043e\u043c\u0456\u0441\u0442\u044c \u0443 \u0416\u0438\u0442\u043e\u043c\u0438\u0440\u0456 \u0442\u0430 \u043e\u0431\u043b\u0430\u0441\u0442\u0456";
-
-  if (trimmed === legacyHeroLocal || trimmed === legacyHeroRegional) {
-    return fallback;
-  }
-
-  const legacyLatinCompact = "\u004f\u0072\u0065\u006e\u0064\u0061\u0052\u004d";
-  const legacyLatinSpaced = "\u004f\u0072\u0065\u006e\u0064\u0061\\s?\u0052\u004d";
-  const legacyCyrillic = "\u041e\u0440\u0435\u043d\u0434\u0430\\s?\u0052\u004d";
-
-  return trimmed
-    .replace(
-      new RegExp(
-        "\u041f\u043e\u043f\u0438\u0442 \u043d\u0430 \u043e\u0440\u0435\u043d\u0434\u0443 \u043a\u043e\u043c\u0435\u0440\u0446\u0456\u0439\u043d\u0438\u0445 \u043f\u0440\u0438\u043c\u0456\u0449\u0435\u043d\u044c \u0443 \u0416\u0438\u0442\u043e\u043c\u0438\u0440\u0456 \u0437\u0440\u043e\u0441\u0442\u0430\u0454",
-        "g"
-      ),
-      "Попит на комерційні приміщення зростає"
-    )
-    .replace(
-      new RegExp(
-        "\u041e\u0433\u043b\u044f\u0434 \u043f\u043e\u043f\u0438\u0442\u0443 \u043d\u0430 \u043e\u0444\u0456\u0441\u0438, \u0441\u043a\u043b\u0430\u0434\u0438 \u0442\u0430 \u043a\u043e\u043c\u0435\u0440\u0446\u0456\u0439\u043d\u0456 \u043f\u0440\u0438\u043c\u0456\u0449\u0435\u043d\u043d\u044f \u0443 \u0416\u0438\u0442\u043e\u043c\u0438\u0440\u0456\\.",
-        "g"
-      ),
-      "Огляд актуального попиту на офіси, склади та комерційні простори."
-    )
-    .replace(
-      new RegExp(
-        "\u0421\u043a\u043b\u0430\u0434\u0438 \u0442\u0430 \u0432\u0438\u0440\u043e\u0431\u043d\u0438\u0447\u0456 \u043f\u0440\u0438\u043c\u0456\u0449\u0435\u043d\u043d\u044f \u0432 \u0416\u0438\u0442\u043e\u043c\u0438\u0440\u0441\u044c\u043a\u0456\u0439 \u043e\u0431\u043b\u0430\u0441\u0442\u0456",
-        "g"
-      ),
-      "Склади та виробничі приміщення для бізнесу"
-    )
-    .replace(new RegExp(legacyLatinCompact, "gi"), "Investal Estate")
-    .replace(new RegExp(legacyLatinSpaced, "gi"), "Investal Estate")
-    .replace(new RegExp(legacyCyrillic, "gi"), "Investal Estate");
-}
-
-export function rowToSettings(row: HomepageSettingsRow | null): HomepageSettings {
-  if (!row) {
+  if (!supabaseUrl || !supabaseAnonKey) {
     return defaultHomepageSettings;
   }
 
-  return {
-    heroTitle: normalizeBrandText(row.hero_title, defaultHomepageSettings.heroTitle),
-    heroSubtitle: normalizeBrandText(row.hero_subtitle, defaultHomepageSettings.heroSubtitle),
-    heroButtonText: normalizeBrandText(row.hero_button_text, defaultHomepageSettings.heroButtonText),
-    heroButtonUrl: row.hero_button_url || defaultHomepageSettings.heroButtonUrl,
-    sectionTitle: normalizeBrandText(row.section_title, defaultHomepageSettings.sectionTitle),
-    sectionSubtitle: normalizeBrandText(row.section_subtitle, defaultHomepageSettings.sectionSubtitle),
-    telegramTitle: normalizeBrandText(row.telegram_title, defaultHomepageSettings.telegramTitle),
-    telegramText: normalizeBrandText(row.telegram_text, defaultHomepageSettings.telegramText),
-    telegramButtonText:
-      normalizeBrandText(row.telegram_button_text, defaultHomepageSettings.telegramButtonText),
-    telegramUrl: row.telegram_url || defaultHomepageSettings.telegramUrl,
-    realEstateBlocks: normalizeRealEstateBlocks(row.real_estate_blocks),
-  };
-}
+  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      fetch: (input, init) =>
+        fetch(input, {
+          ...init,
+          cache: "no-store",
+          next: { revalidate: 0 },
+        }),
+    },
+  });
 
-export async function getHomepageSettings(): Promise<HomepageSettings> {
-  const noStoreSupabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      global: {
-        fetch: (input, init) =>
-          fetch(input, {
-            ...init,
-            cache: "no-store",
-          }),
-      },
-    }
-  );
-
-  const { data, error } = await noStoreSupabase
+  const { data, error } = await supabase
     .from("homepage_settings")
-    .select(
-      "id, hero_title, hero_subtitle, hero_button_text, hero_button_url, section_title, section_subtitle, telegram_title, telegram_text, telegram_button_text, telegram_url, real_estate_blocks"
-    )
+    .select(homepageSettingsSelect)
     .eq("id", 1)
     .maybeSingle();
 
   if (error) {
-    console.error("Homepage settings error:", error);
+    console.error("HOMEPAGE SETTINGS FETCH ERROR:", error);
     return defaultHomepageSettings;
   }
 
