@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import BrandLogo from "@/components/BrandLogo";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -40,8 +41,12 @@ export default function AdminLoginPage() {
         onSubmit={login}
         className="w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-blue-950/20 backdrop-blur-xl sm:p-8"
       >
+        <div className="mb-6 flex justify-center">
+          <BrandLogo className="h-20 w-36" priority />
+        </div>
+
         <p className="mb-3 text-sm uppercase tracking-[0.3em] text-white/40">
-          Admin Login
+          Investal Estate Admin
         </p>
 
         <h1 className="text-3xl font-bold">Вхід в адмінку</h1>

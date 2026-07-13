@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import BrandLogo from "@/components/BrandLogo";
 import FavoritesNav from "./FavoritesNav";
 import { DesktopSocialLinks, HeaderSocialLinks } from "./SocialLinks";
 
@@ -30,15 +30,11 @@ export default function Header() {
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-3 sm:px-4 md:flex-nowrap md:gap-4 md:px-6">
         <div className="flex w-full items-center justify-between gap-3 md:w-auto md:justify-start">
           <Link href="/" className="flex min-w-0 items-center">
-            <Image
-              src="/logo_v1.png"
-              alt="Orenda RM"
-              width={110}
-              height={110}
+            <BrandLogo
               className={`object-contain transition-all duration-300 ${
                 scrolled
-                  ? "h-11 w-[4.25rem] md:h-12 md:w-16"
-                  : "h-12 w-[4.75rem] md:h-16 md:w-24"
+                  ? "h-11 w-[5.25rem] md:h-12 md:w-20"
+                  : "h-12 w-[5.75rem] md:h-16 md:w-28"
               }`}
               priority
             />

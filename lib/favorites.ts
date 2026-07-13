@@ -2,13 +2,18 @@
 
 import { useEffect, useState } from "react";
 
-const FAVORITES_KEY = "zt-space-favorites";
+const FAVORITES_KEY = "investal-estate-favorites";
 
 export function getFavoriteIds(): number[] {
   if (typeof window === "undefined") return [];
 
   const saved = localStorage.getItem(FAVORITES_KEY);
-  return saved ? JSON.parse(saved) : [];
+
+  if (saved) {
+    return JSON.parse(saved);
+  }
+
+  return [];
 }
 
 export function toggleFavoriteId(id: number) {

@@ -16,10 +16,10 @@ const homepageSettingsSelect =
 async function isAdminSession() {
   const cookieStore = await cookies();
 
-  return cookieStore.get("orendarm-admin-session")?.value === "true";
+  return cookieStore.get("investal-admin-session")?.value === "true";
 }
 
-function settingsToRow(data: HomepageSettingsPayload) {
+function settingsToRow(data: HomepageSettings) {
   return {
     id: 1,
     hero_title: data.heroTitle,
@@ -34,6 +34,63 @@ function settingsToRow(data: HomepageSettingsPayload) {
     telegram_url: data.telegramUrl,
     real_estate_blocks: data.realEstateBlocks,
     updated_at: new Date().toISOString(),
+  };
+}
+
+function hasOwn<T extends object>(object: T, key: keyof HomepageSettings) {
+  return Object.prototype.hasOwnProperty.call(object, key);
+}
+
+function mergeHomepageSettings(
+  currentSettings: HomepageSettings,
+  payload: HomepageSettingsPayload
+): HomepageSettings {
+  return {
+    heroTitle:
+      typeof payload.heroTitle === "string"
+        ? payload.heroTitle
+        : currentSettings.heroTitle,
+    heroSubtitle:
+      typeof payload.heroSubtitle === "string"
+        ? payload.heroSubtitle
+        : currentSettings.heroSubtitle,
+    heroButtonText:
+      typeof payload.heroButtonText === "string"
+        ? payload.heroButtonText
+        : currentSettings.heroButtonText,
+    heroButtonUrl:
+      typeof payload.heroButtonUrl === "string"
+        ? payload.heroButtonUrl
+        : currentSettings.heroButtonUrl,
+    sectionTitle:
+      typeof payload.sectionTitle === "string"
+        ? payload.sectionTitle
+        : currentSettings.sectionTitle,
+    sectionSubtitle:
+      typeof payload.sectionSubtitle === "string"
+        ? payload.sectionSubtitle
+        : currentSettings.sectionSubtitle,
+    telegramTitle:
+      typeof payload.telegramTitle === "string"
+        ? payload.telegramTitle
+        : currentSettings.telegramTitle,
+    telegramText:
+      typeof payload.telegramText === "string"
+        ? payload.telegramText
+        : currentSettings.telegramText,
+    telegramButtonText:
+      typeof payload.telegramButtonText === "string"
+        ? payload.telegramButtonText
+        : currentSettings.telegramButtonText,
+    telegramUrl:
+      typeof payload.telegramUrl === "string"
+        ? payload.telegramUrl
+        : currentSettings.telegramUrl,
+    realEstateBlocks: hasOwn(payload, "realEstateBlocks")
+      ? Array.isArray(payload.realEstateBlocks)
+        ? payload.realEstateBlocks
+        : []
+      : currentSettings.realEstateBlocks,
   };
 }
 
@@ -97,9 +154,28 @@ async function saveHomepageSettings(request: Request) {
 
   try {
     const supabase = createSupabaseAdminClient();
+    const { data: currentData, error: currentError } = await supabase
+      .from("homepage_settings")
+      .select(homepageSettingsSelect)
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (currentError) {
+      console.error("HOMEPAGE SETTINGS CURRENT LOAD ERROR:", currentError);
+
+      return Response.json(
+        { ok: false, message: currentError.message },
+        { status: 500 }
+      );
+    }
+
+    const currentSettings = rowToSettings(
+      currentData as HomepageSettingsRow | null
+    );
+    const mergedSettings = mergeHomepageSettings(currentSettings, payload);
     const { data, error } = await supabase
       .from("homepage_settings")
-      .upsert(settingsToRow(payload), { onConflict: "id" })
+      .upsert(settingsToRow(mergedSettings), { onConflict: "id" })
       .select(homepageSettingsSelect)
       .single();
 

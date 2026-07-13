@@ -41,8 +41,8 @@ export type HomepageSettingsRow = {
 export const defaultRealEstateBlocks: RealEstateBlockSettings[] = [
   {
     tag: "Ринок",
-    title: "Попит на оренду комерційних приміщень у Житомирі зростає",
-    text: "Огляд попиту на офіси, склади та комерційні приміщення у Житомирі.",
+    title: "Попит на комерційні приміщення зростає",
+    text: "Огляд актуального попиту на офіси, склади та комерційні простори.",
     date: "25 червня 2026",
     image:
       "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop",
@@ -68,7 +68,7 @@ export const defaultRealEstateBlocks: RealEstateBlockSettings[] = [
   },
   {
     tag: "Оренда",
-    title: "Склади та виробничі приміщення в Житомирській області",
+    title: "Склади та виробничі приміщення для бізнесу",
     text: "Короткий зріз пропозицій для бізнесу та виробництва.",
     date: "25 червня 2026",
     image:
@@ -78,13 +78,13 @@ export const defaultRealEstateBlocks: RealEstateBlockSettings[] = [
 ];
 
 export const defaultHomepageSettings: HomepageSettings = {
-  heroTitle: "Нерухомість в Житомирі та області",
+  heroTitle: "Інвестиційна нерухомість по всій Україні",
   heroSubtitle:
-    "Комерційні приміщення, офіси, склади, квартири та інвестиційні об'єкти в одному сучасному каталозі.",
+    "Комерційні приміщення, земельні ділянки, будинки, квартири та інвестиційні об'єкти в одному сучасному каталозі.",
   heroButtonText: "Дивитись об'єкти",
   heroButtonUrl: "#objects",
-  sectionTitle: "Актуальні об'єкти",
-  sectionSubtitle: "Каталог нерухомості",
+  sectionTitle: "Преміальні об'єкти",
+  sectionSubtitle: "Каталог Investal Estate",
   telegramTitle: "Зв'язатися в Telegram",
   telegramText:
     "Напишіть нам у Telegram, щоб уточнити деталі, домовитися про перегляд або запропонувати свій об'єкт.",
@@ -94,9 +94,13 @@ export const defaultHomepageSettings: HomepageSettings = {
 };
 
 function normalizeRealEstateBlocks(
-  blocks: RealEstateBlockSettings[] | null
+  blocks: RealEstateBlockSettings[] | null | undefined
 ): RealEstateBlockSettings[] {
-  if (!Array.isArray(blocks) || blocks.length === 0) {
+  if (blocks === null || blocks === undefined) {
+    return defaultRealEstateBlocks;
+  }
+
+  if (!Array.isArray(blocks)) {
     return defaultRealEstateBlocks;
   }
 
@@ -109,8 +113,8 @@ function normalizeRealEstateBlocks(
 
     return {
       tag: block.tag || fallback.tag,
-      title: block.title || fallback.title,
-      text: block.text || fallback.text,
+      title: normalizeBrandText(block.title || null, fallback.title),
+      text: normalizeBrandText(block.text || null, fallback.text),
       date: block.date || fallback.date,
       image: block.image || fallback.image,
       href: block.href || fallback.href,
@@ -134,22 +138,67 @@ export function createEmptyRealEstateBlock(): RealEstateBlockSettings {
   };
 }
 
+function normalizeBrandText(value: string | null, fallback: string): string {
+  if (!value) {
+    return fallback;
+  }
+
+  const trimmed = value.trim();
+
+  const legacyHeroLocal = "\u041d\u0435\u0440\u0443\u0445\u043e\u043c\u0456\u0441\u0442\u044c \u0432 \u0416\u0438\u0442\u043e\u043c\u0438\u0440\u0456 \u0442\u0430 \u043e\u0431\u043b\u0430\u0441\u0442\u0456";
+  const legacyHeroRegional = "\u041d\u0435\u0440\u0443\u0445\u043e\u043c\u0456\u0441\u0442\u044c \u0443 \u0416\u0438\u0442\u043e\u043c\u0438\u0440\u0456 \u0442\u0430 \u043e\u0431\u043b\u0430\u0441\u0442\u0456";
+
+  if (trimmed === legacyHeroLocal || trimmed === legacyHeroRegional) {
+    return fallback;
+  }
+
+  const legacyLatinCompact = "\u004f\u0072\u0065\u006e\u0064\u0061\u0052\u004d";
+  const legacyLatinSpaced = "\u004f\u0072\u0065\u006e\u0064\u0061\\s?\u0052\u004d";
+  const legacyCyrillic = "\u041e\u0440\u0435\u043d\u0434\u0430\\s?\u0052\u004d";
+
+  return trimmed
+    .replace(
+      new RegExp(
+        "\u041f\u043e\u043f\u0438\u0442 \u043d\u0430 \u043e\u0440\u0435\u043d\u0434\u0443 \u043a\u043e\u043c\u0435\u0440\u0446\u0456\u0439\u043d\u0438\u0445 \u043f\u0440\u0438\u043c\u0456\u0449\u0435\u043d\u044c \u0443 \u0416\u0438\u0442\u043e\u043c\u0438\u0440\u0456 \u0437\u0440\u043e\u0441\u0442\u0430\u0454",
+        "g"
+      ),
+      "Попит на комерційні приміщення зростає"
+    )
+    .replace(
+      new RegExp(
+        "\u041e\u0433\u043b\u044f\u0434 \u043f\u043e\u043f\u0438\u0442\u0443 \u043d\u0430 \u043e\u0444\u0456\u0441\u0438, \u0441\u043a\u043b\u0430\u0434\u0438 \u0442\u0430 \u043a\u043e\u043c\u0435\u0440\u0446\u0456\u0439\u043d\u0456 \u043f\u0440\u0438\u043c\u0456\u0449\u0435\u043d\u043d\u044f \u0443 \u0416\u0438\u0442\u043e\u043c\u0438\u0440\u0456\\.",
+        "g"
+      ),
+      "Огляд актуального попиту на офіси, склади та комерційні простори."
+    )
+    .replace(
+      new RegExp(
+        "\u0421\u043a\u043b\u0430\u0434\u0438 \u0442\u0430 \u0432\u0438\u0440\u043e\u0431\u043d\u0438\u0447\u0456 \u043f\u0440\u0438\u043c\u0456\u0449\u0435\u043d\u043d\u044f \u0432 \u0416\u0438\u0442\u043e\u043c\u0438\u0440\u0441\u044c\u043a\u0456\u0439 \u043e\u0431\u043b\u0430\u0441\u0442\u0456",
+        "g"
+      ),
+      "Склади та виробничі приміщення для бізнесу"
+    )
+    .replace(new RegExp(legacyLatinCompact, "gi"), "Investal Estate")
+    .replace(new RegExp(legacyLatinSpaced, "gi"), "Investal Estate")
+    .replace(new RegExp(legacyCyrillic, "gi"), "Investal Estate");
+}
+
 export function rowToSettings(row: HomepageSettingsRow | null): HomepageSettings {
   if (!row) {
     return defaultHomepageSettings;
   }
 
   return {
-    heroTitle: row.hero_title || defaultHomepageSettings.heroTitle,
-    heroSubtitle: row.hero_subtitle || defaultHomepageSettings.heroSubtitle,
-    heroButtonText: row.hero_button_text || defaultHomepageSettings.heroButtonText,
+    heroTitle: normalizeBrandText(row.hero_title, defaultHomepageSettings.heroTitle),
+    heroSubtitle: normalizeBrandText(row.hero_subtitle, defaultHomepageSettings.heroSubtitle),
+    heroButtonText: normalizeBrandText(row.hero_button_text, defaultHomepageSettings.heroButtonText),
     heroButtonUrl: row.hero_button_url || defaultHomepageSettings.heroButtonUrl,
-    sectionTitle: row.section_title || defaultHomepageSettings.sectionTitle,
-    sectionSubtitle: row.section_subtitle || defaultHomepageSettings.sectionSubtitle,
-    telegramTitle: row.telegram_title || defaultHomepageSettings.telegramTitle,
-    telegramText: row.telegram_text || defaultHomepageSettings.telegramText,
+    sectionTitle: normalizeBrandText(row.section_title, defaultHomepageSettings.sectionTitle),
+    sectionSubtitle: normalizeBrandText(row.section_subtitle, defaultHomepageSettings.sectionSubtitle),
+    telegramTitle: normalizeBrandText(row.telegram_title, defaultHomepageSettings.telegramTitle),
+    telegramText: normalizeBrandText(row.telegram_text, defaultHomepageSettings.telegramText),
     telegramButtonText:
-      row.telegram_button_text || defaultHomepageSettings.telegramButtonText,
+      normalizeBrandText(row.telegram_button_text, defaultHomepageSettings.telegramButtonText),
     telegramUrl: row.telegram_url || defaultHomepageSettings.telegramUrl,
     realEstateBlocks: normalizeRealEstateBlocks(row.real_estate_blocks),
   };

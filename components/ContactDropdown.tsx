@@ -26,8 +26,8 @@ const contacts: ContactItem[] = [
   },
   {
     label: "Email",
-    value: "orenda.rm.zt@gmail.com",
-    href: "mailto:orenda.rm.zt@gmail.com",
+    value: "investal.estate.zt@gmail.com",
+    href: "mailto:investal.estate.zt@gmail.com",
     icon: "email",
   },
 ];

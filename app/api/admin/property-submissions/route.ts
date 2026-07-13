@@ -8,7 +8,7 @@ const allowedStatuses = ["new", "contacted", "rejected", "approved"] as const;
 async function isAdminSession() {
   const cookieStore = await cookies();
 
-  return cookieStore.get("orendarm-admin-session")?.value === "true";
+  return cookieStore.get("investal-admin-session")?.value === "true";
 }
 
 export async function GET() {

@@ -123,13 +123,13 @@ export default function PropertyLeadModal({
         onClick={(event) => event.stopPropagation()}
         onPointerDown={(event) => event.stopPropagation()}
         onTouchStart={(event) => event.stopPropagation()}
-        className="orenda-lead-modal-panel relative w-full max-w-[430px] min-w-0 overflow-y-auto overscroll-contain rounded-t-3xl border border-[#b89652]/35 bg-[#090909] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.62)] sm:rounded-3xl sm:p-6"
+        className="investal-lead-modal-panel relative w-full max-w-[430px] min-w-0 overflow-y-auto overscroll-contain rounded-t-3xl border border-[#b89652]/35 bg-[#090909] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.62)] sm:rounded-3xl sm:p-6"
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(184,150,82,0.18),transparent_42%)]" />
 
         <div className="relative min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#b89652]">
-            Orenda RM
+            Investal Estate
           </p>
           <h2 className="mt-3 text-2xl font-black leading-tight text-white">
             Отримати доступ до ціни

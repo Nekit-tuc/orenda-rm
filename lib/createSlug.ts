@@ -70,7 +70,7 @@ function getDealSlug(dealType?: string | null) {
     return "prodazh";
   }
 
-  return "orenda";
+  return "investal";
 }
 
 function getTypeSlug(type?: string | null) {

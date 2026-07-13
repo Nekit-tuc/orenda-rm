@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BrandLogo, { BRAND_NAME } from "@/components/BrandLogo";
 import { FooterSocialLinks } from "./SocialLinks";
 import SubmitPropertyButton from "@/components/SubmitPropertyButton";
 
@@ -11,13 +12,13 @@ export default function Footer() {
         <div className="text-center md:text-left">
           <Link
             href="/"
-            className="inline-flex items-center justify-center text-2xl font-extrabold tracking-tight text-[#d4af37] transition hover:text-[#e2c56d] md:text-3xl"
+            className="inline-flex items-center justify-center transition hover:opacity-90"
           >
-            Orenda RM
+            <BrandLogo className="h-20 w-36 md:h-24 md:w-44" />
           </Link>
 
           <p className="mt-3 max-w-md text-sm leading-6 text-white/58 md:text-base">
-            Нерухомість Житомира та області.
+            Сучасна платформа нерухомості для купівлі, продажу та оренди.
           </p>
 
           <div className="mt-5">
@@ -29,7 +30,7 @@ export default function Footer() {
           <FooterSocialLinks />
 
           <div className="mt-5 text-xs leading-6 text-white/42 sm:text-sm">
-            <p>© 2026 Orenda RM</p>
+            <p>© 2026 {BRAND_NAME}</p>
             <p>Всі права захищені.</p>
           </div>
         </div>

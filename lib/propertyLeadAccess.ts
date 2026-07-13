@@ -1,4 +1,4 @@
-export const PROPERTY_LEAD_ACCESS_KEY = "orendarm_lead_access";
+export const PROPERTY_LEAD_ACCESS_KEY = "investal_lead_access";
 
 export function hasPropertyLeadAccess() {
   if (typeof window === "undefined") {

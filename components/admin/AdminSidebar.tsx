@@ -1,3 +1,5 @@
+import BrandLogo from "@/components/BrandLogo";
+
 type AdminSidebarProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -36,11 +38,11 @@ export default function AdminSidebar({
         }`}
       >
         <div className="flex items-center gap-3 rounded-2xl border border-blue-400/20 bg-blue-400/10 p-4">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-blue-500 text-sm font-bold text-white shadow-lg shadow-blue-500/25">
-            RM
+          <div className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-black shadow-lg shadow-blue-500/25">
+            <BrandLogo className="h-11 w-11" />
           </div>
           <div className="min-w-0 md:hidden lg:block">
-            <p className="text-sm font-semibold text-white">OrendaRM</p>
+            <p className="text-sm font-semibold text-white">Investal Estate</p>
             <p className="text-xs text-slate-400">Адмін-панель</p>
           </div>
         </div>

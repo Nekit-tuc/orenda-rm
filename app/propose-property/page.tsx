@@ -3,9 +3,9 @@ import Footer from "@/components/Footer";
 import ProposePropertyForm from "@/components/ProposePropertyForm";
 
 export const metadata = {
-  title: "Запропонувати обʼєкт | Orenda RM",
+  title: "Запропонувати обʼєкт | Investal Estate",
   description:
-    "Запропонуйте свій обʼєкт нерухомості для перевірки командою Orenda RM.",
+    "Запропонуйте свій обʼєкт нерухомості для перевірки командою Investal Estate.",
 };
 
 const rules = [
@@ -15,7 +15,7 @@ const rules = [
   "Надсилати заявку може лише власник обʼєкта або його уповноважений представник.",
   "Додавайте реальні фотографії обʼєкта. Чим більше якісних фото, тим швидше ми зможемо оцінити пропозицію.",
   "Ми використовуємо ваш телефон лише для звʼязку щодо цього обʼєкта.",
-  "Адміністрація Orenda RM залишає за собою право відмовити у розміщенні без пояснення причин.",
+  "Адміністрація Investal Estate залишає за собою право відмовити у розміщенні без пояснення причин.",
 ];
 
 export default function ProposePropertyPage() {
@@ -27,7 +27,7 @@ export default function ProposePropertyPage() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(184,150,82,0.2),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.04),transparent)]" />
         <div className="relative mx-auto w-full max-w-5xl min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#b89652]">
-            Orenda RM
+            INVESTAL ESTATE
           </p>
           <h1 className="mt-3 max-w-3xl text-2xl font-black leading-tight sm:text-3xl md:text-4xl">
             Запропонувати свій обʼєкт

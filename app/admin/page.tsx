@@ -685,7 +685,7 @@ export default function AdminPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `orendarm-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `investal-estate-leads-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -781,7 +781,7 @@ export default function AdminPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `orendarm-submissions-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `investal-estate-submissions-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   }

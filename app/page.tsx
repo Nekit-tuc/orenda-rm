@@ -27,7 +27,7 @@ const benefits = [
   {
     icon: "⌖",
     title: "Весь регіон",
-    text: "Житомир та область",
+    text: "Україна та актуальні напрямки",
   },
   {
     icon: "◌",
@@ -41,6 +41,7 @@ export default async function Home() {
     getProperties(),
     getHomepageSettings(),
   ]);
+  const newsBlocks = homepageSettings.realEstateBlocks;
 
   return (
     <main className="min-h-screen max-w-full overflow-x-hidden bg-[#020202] text-white">
@@ -54,7 +55,7 @@ export default async function Home() {
       <section className="relative overflow-hidden border-b border-white/10">
         <Image
           src="/hero-building.png"
-          alt="Сучасний будинок Orenda RM"
+          alt="Сучасна нерухомість Investal Estate"
           fill
           priority
           sizes="100vw"
@@ -66,7 +67,7 @@ export default async function Home() {
         <div className="relative mx-auto grid min-h-[calc(100svh-76px)] w-full max-w-7xl gap-5 px-4 py-7 sm:px-6 sm:py-9 md:min-h-[660px] md:gap-8 md:py-12 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-center lg:py-10 xl:grid-cols-[minmax(0,1fr)_390px]">
           <div className="relative z-10 max-w-3xl">
             <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-[#c9a85a] sm:text-[11px] sm:tracking-[0.32em]">
-              Orenda RM • Житомир
+              INVESTAL ESTATE • УКРАЇНА
             </p>
 
             <h1 className="max-w-[570px] text-[clamp(2.05rem,9.6vw,2.55rem)] font-extrabold uppercase leading-[1.1] tracking-[-0.01em] text-white md:text-[clamp(2.85rem,4.9vw,4.15rem)]">
@@ -114,7 +115,7 @@ export default async function Home() {
               <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.045] p-3 lg:rounded-2xl lg:p-4">
                 <p className="text-[10px] text-white/45 sm:text-xs">Регіон</p>
                 <p className="mt-1 text-xs font-extrabold leading-tight sm:text-sm lg:text-lg">
-                  Житомир та область
+                  Україна
                 </p>
               </div>
             </div>
@@ -190,7 +191,7 @@ export default async function Home() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {homepageSettings.realEstateBlocks.map((item) => (
+          {newsBlocks.map((item) => (
             <a
               key={`${item.title}-${item.date}`}
               href={item.href || "/#objects"}
@@ -262,12 +263,12 @@ export default async function Home() {
             </p>
 
             <h3 className="mt-3 text-3xl font-bold md:text-4xl">
-              Карта нерухомості Житомира
+              Карта актуальних обʼєктів
             </h3>
 
             <p className="mt-3 max-w-2xl text-white/50">
               Переглядайте актуальні обʼєкти на карті та швидко знаходьте
-              приміщення у потрібній частині міста.
+              нерухомість у потрібній локації.
             </p>
           </div>
         </div>

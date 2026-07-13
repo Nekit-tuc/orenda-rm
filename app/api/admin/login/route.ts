@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   const cookieStore = await cookies();
   const isHttps = new URL(request.url).protocol === "https:";
 
-  cookieStore.set("orendarm-admin-session", "true", {
+  cookieStore.set("investal-admin-session", "true", {
     httpOnly: true,
     sameSite: "strict",
     secure: isHttps,

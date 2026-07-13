@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const cookieStore = await cookies();
-  const isAdmin = cookieStore.get("orendarm-admin-session")?.value === "true";
+  const isAdmin = cookieStore.get("investal-admin-session")?.value === "true";
 
   if (!isAdmin) {
     return Response.json({ ok: false, message: "Unauthorized" }, { status: 401 });

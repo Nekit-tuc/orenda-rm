@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 async function isAdminSession() {
   const cookieStore = await cookies();
 
-  return cookieStore.get("orendarm-admin-session")?.value === "true";
+  return cookieStore.get("investal-admin-session")?.value === "true";
 }
 
 export async function DELETE(

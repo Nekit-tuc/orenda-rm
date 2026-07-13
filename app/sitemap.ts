@@ -3,7 +3,7 @@ import { getProperties } from "@/lib/getProperties";
 import { getPropertySlug } from "@/lib/getPropertySlug";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://orenda-rm.vercel.app";
+  const baseUrl = "https://investal-estate.vercel.app";
   const properties = await getProperties();
 
   return [

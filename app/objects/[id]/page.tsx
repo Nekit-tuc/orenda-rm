@@ -13,7 +13,7 @@ import Header from "@/components/Header";
 import { BackIcon, MessageIcon, RouteIcon } from "@/components/PremiumIcons";
 import PropertyPageAccessGate from "@/components/PropertyPageAccessGate";
 
-const baseUrl = "https://orenda-rm.vercel.app";
+const baseUrl = "https://investal-estate.vercel.app";
 
       type Props = {
         params: Promise<{
@@ -28,7 +28,7 @@ const baseUrl = "https://orenda-rm.vercel.app";
 
         if (!data) {
           return {
-            title: "Об’єкт не знайдено | ZT SPACE",
+            title: "Об’єкт не знайдено | Investal Estate",
             description: "Об’єкт нерухомості не знайдено.",
           };
         }
@@ -43,13 +43,13 @@ const baseUrl = "https://orenda-rm.vercel.app";
         const canonicalUrl = `${baseUrl}/objects/${propertySlug}`;
 
         return {
-          title: `${property.dealType}: ${property.title}, ${property.area} | Orenda RM`,
-          description: `${property.title}. ${property.address}. ${property.area}, ${mainPrice}. ${property.dealType} нерухомості у Житомирі та області.`,
+          title: `${property.dealType}: ${property.title}, ${property.area} | Investal Estate`,
+          description: `${property.title}. ${property.address}. ${property.area}, ${mainPrice}. ${property.dealType} нерухомості від Investal Estate.`,
           alternates: {
             canonical: canonicalUrl,
           },
           openGraph: {
-            title: `${property.dealType}: ${property.title} | Orenda RM`,
+            title: `${property.dealType}: ${property.title} | Investal Estate`,
             description: `${property.area}, ${mainPrice}, ${property.address}`,
             url: canonicalUrl,
             images: [
@@ -111,7 +111,7 @@ const baseUrl = "https://orenda-rm.vercel.app";
 
           <div className="min-w-0">
             <p className="mb-2 text-[11px] uppercase tracking-[0.22em] text-white/40 sm:text-xs sm:tracking-[0.28em]">
-              Житомир
+              Investal Estate
             </p>
 
             <h1 className="break-words text-2xl font-extrabold leading-tight md:text-4xl">

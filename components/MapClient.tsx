@@ -81,7 +81,7 @@ function PropertyMarker({ property }: { property: MappableProperty }) {
     >
       <Popup
         closeButton={false}
-        className="orenda-map-popup"
+        className="investal-map-popup"
         maxWidth={320}
         minWidth={0}
         autoPanPadding={[16, 16]}
