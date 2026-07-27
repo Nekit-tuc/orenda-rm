@@ -70,6 +70,124 @@ body {
   display: none;
 }
 
+.news-slider-scroll {
+  scrollbar-width: none;
+}
+
+.news-slider-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.partners-marquee-mask {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
+.partners-marquee-track {
+  animation: partners-marquee var(--partners-mobile-duration, 22s) linear infinite;
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.partners-marquee-group {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  gap: 10px;
+  padding-right: 10px;
+  white-space: nowrap;
+  width: max-content;
+}
+
+.partners-logo-item {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
+.partners-logo {
+  height: 42px;
+  max-height: 42px;
+  max-width: 130px;
+  object-fit: contain;
+  width: auto;
+}
+
+@media (min-width: 1024px) {
+  .partners-marquee-track {
+    animation-duration: var(--partners-duration, 24s);
+  }
+
+  .partners-marquee-group {
+    gap: 14px;
+    padding-right: 14px;
+  }
+
+  .partners-logo {
+    height: 48px;
+    max-height: 48px;
+    max-width: 145px;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .partners-marquee-mask:hover .partners-marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partners-marquee-mask {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+    scrollbar-width: none;
+  }
+
+  .partners-marquee-mask::-webkit-scrollbar {
+    display: none;
+  }
+
+  .partners-marquee-track {
+    animation: none;
+    width: max-content;
+  }
+
+  .partners-marquee-group {
+    flex: 0 0 auto;
+    min-width: auto;
+  }
+
+  .partners-marquee-group[aria-hidden="true"] {
+    display: none;
+  }
+}
+
+@keyframes partners-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
 .leaflet-container {
   max-width: 100% !important;
   overflow: hidden;

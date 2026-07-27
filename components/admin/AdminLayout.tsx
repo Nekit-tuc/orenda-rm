@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminSidebar, { type AdminSection } from "@/components/admin/AdminSidebar";
 
 type AdminLayoutProps = {
   children: React.ReactNode;
-  activeSection: "overview" | "objects" | "homepage" | "leads" | "submissions";
-  onSectionChange: (section: "overview" | "objects" | "homepage" | "leads" | "submissions") => void;
+  activeSection: AdminSection;
+  onSectionChange: (section: AdminSection) => void;
 };
 
 export default function AdminLayout({

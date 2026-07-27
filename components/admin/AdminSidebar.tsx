@@ -1,15 +1,26 @@
 import BrandLogo from "@/components/BrandLogo";
 
+export type AdminSection =
+  | "overview"
+  | "objects"
+  | "homepage"
+  | "news"
+  | "partners"
+  | "leads"
+  | "submissions";
+
 type AdminSidebarProps = {
   isOpen: boolean;
   onClose: () => void;
-  activeSection: "overview" | "objects" | "homepage" | "leads" | "submissions";
-  onSectionChange: (section: "overview" | "objects" | "homepage" | "leads" | "submissions") => void;
+  activeSection: AdminSection;
+  onSectionChange: (section: AdminSection) => void;
 };
 
 const navItems = [
   { id: "overview" as const, label: "Огляд", short: "О" },
   { id: "objects" as const, label: "Об'єкти", short: "ОБ" },
+  { id: "news" as const, label: "Новини", short: "Н" },
+  { id: "partners" as const, label: "Партнери", short: "ПА" },
   { id: "leads" as const, label: "Клієнти / Ліди", short: "Л" },
   { id: "submissions" as const, label: "Пропозиції", short: "П" },
   { id: "homepage" as const, label: "Контент головної", short: "К" },
@@ -74,7 +85,8 @@ export default function AdminSidebar({
         <div className="mt-auto rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-400 md:hidden lg:block">
           <p className="font-medium text-slate-200">Панель керування</p>
           <p className="mt-2 leading-5">
-            Обʼєкти, статуси, контент головної сторінки та швидкі дії.
+            Обʼєкти, новини, партнери, ліди, пропозиції та контент головної
+            сторінки.
           </p>
         </div>
       </aside>

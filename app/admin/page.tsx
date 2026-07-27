@@ -15,14 +15,18 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import AdminObjectsTable from "@/components/admin/AdminObjectsTable";
 import AdminStatCard from "@/components/admin/AdminStatCard";
 import { RouteIcon } from "@/components/PremiumIcons";
-import {
-  createEmptyRealEstateBlock,
-  defaultHomepageSettings,
-  type HomepageSettings,
-  type RealEstateBlockSettings,
-} from "@/lib/homepageSettings";
+import { defaultHomepageSettings, type HomepageSettings } from "@/lib/homepageSettings";
+import type { NewsFormPayload, RealEstateNews } from "@/types/news";
+import type { Partner } from "@/types/partner";
 
-type AdminSection = "overview" | "objects" | "homepage" | "leads" | "submissions";
+type AdminSection =
+  | "overview"
+  | "objects"
+  | "homepage"
+  | "news"
+  | "partners"
+  | "leads"
+  | "submissions";
 
 type PropertyLead = {
   id: string;
@@ -78,6 +82,35 @@ export default function AdminPage() {
   );
   const [homepageMessage, setHomepageMessage] = useState("");
   const [homepageSaving, setHomepageSaving] = useState(false);
+  const [news, setNews] = useState<RealEstateNews[]>([]);
+  const [newsLoading, setNewsLoading] = useState(false);
+  const [newsSaving, setNewsSaving] = useState(false);
+  const [newsMessage, setNewsMessage] = useState("");
+  const [newsError, setNewsError] = useState("");
+  const [editingNewsId, setEditingNewsId] = useState<string | null>(null);
+  const [newsForm, setNewsForm] = useState<NewsFormPayload>({
+    title: "",
+    excerpt: "",
+    content: "",
+    category: "",
+    image_url: "",
+    published: true,
+    featured: false,
+    sort_order: 0,
+    published_at: new Date().toISOString().slice(0, 10),
+  });
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [partnersLoading, setPartnersLoading] = useState(false);
+  const [partnersSaving, setPartnersSaving] = useState(false);
+  const [partnersMessage, setPartnersMessage] = useState("");
+  const [partnersError, setPartnersError] = useState("");
+  const [editingPartnerId, setEditingPartnerId] = useState<string | null>(null);
+  const [partnerName, setPartnerName] = useState("");
+  const [partnerLogoFile, setPartnerLogoFile] = useState<File | null>(null);
+  const [partnerLogoPreview, setPartnerLogoPreview] = useState("");
+  const [partnerIsActive, setPartnerIsActive] = useState(true);
+  const [partnerSortOrder, setPartnerSortOrder] = useState(0);
+  const [partnerFileInputKey, setPartnerFileInputKey] = useState(0);
   const [leads, setLeads] = useState<PropertyLead[]>([]);
   const [leadsSearch, setLeadsSearch] = useState("");
   const [leadsLoading, setLeadsLoading] = useState(false);
@@ -248,6 +281,52 @@ export default function AdminPage() {
     setSubmissionsLoading(false);
   }, []);
 
+  const loadNews = useCallback(async function loadNews() {
+    setNewsLoading(true);
+    setNewsError("");
+
+    const response = await fetch("/api/admin/news", {
+      cache: "no-store",
+    });
+    const result = (await response.json().catch(() => null)) as {
+      ok?: boolean;
+      news?: RealEstateNews[];
+      message?: string;
+    } | null;
+
+    if (!response.ok || !result?.ok) {
+      setNews([]);
+      setNewsError(result?.message || "Не вдалося завантажити новини.");
+    } else {
+      setNews(result.news || []);
+    }
+
+    setNewsLoading(false);
+  }, []);
+
+  const loadPartners = useCallback(async function loadPartners() {
+    setPartnersLoading(true);
+    setPartnersError("");
+
+    const response = await fetch("/api/admin/partners", {
+      cache: "no-store",
+    });
+    const result = (await response.json().catch(() => null)) as {
+      ok?: boolean;
+      partners?: Partner[];
+      message?: string;
+    } | null;
+
+    if (!response.ok || !result?.ok) {
+      setPartners([]);
+      setPartnersError(result?.message || "Не вдалося завантажити партнерів.");
+    } else {
+      setPartners(result.partners || []);
+    }
+
+    setPartnersLoading(false);
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -310,6 +389,26 @@ export default function AdminPage() {
       return () => window.clearTimeout(timeoutId);
     }
   }, [activeSection, loadSubmissions]);
+
+  useEffect(() => {
+    if (activeSection === "news") {
+      const timeoutId = window.setTimeout(() => {
+        void loadNews();
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
+    }
+  }, [activeSection, loadNews]);
+
+  useEffect(() => {
+    if (activeSection === "partners") {
+      const timeoutId = window.setTimeout(() => {
+        void loadPartners();
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
+    }
+  }, [activeSection, loadPartners]);
         
         async function geocodeAddress() {
         if (!formData.address.trim()) {
@@ -900,36 +999,302 @@ export default function AdminPage() {
       setHomepageMessage("Контент головної сторінки оновлено");
     }
 
-    function updateRealEstateBlock(
-      index: number,
-      field: keyof RealEstateBlockSettings,
-      value: string
-    ) {
-      setHomepageContent((current) => ({
-        ...current,
-        realEstateBlocks: current.realEstateBlocks.map((block, blockIndex) =>
-          blockIndex === index ? { ...block, [field]: value } : block
-        ),
-      }));
+    function resetNewsForm() {
+      setEditingNewsId(null);
+      setNewsForm({
+        title: "",
+        excerpt: "",
+        content: "",
+        category: "",
+        image_url: "",
+        published: true,
+        featured: false,
+        sort_order: 0,
+        published_at: new Date().toISOString().slice(0, 10),
+      });
     }
 
-    function addRealEstateBlock() {
-      setHomepageContent((current) => ({
-        ...current,
-        realEstateBlocks: [
-          ...current.realEstateBlocks,
-          createEmptyRealEstateBlock(),
-        ],
-      }));
+    function editNewsItem(item: RealEstateNews) {
+      setEditingNewsId(item.id);
+      setNewsMessage("");
+      setNewsError("");
+      setNewsForm({
+        title: item.title,
+        excerpt: item.excerpt || "",
+        content: item.content || "",
+        category: item.category || "",
+        image_url: item.image_url || "",
+        published: item.published,
+        featured: item.featured,
+        sort_order: item.sort_order,
+        published_at: item.published_at
+          ? item.published_at.slice(0, 10)
+          : new Date().toISOString().slice(0, 10),
+      });
     }
 
-    function removeRealEstateBlock(index: number) {
-      setHomepageContent((current) => ({
-        ...current,
-        realEstateBlocks: current.realEstateBlocks.filter(
-          (_, blockIndex) => blockIndex !== index
-        ),
-      }));
+    async function saveNewsItem(e: React.FormEvent) {
+      e.preventDefault();
+      setNewsSaving(true);
+      setNewsMessage("");
+      setNewsError("");
+
+      const payload = {
+        ...newsForm,
+        published_at: newsForm.published_at
+          ? new Date(newsForm.published_at).toISOString()
+          : new Date().toISOString(),
+      };
+
+      const response = await fetch(
+        editingNewsId ? `/api/admin/news/${editingNewsId}` : "/api/admin/news",
+        {
+          method: editingNewsId ? "PATCH" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        news?: RealEstateNews;
+        message?: string;
+      } | null;
+
+      setNewsSaving(false);
+
+      if (!response.ok || !result?.ok || !result.news) {
+        const message = result?.message || "Не вдалося зберегти новину.";
+        setNewsError(message);
+        console.error("News save error:", message);
+        return;
+      }
+
+      setNews((current) => {
+        const exists = current.some((item) => item.id === result.news?.id);
+        if (exists) {
+          return current.map((item) =>
+            item.id === result.news?.id ? result.news : item
+          ) as RealEstateNews[];
+        }
+
+        return [result.news as RealEstateNews, ...current];
+      });
+      resetNewsForm();
+      setNewsMessage("Новину збережено");
+      void loadNews();
+    }
+
+    async function deleteNewsItem(id: string) {
+      const confirmed = confirm("Ви точно хочете видалити цю новину?");
+
+      if (!confirmed) {
+        return;
+      }
+
+      const response = await fetch(`/api/admin/news/${id}`, {
+        method: "DELETE",
+      });
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        message?: string;
+      } | null;
+
+      if (!response.ok || !result?.ok) {
+        const message = result?.message || "Не вдалося видалити новину.";
+        setNewsError(message);
+        console.error("News delete error:", message);
+        return;
+      }
+
+      setNews((current) => current.filter((item) => item.id !== id));
+      if (editingNewsId === id) {
+        resetNewsForm();
+      }
+      setNewsMessage("Новину видалено");
+    }
+
+    async function uploadNewsImage(file: File) {
+      setNewsSaving(true);
+      setNewsError("");
+      const formData = new FormData();
+      formData.append("file", file);
+      if (editingNewsId) {
+        formData.append("newsId", editingNewsId);
+      }
+
+      const response = await fetch("/api/admin/news/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        url?: string;
+        message?: string;
+      } | null;
+
+      setNewsSaving(false);
+
+      if (!response.ok || !result?.ok || !result.url) {
+        const message = result?.message || "Не вдалося завантажити фото.";
+        setNewsError(message);
+        console.error("News image upload error:", message);
+        return;
+      }
+
+      setNewsForm((current) => ({ ...current, image_url: result.url }));
+    }
+
+    function resetPartnerForm() {
+      setEditingPartnerId(null);
+      setPartnerName("");
+      setPartnerLogoFile(null);
+      setPartnerLogoPreview("");
+      setPartnerIsActive(true);
+      setPartnerSortOrder(0);
+      setPartnerFileInputKey((current) => current + 1);
+      setPartnersMessage("");
+      setPartnersError("");
+    }
+
+    function editPartner(partner: Partner) {
+      setEditingPartnerId(partner.id);
+      setPartnerName(partner.name);
+      setPartnerLogoFile(null);
+      setPartnerLogoPreview(partner.logo_url);
+      setPartnerIsActive(partner.is_active);
+      setPartnerSortOrder(partner.sort_order);
+      setPartnerFileInputKey((current) => current + 1);
+      setPartnersMessage("");
+      setPartnersError("");
+    }
+
+    function handlePartnerLogoSelect(file?: File) {
+      if (!file) {
+        setPartnerLogoFile(null);
+        setPartnerLogoPreview(editingPartnerId ? partnerLogoPreview : "");
+        setPartnerFileInputKey((current) => current + 1);
+        return;
+      }
+
+      const allowedTypes = [
+        "image/svg+xml",
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        setPartnersError("Дозволені формати: svg, png, webp, jpg, jpeg.");
+        setPartnerLogoFile(null);
+        setPartnerFileInputKey((current) => current + 1);
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        setPartnersError("Логотип має бути до 5 MB.");
+        setPartnerLogoFile(null);
+        setPartnerFileInputKey((current) => current + 1);
+        return;
+      }
+
+      setPartnersError("");
+      setPartnerLogoFile(file);
+      setPartnerLogoPreview(URL.createObjectURL(file));
+    }
+
+    async function savePartner(e: React.FormEvent) {
+      e.preventDefault();
+      setPartnersSaving(true);
+      setPartnersMessage("");
+      setPartnersError("");
+
+      if (!editingPartnerId && !partnerLogoFile) {
+        setPartnersSaving(false);
+        setPartnersError("Оберіть логотип партнера.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("name", partnerName);
+      formData.append("is_active", String(partnerIsActive));
+      formData.append("sort_order", String(partnerSortOrder));
+
+      if (partnerLogoFile) {
+        formData.append("logo", partnerLogoFile);
+      }
+
+      const response = await fetch(
+        editingPartnerId
+          ? `/api/admin/partners/${editingPartnerId}`
+          : "/api/admin/partners",
+        {
+          method: editingPartnerId ? "PATCH" : "POST",
+          body: formData,
+        }
+      );
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        partner?: Partner;
+        message?: string;
+      } | null;
+
+      setPartnersSaving(false);
+
+      if (!response.ok || !result?.ok || !result.partner) {
+        const message = result?.message || "Не вдалося зберегти партнера.";
+        setPartnersError(message);
+        console.error("Partner save error:", message);
+        return;
+      }
+
+      setPartners((current) => {
+        const exists = current.some((item) => item.id === result.partner?.id);
+        const nextPartners = exists
+          ? current.map((item) =>
+              item.id === result.partner?.id ? result.partner : item
+            )
+          : [...current, result.partner as Partner];
+
+        return nextPartners
+          .filter((item): item is Partner => Boolean(item))
+          .sort((a, b) => a.sort_order - b.sort_order);
+      });
+      resetPartnerForm();
+      setPartnersMessage("Партнера збережено");
+      void loadPartners();
+    }
+
+    async function deletePartner(partner: Partner) {
+      const confirmed = confirm(
+        `Ви точно хочете видалити логотип "${partner.name}"?`
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      const response = await fetch(`/api/admin/partners/${partner.id}`, {
+        method: "DELETE",
+      });
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        message?: string;
+      } | null;
+
+      if (!response.ok || !result?.ok) {
+        const message = result?.message || "Не вдалося видалити партнера.";
+        setPartnersError(message);
+        console.error("Partner delete error:", message);
+        return;
+      }
+
+      setPartners((current) => current.filter((item) => item.id !== partner.id));
+      if (editingPartnerId === partner.id) {
+        resetPartnerForm();
+      }
+      setPartnersMessage("Партнера видалено");
     }
 
   return (
@@ -1085,155 +1450,6 @@ export default function AdminPage() {
             </label>
           </div>
 
-          <div className="mt-8 border-t border-white/10 pt-6">
-            <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <h4 className="text-xl font-bold text-white">
-                  Новини ринку нерухомості
-                </h4>
-                <p className="mt-2 text-sm text-white/50">
-                  Додавайте новини для головної сторінки: фото, заголовок,
-                  текст, дату та посилання.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={addRealEstateBlock}
-                className="rounded-2xl border border-blue-400/40 bg-blue-500/10 px-5 py-3 text-sm font-semibold text-blue-100 transition hover:bg-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-300"
-              >
-                + Додати новину
-              </button>
-            </div>
-
-            <div className="grid gap-4 xl:grid-cols-2">
-              {homepageContent.realEstateBlocks.map((block, index) => (
-                <div
-                  key={index}
-                  className="rounded-2xl border border-white/10 bg-[#030712]/70 p-4"
-                >
-                  <div className="mb-4 flex items-center justify-between gap-3">
-                    <p className="text-sm font-semibold text-blue-200">
-                      Новина {index + 1}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={() => removeRealEstateBlock(index)}
-                      className="rounded-full border border-red-400/30 px-3 py-2 text-xs font-medium text-red-200 transition hover:bg-red-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-300"
-                    >
-                      Видалити
-                    </button>
-                  </div>
-
-                  <div className="grid gap-3">
-                    <label className="grid gap-2">
-                      <span className="text-sm text-white/60">
-                        Категорія / бейдж
-                      </span>
-                      <input
-                        value={block.tag}
-                        onChange={(e) =>
-                          updateRealEstateBlock(index, "tag", e.target.value)
-                        }
-                        className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none transition focus:border-blue-300/50"
-                      />
-                    </label>
-
-                    <label className="grid gap-2">
-                      <span className="text-sm text-white/60">
-                        Заголовок новини
-                      </span>
-                      <input
-                        value={block.title}
-                        onChange={(e) =>
-                          updateRealEstateBlock(index, "title", e.target.value)
-                        }
-                        className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none transition focus:border-blue-300/50"
-                      />
-                    </label>
-
-                    <label className="grid gap-2">
-                      <span className="text-sm text-white/60">
-                        Текст новини
-                      </span>
-                      <textarea
-                        value={block.text}
-                        onChange={(e) =>
-                          updateRealEstateBlock(index, "text", e.target.value)
-                        }
-                        className="min-h-24 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none transition focus:border-blue-300/50"
-                      />
-                    </label>
-
-                    <label className="grid gap-2">
-                      <span className="text-sm text-white/60">Дата</span>
-                      <input
-                        value={block.date}
-                        onChange={(e) =>
-                          updateRealEstateBlock(index, "date", e.target.value)
-                        }
-                        placeholder="25 червня 2026"
-                        className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none transition placeholder:text-white/30 focus:border-blue-300/50"
-                      />
-                    </label>
-
-                    <div className="grid gap-3">
-                      <ImageUploader
-                        onUploaded={(url) =>
-                          updateRealEstateBlock(index, "image", url)
-                        }
-                      />
-
-                      <label className="grid gap-2">
-                        <span className="text-sm text-white/60">
-                          Фото новини URL
-                        </span>
-                        <input
-                          value={block.image}
-                          onChange={(e) =>
-                            updateRealEstateBlock(
-                              index,
-                              "image",
-                              e.target.value
-                            )
-                          }
-                          placeholder="https://..."
-                          className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none transition placeholder:text-white/30 focus:border-blue-300/50"
-                        />
-                      </label>
-
-                      {block.image && (
-                        <Image
-                          src={block.image}
-                          alt={block.title}
-                          width={640}
-                          height={220}
-                          sizes="(min-width: 1280px) 50vw, 100vw"
-                          unoptimized
-                          className="h-44 w-full rounded-2xl object-cover"
-                        />
-                      )}
-                    </div>
-
-                    <label className="grid gap-2">
-                      <span className="text-sm text-white/60">
-                        Посилання при натисканні
-                      </span>
-                      <input
-                        value={block.href}
-                        onChange={(e) =>
-                          updateRealEstateBlock(index, "href", e.target.value)
-                        }
-                        placeholder="/#objects або https://..."
-                        className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none transition placeholder:text-white/30 focus:border-blue-300/50"
-                      />
-                    </label>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
 
           <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center">
             <button
@@ -1249,6 +1465,508 @@ export default function AdminPage() {
             )}
           </div>
         </form>
+      )}
+
+      {activeSection === "news" && (
+        <section className="grid gap-6">
+          <form
+            onSubmit={saveNewsItem}
+            className="rounded-3xl border border-[#b89652]/25 bg-white/[0.04] p-5 shadow-2xl shadow-black/30 backdrop-blur-xl"
+          >
+            <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.28em] text-[#d8ba68]">
+                  Новини
+                </p>
+                <h2 className="mt-3 text-3xl font-bold text-white">
+                  {editingNewsId ? "Редагувати новину" : "Створити новину"}
+                </h2>
+                <p className="mt-2 text-sm text-white/50">
+                  Новини зберігаються в real_estate_news і оновлюються на сайті без redeploy.
+                </p>
+              </div>
+
+              {editingNewsId && (
+                <button
+                  type="button"
+                  onClick={resetNewsForm}
+                  className="rounded-2xl border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition hover:border-[#b89652]/45 hover:text-[#d8ba68]"
+                >
+                  Скасувати редагування
+                </button>
+              )}
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              <label className="grid gap-2">
+                <span className="text-sm text-white/60">Заголовок *</span>
+                <input
+                  required
+                  value={newsForm.title}
+                  onChange={(e) =>
+                    setNewsForm({ ...newsForm, title: e.target.value })
+                  }
+                  className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-base outline-none transition focus:border-[#d8ba68]/60"
+                />
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-sm text-white/60">Категорія *</span>
+                <input
+                  required
+                  value={newsForm.category || ""}
+                  onChange={(e) =>
+                    setNewsForm({ ...newsForm, category: e.target.value })
+                  }
+                  placeholder="Ринок, Інвестиції, Законодавство..."
+                  className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-base outline-none transition placeholder:text-white/30 focus:border-[#d8ba68]/60"
+                />
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-sm text-white/60">Дата публікації *</span>
+                <input
+                  required
+                  type="date"
+                  value={newsForm.published_at || ""}
+                  onChange={(e) =>
+                    setNewsForm({ ...newsForm, published_at: e.target.value })
+                  }
+                  className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-base outline-none transition focus:border-[#d8ba68]/60"
+                />
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-sm text-white/60">Порядок показу</span>
+                <input
+                  type="number"
+                  value={newsForm.sort_order ?? 0}
+                  onChange={(e) =>
+                    setNewsForm({
+                      ...newsForm,
+                      sort_order: Number(e.target.value),
+                    })
+                  }
+                  className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-base outline-none transition focus:border-[#d8ba68]/60"
+                />
+              </label>
+
+              <label className="grid gap-2 lg:col-span-2">
+                <span className="text-sm text-white/60">Короткий опис</span>
+                <textarea
+                  value={newsForm.excerpt || ""}
+                  onChange={(e) =>
+                    setNewsForm({ ...newsForm, excerpt: e.target.value })
+                  }
+                  className="min-h-24 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-base outline-none transition focus:border-[#d8ba68]/60"
+                />
+              </label>
+
+              <label className="grid gap-2 lg:col-span-2">
+                <span className="text-sm text-white/60">Повний текст</span>
+                <textarea
+                  value={newsForm.content || ""}
+                  onChange={(e) =>
+                    setNewsForm({ ...newsForm, content: e.target.value })
+                  }
+                  className="min-h-36 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-base outline-none transition focus:border-[#d8ba68]/60"
+                />
+              </label>
+
+              <div className="grid gap-3 lg:col-span-2">
+                <label className="grid gap-2 rounded-2xl border border-white/10 bg-black/35 p-4">
+                  <span className="text-sm text-white/60">Фото новини *</span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        void uploadNewsImage(file);
+                      }
+                    }}
+                    className="text-sm text-white/60 file:mr-4 file:rounded-full file:border-0 file:bg-[#d8ba68] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-black"
+                  />
+                </label>
+
+                <input
+                  required
+                  value={newsForm.image_url || ""}
+                  onChange={(e) =>
+                    setNewsForm({ ...newsForm, image_url: e.target.value })
+                  }
+                  placeholder="URL фото"
+                  className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-base outline-none transition placeholder:text-white/30 focus:border-[#d8ba68]/60"
+                />
+
+                {newsForm.image_url && (
+                  <Image
+                    src={newsForm.image_url}
+                    alt={newsForm.title || "Preview"}
+                    width={960}
+                    height={360}
+                    sizes="100vw"
+                    unoptimized
+                    className="h-56 w-full rounded-2xl object-cover"
+                  />
+                )}
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2 lg:col-span-2">
+                <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/35 px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(newsForm.published)}
+                    onChange={(e) =>
+                      setNewsForm({ ...newsForm, published: e.target.checked })
+                    }
+                  />
+                  <span>Показувати на сайті</span>
+                </label>
+                <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/35 px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(newsForm.featured)}
+                    onChange={(e) =>
+                      setNewsForm({ ...newsForm, featured: e.target.checked })
+                    }
+                  />
+                  <span>Рекомендована новина</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <button
+                type="submit"
+                disabled={newsSaving}
+                className="rounded-2xl border border-[#b89652]/45 bg-[#b89652]/15 px-6 py-3.5 text-sm font-bold text-white transition hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {newsSaving ? "Збереження..." : editingNewsId ? "Зберегти" : "Створити новину"}
+              </button>
+              {newsMessage && <p className="text-sm text-[#d8ba68]">{newsMessage}</p>}
+              {newsError && <p className="text-sm text-red-300">{newsError}</p>}
+            </div>
+          </form>
+
+          <section className="rounded-3xl border border-white/10 bg-white/[0.035] p-5">
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-2xl font-bold text-white">Список новин</h3>
+                <p className="mt-1 text-sm text-white/45">
+                  Порядок: sort_order, дата публікації.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void loadNews()}
+                className="rounded-2xl border border-white/10 px-4 py-2 text-sm text-white/70 transition hover:border-[#b89652]/45 hover:text-[#d8ba68]"
+              >
+                Оновити
+              </button>
+            </div>
+
+            {newsLoading ? (
+              <p className="rounded-2xl border border-white/10 bg-black/30 p-5 text-white/60">
+                Завантаження новин...
+              </p>
+            ) : news.length === 0 ? (
+              <p className="rounded-2xl border border-white/10 bg-black/30 p-5 text-white/60">
+                Новин поки немає.
+              </p>
+            ) : (
+              <div className="grid gap-3">
+                {news.map((item) => (
+                  <article
+                    key={item.id}
+                    className="grid gap-4 rounded-2xl border border-white/10 bg-black/30 p-4 md:grid-cols-[140px_minmax(0,1fr)_auto]"
+                  >
+                    <Image
+                      src={item.image_url || "/hero-building.png"}
+                      alt={item.title}
+                      width={280}
+                      height={170}
+                      sizes="140px"
+                      unoptimized
+                      className="h-28 w-full rounded-xl object-cover md:w-36"
+                    />
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap gap-2 text-xs">
+                        <span className="rounded-full bg-[#b89652]/15 px-3 py-1 text-[#d8ba68]">
+                          {item.category || "Без категорії"}
+                        </span>
+                        <span className="rounded-full bg-white/5 px-3 py-1 text-white/55">
+                          {item.published ? "Опубліковано" : "Приховано"}
+                        </span>
+                        {item.featured && (
+                          <span className="rounded-full bg-white/5 px-3 py-1 text-white/55">
+                            Featured
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="mt-3 line-clamp-2 text-lg font-semibold text-white">
+                        {item.title}
+                      </h4>
+                      <p className="mt-2 line-clamp-2 text-sm text-white/50">
+                        {item.excerpt || item.content || "Опис не заповнено"}
+                      </p>
+                    </div>
+                    <div className="grid gap-2 md:w-32">
+                      <button
+                        type="button"
+                        onClick={() => editNewsItem(item)}
+                        className="rounded-xl border border-[#b89652]/35 px-4 py-2 text-sm font-semibold text-[#d8ba68] transition hover:bg-[#b89652] hover:text-black"
+                      >
+                        Редагувати
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void deleteNewsItem(item.id)}
+                        className="rounded-xl border border-red-400/30 px-4 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-500 hover:text-white"
+                      >
+                        Видалити
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        </section>
+      )}
+
+      {activeSection === "partners" && (
+        <section className="grid gap-6">
+          <form
+            onSubmit={savePartner}
+            className="rounded-3xl border border-[#b89652]/25 bg-white/[0.04] p-5 shadow-2xl shadow-black/30 backdrop-blur-xl"
+          >
+            <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.28em] text-[#d8ba68]">
+                  Партнери
+                </p>
+                <h2 className="mt-3 text-3xl font-bold text-white">
+                  {editingPartnerId
+                    ? "Редагувати логотип"
+                    : "Додати логотип"}
+                </h2>
+                <p className="mt-2 text-sm text-white/50">
+                  На сайті показується тільки логотип. Назва потрібна для адмінки
+                  та alt-тексту.
+                </p>
+              </div>
+
+              {editingPartnerId && (
+                <button
+                  type="button"
+                  onClick={resetPartnerForm}
+                  className="rounded-2xl border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition hover:border-[#b89652]/45 hover:text-[#d8ba68]"
+                >
+                  Скасувати редагування
+                </button>
+              )}
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              <label className="grid gap-2">
+                <span className="text-sm text-white/60">
+                  Назва компанії *
+                </span>
+                <input
+                  required
+                  value={partnerName}
+                  onChange={(e) => setPartnerName(e.target.value)}
+                  className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-base outline-none transition focus:border-[#d8ba68]/60"
+                />
+              </label>
+
+              <label className="grid gap-2">
+                <span className="text-sm text-white/60">
+                  Порядок показу
+                </span>
+                <input
+                  type="number"
+                  value={partnerSortOrder}
+                  onChange={(e) => setPartnerSortOrder(Number(e.target.value))}
+                  className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-base outline-none transition focus:border-[#d8ba68]/60"
+                />
+              </label>
+
+              <div className="grid gap-3 rounded-2xl border border-white/10 bg-black/35 p-4 lg:col-span-2">
+                <label className="grid gap-2">
+                  <span className="text-sm text-white/60">
+                    Логотип {editingPartnerId ? "" : "*"}
+                  </span>
+                  <input
+                    key={partnerFileInputKey}
+                    type="file"
+                    accept="image/svg+xml,image/jpeg,image/png,image/webp"
+                    onChange={(e) =>
+                      handlePartnerLogoSelect(e.target.files?.[0])
+                    }
+                    className="text-sm text-white/60 file:mr-4 file:rounded-full file:border-0 file:bg-[#d8ba68] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-black"
+                  />
+                </label>
+
+                {partnerLogoPreview && (
+                  <div className="flex flex-col gap-3 rounded-2xl border border-[#b89652]/20 bg-black/35 p-4 sm:flex-row sm:items-center">
+                    <div className="grid h-20 w-full place-items-center rounded-2xl bg-black/50 sm:w-40">
+                      <Image
+                        src={partnerLogoPreview}
+                        alt={partnerName || "Preview"}
+                        width={180}
+                        height={70}
+                        sizes="180px"
+                        unoptimized
+                        className="max-h-14 w-auto max-w-[150px] object-contain"
+                      />
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPartnerLogoFile(null);
+                          setPartnerLogoPreview(
+                            editingPartnerId
+                              ? partners.find(
+                                  (item) => item.id === editingPartnerId
+                                )?.logo_url || ""
+                              : ""
+                          );
+                          setPartnerFileInputKey((current) => current + 1);
+                        }}
+                        className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/70 transition hover:border-[#b89652]/45 hover:text-[#d8ba68]"
+                      >
+                        Скасувати вибір
+                      </button>
+                      <span className="rounded-xl bg-white/5 px-4 py-2 text-sm text-white/45">
+                        SVG, PNG, WebP або JPG до 5 MB
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 lg:col-span-2">
+                <input
+                  type="checkbox"
+                  checked={partnerIsActive}
+                  onChange={(e) => setPartnerIsActive(e.target.checked)}
+                />
+                <span>Показувати на сайті</span>
+              </label>
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <button
+                type="submit"
+                disabled={partnersSaving}
+                className="rounded-2xl border border-[#b89652]/45 bg-[#b89652]/15 px-6 py-3.5 text-sm font-bold text-white transition hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {partnersSaving
+                  ? "Збереження..."
+                  : editingPartnerId
+                    ? "Зберегти"
+                    : "Додати логотип"}
+              </button>
+              {partnersMessage && (
+                <p className="text-sm text-[#d8ba68]">{partnersMessage}</p>
+              )}
+              {partnersError && (
+                <p className="text-sm text-red-300">{partnersError}</p>
+              )}
+            </div>
+          </form>
+
+          <section className="rounded-3xl border border-white/10 bg-white/[0.035] p-5">
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-2xl font-bold text-white">Партнери</h3>
+                <p className="mt-1 text-sm text-white/45">
+                  Сортування: порядок показу, потім дата створення.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void loadPartners()}
+                className="rounded-2xl border border-white/10 px-4 py-2 text-sm text-white/70 transition hover:border-[#b89652]/45 hover:text-[#d8ba68]"
+              >
+                Оновити
+              </button>
+            </div>
+
+            {partnersLoading ? (
+              <p className="rounded-2xl border border-white/10 bg-black/30 p-5 text-white/60">
+                Завантаження партнерів...
+              </p>
+            ) : partners.length === 0 ? (
+              <p className="rounded-2xl border border-white/10 bg-black/30 p-5 text-white/60">
+                Логотипів поки немає.
+              </p>
+            ) : (
+              <div className="grid gap-3">
+                {partners.map((partner) => (
+                  <article
+                    key={partner.id}
+                    className="grid gap-4 rounded-2xl border border-white/10 bg-black/30 p-4 md:grid-cols-[160px_minmax(0,1fr)_auto]"
+                  >
+                    <div className="grid h-24 place-items-center rounded-2xl bg-black/45">
+                      <Image
+                        src={partner.logo_url}
+                        alt={partner.name}
+                        width={180}
+                        height={70}
+                        sizes="160px"
+                        unoptimized
+                        className="max-h-14 w-auto max-w-[140px] object-contain"
+                      />
+                    </div>
+
+                    <div className="min-w-0">
+                      <h4 className="line-clamp-1 text-lg font-semibold text-white">
+                        {partner.name}
+                      </h4>
+                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                        <span
+                          className={`rounded-full px-3 py-1 ${
+                            partner.is_active
+                              ? "bg-emerald-500/10 text-emerald-200"
+                              : "bg-white/5 text-white/55"
+                          }`}
+                        >
+                          {partner.is_active
+                            ? "Показується"
+                            : "Прихований"}
+                        </span>
+                        <span className="rounded-full bg-[#b89652]/15 px-3 py-1 text-[#d8ba68]">
+                          Порядок: {partner.sort_order}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-2 md:w-32">
+                      <button
+                        type="button"
+                        onClick={() => editPartner(partner)}
+                        className="rounded-xl border border-[#b89652]/35 px-4 py-2 text-sm font-semibold text-[#d8ba68] transition hover:bg-[#b89652] hover:text-black"
+                      >
+                        Редагувати
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void deletePartner(partner)}
+                        className="rounded-xl border border-red-400/30 px-4 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-500 hover:text-white"
+                      >
+                        Видалити
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        </section>
       )}
 
       {activeSection === "leads" && (
@@ -1622,7 +2340,7 @@ export default function AdminPage() {
                     onClick={() => setSelectedSubmission(null)}
                     className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-xl"
                   >
-                    ×
+                    Г—
                   </button>
                 </div>
 

@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 type HomepageSettingsPayload = Partial<HomepageSettings>;
 
 const homepageSettingsSelect =
-  "id, hero_title, hero_subtitle, hero_button_text, hero_button_url, section_title, section_subtitle, telegram_title, telegram_text, telegram_button_text, telegram_url, real_estate_blocks";
+  "id, hero_title, hero_subtitle, hero_button_text, hero_button_url, section_title, section_subtitle, telegram_title, telegram_text, telegram_button_text, telegram_url";
 
 async function isAdminSession() {
   const cookieStore = await cookies();
@@ -32,13 +32,8 @@ function settingsToRow(data: HomepageSettings) {
     telegram_text: data.telegramText,
     telegram_button_text: data.telegramButtonText,
     telegram_url: data.telegramUrl,
-    real_estate_blocks: data.realEstateBlocks,
     updated_at: new Date().toISOString(),
   };
-}
-
-function hasOwn<T extends object>(object: T, key: keyof HomepageSettings) {
-  return Object.prototype.hasOwnProperty.call(object, key);
 }
 
 function mergeHomepageSettings(
@@ -86,11 +81,6 @@ function mergeHomepageSettings(
       typeof payload.telegramUrl === "string"
         ? payload.telegramUrl
         : currentSettings.telegramUrl,
-    realEstateBlocks: hasOwn(payload, "realEstateBlocks")
-      ? Array.isArray(payload.realEstateBlocks)
-        ? payload.realEstateBlocks
-        : []
-      : currentSettings.realEstateBlocks,
   };
 }
 

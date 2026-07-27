@@ -10,83 +10,16 @@ create table if not exists public.homepage_settings (
   telegram_text text not null,
   telegram_button_text text not null,
   telegram_url text not null,
-  real_estate_blocks jsonb not null default '[
-    {
-      "tag": "Ринок",
-      "title": "Попит на комерційні приміщення зростає",
-      "text": "Огляд актуального попиту на офіси, склади та комерційні простори.",
-      "date": "25 червня 2026",
-      "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop",
-      "href": "/#objects"
-    },
-    {
-      "tag": "Поради",
-      "title": "Як правильно обрати приміщення для оренди: 7 важливих порад",
-      "text": "На що звернути увагу перед підписанням договору оренди.",
-      "date": "25 червня 2026",
-      "image": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200&auto=format&fit=crop",
-      "href": "/#objects"
-    },
-    {
-      "tag": "Інвестиції",
-      "title": "Інвестиційна нерухомість: актуальні тренди року",
-      "text": "Які обʼєкти залишаються цікавими для інвесторів.",
-      "date": "25 червня 2026",
-      "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop",
-      "href": "/#objects"
-    },
-    {
-      "tag": "Оренда",
-      "title": "Склади та виробничі приміщення для бізнесу",
-      "text": "Короткий зріз пропозицій для бізнесу та виробництва.",
-      "date": "25 червня 2026",
-      "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200&auto=format&fit=crop",
-      "href": "/#objects"
-    }
-  ]'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint homepage_settings_single_row check (id = 1)
 );
 
 alter table public.homepage_settings
-  add column if not exists real_estate_blocks jsonb not null default '[
-    {
-      "tag": "Ринок",
-      "title": "Попит на комерційні приміщення зростає",
-      "text": "Огляд актуального попиту на офіси, склади та комерційні простори.",
-      "date": "25 червня 2026",
-      "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop",
-      "href": "/#objects"
-    },
-    {
-      "tag": "Поради",
-      "title": "Як правильно обрати приміщення для оренди: 7 важливих порад",
-      "text": "На що звернути увагу перед підписанням договору оренди.",
-      "date": "25 червня 2026",
-      "image": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200&auto=format&fit=crop",
-      "href": "/#objects"
-    },
-    {
-      "tag": "Інвестиції",
-      "title": "Інвестиційна нерухомість: актуальні тренди року",
-      "text": "Які обʼєкти залишаються цікавими для інвесторів.",
-      "date": "25 червня 2026",
-      "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop",
-      "href": "/#objects"
-    },
-    {
-      "tag": "Оренда",
-      "title": "Склади та виробничі приміщення для бізнесу",
-      "text": "Короткий зріз пропозицій для бізнесу та виробництва.",
-      "date": "25 червня 2026",
-      "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200&auto=format&fit=crop",
-      "href": "/#objects"
-    }
-  ]'::jsonb;
+  drop column if exists show_quick_search;
 
 alter table public.homepage_settings
-  drop column if exists show_quick_search;
+  drop column if exists real_estate_blocks;
 
 alter table public.homepage_settings enable row level security;
 
@@ -116,8 +49,7 @@ insert into public.homepage_settings (
   telegram_title,
   telegram_text,
   telegram_button_text,
-  telegram_url,
-  real_estate_blocks
+  telegram_url
 ) values (
   1,
   'Інвестиційна нерухомість по всій Україні',
@@ -129,39 +61,5 @@ insert into public.homepage_settings (
   'Зв''язатися в Telegram',
   'Напишіть нам у Telegram, щоб уточнити деталі, домовитися про перегляд або запропонувати свій об''єкт.',
   'Зв''язатися',
-  'https://t.me/orenda_rm',
-  '[
-    {
-      "tag": "Ринок",
-      "title": "Попит на комерційні приміщення зростає",
-      "text": "Огляд актуального попиту на офіси, склади та комерційні простори.",
-      "date": "25 червня 2026",
-      "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop",
-      "href": "/#objects"
-    },
-    {
-      "tag": "Поради",
-      "title": "Як правильно обрати приміщення для оренди: 7 важливих порад",
-      "text": "На що звернути увагу перед підписанням договору оренди.",
-      "date": "25 червня 2026",
-      "image": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200&auto=format&fit=crop",
-      "href": "/#objects"
-    },
-    {
-      "tag": "Інвестиції",
-      "title": "Інвестиційна нерухомість: актуальні тренди року",
-      "text": "Які обʼєкти залишаються цікавими для інвесторів.",
-      "date": "25 червня 2026",
-      "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop",
-      "href": "/#objects"
-    },
-    {
-      "tag": "Оренда",
-      "title": "Склади та виробничі приміщення для бізнесу",
-      "text": "Короткий зріз пропозицій для бізнесу та виробництва.",
-      "date": "25 червня 2026",
-      "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200&auto=format&fit=crop",
-      "href": "/#objects"
-    }
-  ]'::jsonb
+  'https://t.me/orenda_rm'
 ) on conflict (id) do nothing;

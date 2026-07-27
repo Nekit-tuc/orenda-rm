@@ -3,11 +3,15 @@ import PropertiesSection from "@/components/PropertiesSection";
 import MapWrapper from "@/components/MapWrapper";
 import { getProperties } from "@/lib/getProperties";
 import { getHomepageSettings } from "@/lib/homepageSettings";
+import { getPublishedNews } from "@/lib/getPublishedNews";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { BuyoutIcon, MessageIcon, ObjectsIcon } from "@/components/PremiumIcons";
 import SubmitPropertyButton from "@/components/SubmitPropertyButton";
 import ContactDropdown from "@/components/ContactDropdown";
+import NewsSlider from "@/components/news/NewsSlider";
+import PartnersMarquee from "@/components/PartnersMarquee";
+import { getActivePartners } from "@/lib/getActivePartners";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -37,11 +41,12 @@ const benefits = [
 ];
 
 export default async function Home() {
-  const [properties, homepageSettings] = await Promise.all([
+  const [properties, homepageSettings, publishedNews, partners] = await Promise.all([
     getProperties(),
     getHomepageSettings(),
+    getPublishedNews(6),
+    getActivePartners(),
   ]);
-  const newsBlocks = homepageSettings.realEstateBlocks;
 
   return (
     <main className="min-h-screen max-w-full overflow-x-hidden bg-[#020202] text-white">
@@ -114,14 +119,17 @@ export default async function Home() {
 
               <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.045] p-3 lg:rounded-2xl lg:p-4">
                 <p className="text-[10px] text-white/45 sm:text-xs">Регіон</p>
-                <p className="mt-1 text-xs font-extrabold leading-tight sm:text-sm lg:text-lg">
-                  Україна
+                <p className="mt-1 whitespace-normal break-words text-xs font-extrabold leading-tight sm:text-sm lg:text-lg">
+                  Житомир /<br />
+                  Житомирська область
                 </p>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      <PartnersMarquee partners={partners} />
 
       <div className="relative flex w-full max-w-full min-w-0 flex-col overflow-hidden md:block">
       <section className="relative order-5 mx-auto max-w-7xl px-4 py-5 sm:px-6 md:order-none md:py-8">
@@ -184,48 +192,12 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="relative order-1 mx-auto flex max-w-7xl flex-col px-4 py-8 sm:px-6 md:order-none md:py-12">
+      <section className="relative order-1 flex w-full max-w-full min-w-0 flex-col overflow-hidden md:order-none">
         <div className="order-2 md:order-1">
-        <div className="mb-6">
-          <h2 className="text-xl font-extrabold sm:text-2xl">Новини ринку нерухомості</h2>
+          <NewsSlider news={publishedNews} />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {newsBlocks.map((item) => (
-            <a
-              key={`${item.title}-${item.date}`}
-              href={item.href || "/#objects"}
-              className="group relative min-h-64 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] text-left transition hover:-translate-y-1 hover:border-[#c9a85a]/50 focus:outline-none focus:ring-2 focus:ring-[#c9a85a]"
-              aria-label={item.title}
-            >
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
-                unoptimized
-                className="object-cover opacity-75 transition duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                <span className="rounded-full bg-[#c9a85a]/18 px-3 py-1 text-[11px] font-bold text-[#e2c875]">
-                  {item.tag}
-                </span>
-                <h3 className="mt-4 line-clamp-2 text-base font-black leading-snug">
-                  {item.title}
-                </h3>
-                <p className="mt-2 line-clamp-2 text-sm leading-5 text-white/65">
-                  {item.text}
-                </p>
-                <p className="mt-5 text-sm text-white/55">{item.date}</p>
-              </div>
-            </a>
-          ))}
-        </div>
-
-        </div>
-
-        <div className="order-1 mb-6 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/[0.035] p-2 sm:grid-cols-2 sm:gap-0 sm:overflow-hidden sm:p-0 md:order-2 md:mb-0 md:mt-7 lg:grid-cols-4">
+        <div className="order-1 mx-auto mb-6 grid w-full max-w-7xl grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/[0.035] p-2 sm:grid-cols-2 sm:gap-0 sm:overflow-hidden sm:p-0 md:order-2 md:mb-0 md:mt-7 lg:grid-cols-4">
           {benefits.map((item) => (
             <div
               key={item.title}

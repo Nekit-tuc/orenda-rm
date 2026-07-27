@@ -92,6 +92,7 @@ function ContactIcon({ icon }: { icon: ContactItem["icon"] }) {
 }
 
 export default function ContactDropdown() {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [desktopPosition, setDesktopPosition] = useState({
     right: 16,
@@ -102,6 +103,12 @@ export default function ContactDropdown() {
   const panelRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const firstLinkRef = useRef<HTMLAnchorElement | null>(null);
+
+  useEffect(() => {
+    const frameId = requestAnimationFrame(() => setMounted(true));
+
+    return () => cancelAnimationFrame(frameId);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) {
@@ -196,7 +203,7 @@ export default function ContactDropdown() {
   } as CSSProperties;
 
   const dropdownLayer =
-    typeof document !== "undefined"
+    mounted
       ? createPortal(
           <>
             <button
