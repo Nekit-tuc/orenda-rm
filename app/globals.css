@@ -96,10 +96,15 @@ body {
 }
 
 .partners-marquee-track {
-  animation: partners-marquee var(--partners-mobile-duration, 22s) linear infinite;
+  animation: partners-marquee var(--partners-duration, 24s) linear infinite;
   display: flex;
   width: max-content;
   will-change: transform;
+}
+
+.partners-marquee-track[data-ready="false"] {
+  animation: none;
+  transform: translate3d(0, 0, 0);
 }
 
 .partners-marquee-group {
@@ -121,27 +126,25 @@ body {
 }
 
 .partners-logo {
-  height: 50px;
-  max-height: 50px;
-  max-width: 160px;
+  display: block;
+  flex-shrink: 0;
+  height: 56px;
+  max-height: 56px;
+  max-width: 175px;
   object-fit: contain;
   width: auto;
 }
 
 @media (min-width: 1024px) {
-  .partners-marquee-track {
-    animation-duration: var(--partners-duration, 24s);
-  }
-
   .partners-marquee-group {
     gap: 14px;
     padding-right: 14px;
   }
 
   .partners-logo {
-    height: 56px;
-    max-height: 56px;
-    max-width: 170px;
+    height: 62px;
+    max-height: 62px;
+    max-width: 185px;
   }
 }
 
@@ -184,7 +187,7 @@ body {
   }
 
   to {
-    transform: translate3d(-50%, 0, 0);
+    transform: translate3d(calc(-1 * var(--partners-distance, 0px)), 0, 0);
   }
 }
 
