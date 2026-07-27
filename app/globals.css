@@ -121,9 +121,9 @@ body {
 }
 
 .partners-logo {
-  height: 42px;
-  max-height: 42px;
-  max-width: 130px;
+  height: 50px;
+  max-height: 50px;
+  max-width: 160px;
   object-fit: contain;
   width: auto;
 }
@@ -139,9 +139,9 @@ body {
   }
 
   .partners-logo {
-    height: 48px;
-    max-height: 48px;
-    max-width: 145px;
+    height: 56px;
+    max-height: 56px;
+    max-width: 170px;
   }
 }
 
