@@ -28,5 +28,7 @@ export function formatProperty(property: Property): FormattedProperty {
     views: property.views,
     status: property.status,
     slug: getPropertySlug(property),
+    created_at: property.created_at,
+    updated_at: property.updated_at,
   };
 }

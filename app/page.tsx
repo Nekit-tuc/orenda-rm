@@ -12,6 +12,7 @@ import ContactDropdown from "@/components/ContactDropdown";
 import NewsSlider from "@/components/news/NewsSlider";
 import PartnersMarquee from "@/components/PartnersMarquee";
 import { getActivePartners } from "@/lib/getActivePartners";
+import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -47,9 +48,60 @@ export default async function Home() {
     getPublishedNews(6),
     getActivePartners(),
   ]);
+  const organizationJsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: absoluteUrl("/icon.png"),
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          telephone: "+380979573856",
+          contactType: "customer service",
+          areaServed: "UA",
+          availableLanguage: ["uk"],
+        },
+      ],
+      sameAs: [
+        "https://t.me/orenda_rm",
+        "https://www.instagram.com/orenda_rm?igsh=anhvZGV5cDVxZTdi",
+        "https://www.tiktok.com/@romaniuk_yevheniy?_r=1&_t=ZS-97YSgliz5AS",
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "RealEstateAgent",
+      name: SITE_NAME,
+      url: SITE_URL,
+      image: absoluteUrl(DEFAULT_OG_IMAGE),
+      areaServed: {
+        "@type": "AdministrativeArea",
+        name: "Житомир та Житомирська область",
+      },
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Житомир",
+        addressRegion: "Житомирська область",
+        addressCountry: "UA",
+      },
+      telephone: "+380979573856",
+      email: "investal.estate.zt@gmail.com",
+      sameAs: [
+        "https://t.me/orenda_rm",
+        "https://www.instagram.com/orenda_rm?igsh=anhvZGV5cDVxZTdi",
+        "https://www.tiktok.com/@romaniuk_yevheniy?_r=1&_t=ZS-97YSgliz5AS",
+      ],
+    },
+  ];
 
   return (
     <main className="min-h-screen max-w-full overflow-x-hidden bg-[#020202] text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute left-1/2 top-0 h-[520px] w-[min(820px,100vw)] -translate-x-1/2 rounded-full bg-[#b89652]/10 blur-3xl" />
         <div className="absolute bottom-0 right-[-12rem] h-[420px] w-[420px] rounded-full bg-white/5 blur-3xl" />

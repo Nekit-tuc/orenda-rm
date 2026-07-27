@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Investal Estate",
     short_name: "Investal",
     description:
-      "Сучасна платформа нерухомості для купівлі, продажу та оренди.",
+      "Оренда та продаж комерційної нерухомості у Житомирі та Житомирській області.",
     start_url: "/",
     scope: "/",
     display: "standalone",

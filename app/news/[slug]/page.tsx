@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { formatNewsDate } from "@/components/news/NewsCard";
 import { getPublishedNewsBySlug } from "@/lib/getPublishedNews";
+import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -21,9 +22,7 @@ export async function generateMetadata({
   const news = await getPublishedNewsBySlug(slug);
 
   if (!news) {
-    return {
-      title: "Новину не знайдено",
-    };
+    notFound();
   }
 
   const description =
@@ -38,9 +37,18 @@ export async function generateMetadata({
     openGraph: {
       title: news.title,
       description,
+      url: `/news/${news.slug}`,
+      siteName: SITE_NAME,
       type: "article",
       publishedTime: news.published_at || undefined,
-      images: news.image_url ? [news.image_url] : undefined,
+      images: news.image_url ? [news.image_url] : [DEFAULT_OG_IMAGE],
+      locale: "uk_UA",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: news.title,
+      description,
+      images: news.image_url ? [news.image_url] : [DEFAULT_OG_IMAGE],
     },
   };
 }

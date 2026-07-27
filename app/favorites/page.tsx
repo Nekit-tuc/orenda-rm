@@ -1,6 +1,15 @@
+import type { Metadata } from "next";
 import FavoritesClient from "@/components/FavoritesClient";
 import { getProperties } from "@/lib/getProperties";
 import Header from "@/components/Header";
+
+export const metadata: Metadata = {
+  title: "Обране",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function FavoritesPage() {
   const properties = await getProperties();

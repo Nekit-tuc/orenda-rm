@@ -1,14 +1,13 @@
 import type { MetadataRoute } from "next";
+import { absoluteUrl } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://investal-estate.vercel.app";
-
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/admin", "/admin/login"],
+      disallow: ["/admin", "/api", "/login"],
     },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: absoluteUrl("/sitemap.xml"),
   };
 }

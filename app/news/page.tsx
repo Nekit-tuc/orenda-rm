@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import NewsCard from "@/components/news/NewsCard";
 import { getPublishedNews } from "@/lib/getPublishedNews";
+import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -11,9 +12,33 @@ export const revalidate = 0;
 export const metadata: Metadata = {
   title: "Новини ринку нерухомості",
   description:
-    "Аналітика, поради та актуальні матеріали про інвестиційну нерухомість від Investal Estate.",
+    "Аналітика, поради та актуальні матеріали про комерційну нерухомість, інвестиції й ринок Житомира від Investal Estate.",
   alternates: {
     canonical: "/news",
+  },
+  openGraph: {
+    title: "Новини ринку нерухомості",
+    description:
+      "Аналітика, поради та актуальні матеріали про комерційну нерухомість, інвестиції й ринок Житомира.",
+    url: "/news",
+    siteName: SITE_NAME,
+    type: "website",
+    locale: "uk_UA",
+    images: [
+      {
+        url: DEFAULT_OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: SITE_NAME,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Новини ринку нерухомості",
+    description:
+      "Аналітика, поради та актуальні матеріали про комерційну нерухомість, інвестиції й ринок Житомира.",
+    images: [DEFAULT_OG_IMAGE],
   },
 };
 

@@ -23,6 +23,8 @@ export type Property = {
   views: number;
   status: string;
   slug?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 };
 
 export type FormattedProperty = {
@@ -50,4 +52,6 @@ export type FormattedProperty = {
   views: number;
   status: string;
   slug?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 };

@@ -1,34 +1,28 @@
 import type { Metadata } from "next";
+import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-const siteUrl = "https://investal-estate.vercel.app";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  applicationName: "Investal Estate",
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
   appleWebApp: {
     capable: true,
-    title: "Investal Estate",
+    title: SITE_NAME,
     statusBarStyle: "black-translucent",
   },
   title: {
-    default: "Investal Estate — сучасний каталог нерухомості",
-    template: "%s | Investal Estate",
+    default: "Investal Estate — комерційна нерухомість у Житомирі",
+    template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Investal Estate — сучасна платформа нерухомості для купівлі, продажу та оренди комерційної нерухомості, земельних ділянок, будинків та квартир.",
+    "Оренда та продаж комерційної нерухомості у Житомирі та Житомирській області. Офіси, магазини, склади та інші перевірені об’єкти.",
   keywords: [
     "Investal Estate",
-    "нерухомість",
-    "комерційна нерухомість",
-    "купити нерухомість",
-    "продати нерухомість",
-    "оренда нерухомості",
-    "земля",
-    "будинки",
-    "офіси",
-    "склади",
-    "інвестиції",
+    "комерційна нерухомість Житомир",
+    "оренда офісу Житомир",
+    "продаж складу Житомир",
+    "оренда магазину Житомир",
+    "нерухомість Житомирська область",
   ],
   manifest: "/manifest.webmanifest",
   icons: {
@@ -38,29 +32,36 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/apple-icon.png", type: "image/png" }],
   },
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Investal Estate — сучасний каталог нерухомості",
-    description:
-      "Платформа для купівлі, продажу та оренди комерційної нерухомості, землі, будинків і квартир.",
-    url: siteUrl,
-    siteName: "Investal Estate",
-    locale: "uk_UA",
     type: "website",
+    locale: "uk_UA",
+    siteName: SITE_NAME,
+    url: "/",
+    title: "Investal Estate — комерційна нерухомість у Житомирі",
+    description:
+      "Оренда та продаж комерційної нерухомості у Житомирі та Житомирській області.",
     images: [
       {
-        url: "/opengraph-image.jpg",
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: "Investal Estate",
+        alt: SITE_NAME,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Investal Estate — сучасний каталог нерухомості",
+    title: "Investal Estate — комерційна нерухомість у Житомирі",
     description:
-      "Платформа для купівлі, продажу та оренди комерційної нерухомості, землі, будинків і квартир.",
-    images: ["/twitter-image.jpg"],
+      "Оренда та продаж комерційної нерухомості у Житомирі та Житомирській області.",
+    images: [DEFAULT_OG_IMAGE],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

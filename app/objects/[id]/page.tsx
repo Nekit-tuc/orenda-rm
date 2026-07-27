@@ -1,5 +1,6 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import PropertyGallery from "@/components/PropertyGallery";
 import PropertyFeatures from "@/components/PropertyFeatures";
 import { formatProperty } from "@/lib/formatProperty";
@@ -12,71 +13,84 @@ import { getPropertySlug } from "@/lib/getPropertySlug";
 import Header from "@/components/Header";
 import { BackIcon, MessageIcon, RouteIcon } from "@/components/PremiumIcons";
 import PropertyPageAccessGate from "@/components/PropertyPageAccessGate";
+import { DEFAULT_OG_IMAGE, SITE_NAME, absoluteUrl } from "@/lib/site";
+import {
+  buildPropertySeoDescription,
+  buildPropertySeoTitle,
+  getPropertyDealTypeLabel,
+  getVisiblePropertyPrice,
+} from "@/lib/propertySeo";
 
-const baseUrl = "https://investal-estate.vercel.app";
+type Props = {
+  params: Promise<{
+    id: string;
+  }>;
+};
 
-      type Props = {
-        params: Promise<{
-          id: string;
-        }>;
-      };
+function parseNumericValue(value?: string | null) {
+  if (!value) {
+    return null;
+  }
 
-      export async function generateMetadata({ params }: Props) {
-        const { id } = await params;
+  const normalized = value.replace(/\s/g, "").replace(",", ".");
+  const match = normalized.match(/\d+(?:\.\d+)?/);
 
-        const { data } = await getPropertyBySlugOrId(id);
+  return match ? Number(match[0]) : null;
+}
 
-        if (!data) {
-          return {
-            title: "Об’єкт не знайдено | Investal Estate",
-            description: "Об’єкт нерухомості не знайдено.",
-          };
-        }
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const { data } = await getPropertyBySlugOrId(id);
 
-        const property = formatProperty(data);
+  if (!data) {
+    notFound();
+  }
 
-        const mainPrice =
-          property.dealType === "Оренда"
-            ? property.pricePerMeter
-            : property.priceTotal;
-        const propertySlug = getPropertySlug(property);
-        const canonicalUrl = `${baseUrl}/objects/${propertySlug}`;
+  const property = formatProperty(data);
+  const propertySlug = getPropertySlug(property);
+  const canonicalPath = `/objects/${propertySlug}`;
+  const title = buildPropertySeoTitle(property);
+  const description = buildPropertySeoDescription(property);
+  const image = property.image || DEFAULT_OG_IMAGE;
 
-        return {
-          title: `${property.dealType}: ${property.title}, ${property.area} | Investal Estate`,
-          description: `${property.title}. ${property.address}. ${property.area}, ${mainPrice}. ${property.dealType} нерухомості від Investal Estate.`,
-          alternates: {
-            canonical: canonicalUrl,
-          },
-          openGraph: {
-            title: `${property.dealType}: ${property.title} | Investal Estate`,
-            description: `${property.area}, ${mainPrice}, ${property.address}`,
-            url: canonicalUrl,
-            images: [
-              {
-                url: property.image,
-                width: 1200,
-                height: 630,
-                alt: property.title,
-              },
-            ],
-            type: "website",
-          },
-        };
-      }
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalPath,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalPath,
+      siteName: SITE_NAME,
+      type: "website",
+      locale: "uk_UA",
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: property.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
 
-    export default async function PropertyPage({ params }: Props) {
-      const { id } = await params;
+export default async function PropertyPage({ params }: Props) {
+  const { id } = await params;
+  const { data, error, foundBy } = await getPropertyBySlugOrId(id);
 
-      const { data, error, foundBy } = await getPropertyBySlugOrId(id);
-
-      if (error || !data) {
-        return (
-          <main className="flex min-h-screen items-center justify-center bg-black text-white">
-            Об’єкт не знайдено
-          </main>
-        );
-      }
+  if (error || !data) {
+    notFound();
+  }
 
   const property = formatProperty(data);
   const propertySlug = getPropertySlug(property);
@@ -87,14 +101,85 @@ const baseUrl = "https://investal-estate.vercel.app";
 
   const routeUrl = getRouteUrl(property);
   const propertyUrl = `/objects/${propertySlug}`;
+  const absolutePropertyUrl = absoluteUrl(propertyUrl);
   const shareText = `${property.description} ${property.priceTotal}`.trim();
+  const visiblePrice = getVisiblePropertyPrice(property);
+  const areaValue = parseNumericValue(property.area);
+  const offerPrice = parseNumericValue(visiblePrice);
+  const propertyImages = property.images?.filter(Boolean) || [];
+  const listingJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    name: property.title,
+    description: property.description,
+    url: absolutePropertyUrl,
+    image: propertyImages.length ? propertyImages : [absoluteUrl(DEFAULT_OG_IMAGE)],
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: property.address,
+      addressLocality: "Житомир",
+      addressRegion: "Житомирська область",
+      addressCountry: "UA",
+    },
+    ...(areaValue
+      ? {
+          floorSize: {
+            "@type": "QuantitativeValue",
+            value: areaValue,
+            unitCode: "MTK",
+          },
+        }
+      : {}),
+    offers: {
+      "@type": "Offer",
+      url: absolutePropertyUrl,
+      availability: "https://schema.org/InStock",
+      businessFunction:
+        getPropertyDealTypeLabel(property) === "Оренда"
+          ? "http://purl.org/goodrelations/v1#LeaseOut"
+          : "http://purl.org/goodrelations/v1#Sell",
+      ...(offerPrice
+        ? {
+            price: offerPrice,
+            priceCurrency: "UAH",
+          }
+        : {}),
+    },
+  };
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Головна",
+        item: absoluteUrl("/"),
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Об’єкти",
+        item: absoluteUrl("/#objects"),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: property.title,
+        item: absolutePropertyUrl,
+      },
+    ],
+  };
 
   return (
     <main className="min-h-screen bg-black text-white">
-      <ViewCounter
-        propertyId={property.id}
-        currentViews={property.views}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([listingJsonLd, breadcrumbJsonLd]),
+        }}
       />
+      <ViewCounter propertyId={property.id} currentViews={property.views} />
       <Header />
       <PropertyPageAccessGate
         propertyId={property.id}
@@ -119,7 +204,7 @@ const baseUrl = "https://investal-estate.vercel.app";
             </h1>
 
             <p className="mt-3 break-words text-sm leading-6 text-white/50">
-              📍 {property.address}
+              Адреса: {property.address}
             </p>
 
             <div className="mt-4 flex flex-wrap gap-2">
@@ -201,10 +286,7 @@ const baseUrl = "https://investal-estate.vercel.app";
               Назад
             </Link>
 
-            <ContactForm
-              propertyTitle={property.title}
-              propertyId={property.id}
-            />
+            <ContactForm propertyTitle={property.title} propertyId={property.id} />
           </div>
         </div>
       </section>
