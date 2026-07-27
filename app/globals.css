@@ -128,9 +128,9 @@ body {
 .partners-logo {
   display: block;
   flex-shrink: 0;
-  height: 56px;
-  max-height: 56px;
-  max-width: 175px;
+  height: 70px;
+  max-height: 70px;
+  max-width: 220px;
   object-fit: contain;
   width: auto;
 }
@@ -142,9 +142,9 @@ body {
   }
 
   .partners-logo {
-    height: 62px;
-    max-height: 62px;
-    max-width: 185px;
+    height: 78px;
+    max-height: 78px;
+    max-width: 235px;
   }
 }
 
