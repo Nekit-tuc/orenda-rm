@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import PropertiesSection from "@/components/PropertiesSection";
 import MapWrapper from "@/components/MapWrapper";
 import { getProperties } from "@/lib/getProperties";
@@ -41,6 +42,25 @@ const benefits = [
   },
 ];
 
+const seoDirections = [
+  "приміщення під бізнес Житомир",
+  "оренда приміщення під бізнес Житомир",
+  "комерційне приміщення під бізнес Житомир",
+  "приміщення для відкриття бізнесу Житомир",
+  "приміщення для підприємця Житомир",
+  "оренда приміщення для бізнесу",
+  "комерційне приміщення для бізнесу",
+  "площа під бізнес",
+  "нерухомість для бізнесу Житомир",
+  "оренда магазину в центрі Житомира",
+  "магазин в оренду з окремим входом",
+  "магазин в оренду з ремонтом",
+  "магазин в оренду без ремонту",
+  "торгове приміщення з фасадним входом",
+  "торгове приміщення для продуктового магазину",
+  "торгове приміщення для магазину одягу",
+];
+
 export default async function Home() {
   const [properties, homepageSettings, publishedNews, partners] = await Promise.all([
     getProperties(),
@@ -48,6 +68,7 @@ export default async function Home() {
     getPublishedNews(6),
     getActivePartners(),
   ]);
+
   const organizationJsonLd = [
     {
       "@context": "https://schema.org",
@@ -127,11 +148,11 @@ export default async function Home() {
               INVESTAL ESTATE • ЖИТОМИР
             </p>
 
-            <h1 className="max-w-[570px] text-[clamp(2.05rem,9.6vw,2.55rem)] font-extrabold uppercase leading-[1.1] tracking-[-0.01em] text-white md:text-[clamp(2.85rem,4.9vw,4.15rem)]">
+            <h1 className="max-w-[760px] text-[clamp(2.05rem,8.6vw,2.65rem)] font-extrabold uppercase leading-[1.05] tracking-[-0.01em] text-white md:text-[clamp(3rem,4.2vw,4.55rem)]">
               {homepageSettings.heroTitle}
             </h1>
 
-            <p className="mt-4 max-w-[480px] text-sm leading-6 text-white/72 sm:text-[15px] md:mt-5 md:text-base md:leading-7">
+            <p className="mt-4 max-w-[680px] text-sm leading-6 text-white/72 sm:text-[15px] md:mt-5 md:text-base md:leading-7">
               {homepageSettings.heroSubtitle}
             </p>
 
@@ -150,7 +171,7 @@ export default async function Home() {
 
           <div className="relative z-10 rounded-[1.35rem] border border-white/12 bg-[#101010]/70 p-3 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl md:p-4 lg:rounded-[1.75rem] lg:p-5">
             <p className="text-[10px] uppercase tracking-[0.24em] text-[#c9a85a] sm:tracking-[0.32em]">
-              Premium real objects
+              ПРЕМІАЛЬНІ ПРОПОЗИЦІЇ
             </p>
 
             <div className="mt-3 grid grid-cols-3 gap-2 lg:grid-cols-1 lg:gap-3">
@@ -306,6 +327,124 @@ export default async function Home() {
 
         <div id="contacts" />
       </div>
+
+      <section className="relative mx-auto w-full max-w-7xl px-4 pb-10 pt-1 sm:px-6 md:pb-14">
+        <div className="overflow-hidden rounded-3xl border border-[#b89652]/25 bg-[radial-gradient(circle_at_top_left,rgba(184,150,82,0.12),transparent_34%),rgba(255,255,255,0.028)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+            <article className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#b89652]">
+                Оренда для бізнесу
+              </p>
+              <h2 className="mt-2 text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+                Комерційна нерухомість у Житомирі
+              </h2>
+
+              <div className="mt-4 grid gap-3 text-sm leading-6 text-white/65 md:text-[15px] md:leading-7">
+                <p>
+                  Investal Estate допомагає знайти актуальні{" "}
+                  <strong className="font-semibold text-white/80">
+                    комерційні приміщення в оренду у Житомирі
+                  </strong>{" "}
+                  для різних напрямків бізнесу. У каталозі представлені
+                  об’єкти, які можуть підійти під магазин, офіс, склад, салон
+                  краси, аптеку, кафе, медичний кабінет, сервісний центр,
+                  шоурум, навчальний простір або інший вид підприємницької
+                  діяльності.
+                </p>
+
+                <p>
+                  На сайті можна переглянути{" "}
+                  <strong className="font-semibold text-white/80">
+                    оренду комерційної нерухомості в Житомирі
+                  </strong>
+                  , порівняти площу, адресу, характеристики, фотографії та опис
+                  кожного об’єкта. Ми збираємо пропозиції для тих, хто шукає{" "}
+                  <strong className="font-semibold text-white/80">
+                    приміщення для бізнесу в Житомирі
+                  </strong>
+                  , хоче орендувати торгову площу, знайти офісне приміщення,
+                  склад або комерційний об’єкт у зручній частині міста.
+                </p>
+
+                <p>
+                  У каталозі доступні{" "}
+                  <strong className="font-semibold text-white/80">
+                    магазини в оренду у Житомирі
+                  </strong>
+                  , приміщення з окремим входом, фасадні торгові площі, об’єкти
+                  біля дороги, зупинок і прохідних локацій. Також можна знайти{" "}
+                  <strong className="font-semibold text-white/80">
+                    офіси в оренду
+                  </strong>
+                  , приміщення для компаній, кабінетів, представництв, центрів
+                  обслуговування клієнтів і невеликих команд.
+                </p>
+
+                <p>
+                  Для бізнесу, якому потрібні більші площі, доступні{" "}
+                  <strong className="font-semibold text-white/80">
+                    складські приміщення в оренду у Житомирі
+                  </strong>
+                  , приміщення під виробництво, майстерню, склад-магазин, сервіс
+                  або логістичний напрямок. Окремо представлені об’єкти, які
+                  можуть використовуватися як{" "}
+                  <strong className="font-semibold text-white/80">
+                    приміщення під кафе, аптеку, салон краси, стоматологію,
+                    клініку, СТО, шиномонтаж, дитячий центр або навчальні курси
+                  </strong>
+                  .
+                </p>
+
+                <p>
+                  Кожна сторінка об’єкта містить основну інформацію про
+                  нерухомість: площу, адресу, фотографії, опис розташування,
+                  характеристики та доступні способи зв’язку. Це дає змогу
+                  швидше вибрати{" "}
+                  <strong className="font-semibold text-white/80">
+                    комерційне приміщення для оренди у Житомирі
+                  </strong>{" "}
+                  та оцінити, чи підходить воно для конкретного бізнесу.
+                </p>
+
+                <p>
+                  Каталог Investal Estate регулярно оновлюється, тому
+                  користувачі можуть переглядати актуальні пропозиції, нові
+                  об’єкти та доступні{" "}
+                  <strong className="font-semibold text-white/80">
+                    приміщення під бізнес у Житомирі
+                  </strong>{" "}
+                  в одному місці. Перейдіть до каталогу, щоб знайти відповідний
+                  варіант і зв’язатися для уточнення умов оренди.
+                </p>
+              </div>
+            </article>
+
+            <aside className="min-w-0 rounded-3xl border border-white/10 bg-black/30 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#b89652]">
+                Напрямки пошуку
+              </p>
+              <ul className="mt-3 grid gap-2 text-xs leading-4 text-white/58 sm:grid-cols-2 lg:grid-cols-1">
+                {seoDirections.map((direction) => (
+                  <li
+                    key={direction}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2"
+                  >
+                    {direction}
+                  </li>
+                ))}
+              </ul>
+
+              <Link
+                href="/objects"
+                className="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#b89652]/45 bg-[#b89652]/10 px-5 py-2.5 text-center text-sm font-bold text-white shadow-[0_0_24px_rgba(184,150,82,0.16)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_34px_rgba(212,175,55,0.3)] focus:outline-none focus:ring-2 focus:ring-[#d8ba68]"
+              >
+                Переглянути всі об’єкти
+              </Link>
+            </aside>
+          </div>
+        </div>
+      </section>
+
       <Footer />
     </main>
   );

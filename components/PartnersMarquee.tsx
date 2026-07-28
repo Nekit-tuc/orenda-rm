@@ -42,6 +42,7 @@ function PartnerLogo({
         unoptimized
         onLoad={onLogoLoad}
         className="partners-logo"
+        style={{ width: "auto" }}
       />
     </span>
   );

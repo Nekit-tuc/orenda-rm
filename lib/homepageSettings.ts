@@ -28,9 +28,9 @@ export type HomepageSettingsRow = {
 };
 
 export const defaultHomepageSettings: HomepageSettings = {
-  heroTitle: "Комерційні приміщення в оренду у Житомирі та Житомирській області",
+  heroTitle: "Оренда комерційної нерухомості Житомира та області",
   heroSubtitle:
-    "Актуальні приміщення для магазинів, офісів, складів, сфери послуг та інших напрямів бізнесу.",
+    "Актуальні приміщення під магазини, офіси, аптеки та інші напрямків бізнесу в Житомирі.",
   heroButtonText: "Дивитись об’єкти",
   heroButtonUrl: "#objects",
   sectionTitle: "Комерційні приміщення в оренду",
@@ -45,6 +45,31 @@ export const defaultHomepageSettings: HomepageSettings = {
 const homepageSettingsSelect =
   "id, hero_title, hero_subtitle, hero_button_text, hero_button_url, section_title, section_subtitle, telegram_title, telegram_text, telegram_button_text, telegram_url";
 
+const legacyHeroTitles = [
+  "Комерційна нерухомість",
+  "Комерційні приміщення в оренду у Житомирі та Житомирській області",
+];
+
+const legacyBroadSubtitleParts = [
+  "земельні ділянки",
+  "будинки",
+  "квартири",
+  "інвестиційні об'єкти",
+  "інвестиційні об’єкти",
+];
+
+const legacySectionTitles = [
+  "Актуальні об'єкти",
+  "Актуальні об’єкти",
+  "Преміальні об'єкти",
+  "Преміальні об’єкти",
+];
+
+const legacySectionSubtitles = [
+  "Каталог нерухомості",
+  "Каталог Investal Estate",
+];
+
 function normalizeText(value: unknown, fallback: string) {
   if (typeof value !== "string") {
     return fallback;
@@ -55,35 +80,25 @@ function normalizeText(value: unknown, fallback: string) {
   return trimmed || fallback;
 }
 
-function normalizeHomepageContent(settings: HomepageSettings): HomepageSettings {
-  const oldBroadSubtitle =
-    settings.heroSubtitle.includes("земельні ділянки") ||
-    settings.heroSubtitle.includes("будинки") ||
-    settings.heroSubtitle.includes("квартири") ||
-    settings.heroSubtitle.includes("інвестиційні об'єкти") ||
-    settings.heroSubtitle.includes("інвестиційні об’єкти");
+function includesAny(value: string, parts: string[]) {
+  return parts.some((part) => value.includes(part));
+}
 
+function normalizeHomepageContent(settings: HomepageSettings): HomepageSettings {
   return {
     ...settings,
-    heroTitle:
-      settings.heroTitle === "Комерційна нерухомість"
-        ? defaultHomepageSettings.heroTitle
-        : settings.heroTitle,
-    heroSubtitle: oldBroadSubtitle
+    heroTitle: legacyHeroTitles.includes(settings.heroTitle)
+      ? defaultHomepageSettings.heroTitle
+      : settings.heroTitle,
+    heroSubtitle: includesAny(settings.heroSubtitle, legacyBroadSubtitleParts)
       ? defaultHomepageSettings.heroSubtitle
       : settings.heroSubtitle,
-    sectionTitle:
-      settings.sectionTitle === "Актуальні об'єкти" ||
-      settings.sectionTitle === "Актуальні об’єкти" ||
-      settings.sectionTitle === "Преміальні об'єкти" ||
-      settings.sectionTitle === "Преміальні об’єкти"
-        ? defaultHomepageSettings.sectionTitle
-        : settings.sectionTitle,
-    sectionSubtitle:
-      settings.sectionSubtitle === "Каталог нерухомості" ||
-      settings.sectionSubtitle === "Каталог Investal Estate"
-        ? defaultHomepageSettings.sectionSubtitle
-        : settings.sectionSubtitle,
+    sectionTitle: legacySectionTitles.includes(settings.sectionTitle)
+      ? defaultHomepageSettings.sectionTitle
+      : settings.sectionTitle,
+    sectionSubtitle: legacySectionSubtitles.includes(settings.sectionSubtitle)
+      ? defaultHomepageSettings.sectionSubtitle
+      : settings.sectionSubtitle,
   };
 }
 
