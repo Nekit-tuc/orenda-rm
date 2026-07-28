@@ -1,5 +1,5 @@
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://investal.estate"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://investal-est.com"
 ).replace(/\/+$/, "");
 
 export const SITE_NAME = "Investal Estate";

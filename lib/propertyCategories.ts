@@ -7,4 +7,3 @@ export const propertyTypeOptions = [
 ] as const;
 
 export const propertyTypeFilters = ["Всі", ...propertyTypeOptions] as const;
-

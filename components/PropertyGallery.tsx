@@ -24,10 +24,9 @@ export default function PropertyGallery({
   const [activeIndex, setActiveIndex] = useState(0);
 
   const activeImage = safeImages[activeIndex];
-  const primaryAlt = buildPropertyImageAlt({ address, dealType, type });
-  const secondaryAlt = address
-    ? `Фото приміщення на ${address}, Житомир`
-    : `Фото приміщення ${title}`;
+  const getImageAlt = (index: number) =>
+    buildPropertyImageAlt({ address, dealType, type }, index + 1) ||
+    `${title}, фото ${index + 1}`;
 
   function prevImage() {
     setActiveIndex((current) =>
@@ -42,11 +41,18 @@ export default function PropertyGallery({
   }
 
   return (
-    <div className="min-w-0 max-w-full overflow-hidden">
+    <section
+      aria-labelledby="property-photos-heading"
+      className="min-w-0 max-w-full overflow-hidden"
+    >
+      <h2 id="property-photos-heading" className="sr-only">
+        Фотографії
+      </h2>
+
       <div className="relative w-full max-w-full overflow-hidden rounded-3xl border border-[#b89652]/20 bg-[#070707] shadow-[0_0_35px_rgba(184,150,82,0.12)] md:rounded-[2rem]">
         <Image
           src={activeImage}
-          alt={activeIndex === 0 ? primaryAlt : secondaryAlt}
+          alt={getImageAlt(activeIndex)}
           width={1000}
           height={700}
           sizes="(min-width: 1024px) 50vw, 100vw"
@@ -97,7 +103,7 @@ export default function PropertyGallery({
             >
               <Image
                 src={image}
-                alt={index === 0 ? primaryAlt : secondaryAlt}
+                alt={getImageAlt(index)}
                 width={220}
                 height={130}
                 sizes="20vw"
@@ -108,6 +114,6 @@ export default function PropertyGallery({
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

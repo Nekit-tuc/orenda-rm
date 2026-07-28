@@ -4,6 +4,16 @@ function cleanText(value?: string | null) {
   return value?.replace(/\s+/g, " ").trim() || "";
 }
 
+function ensureSquareMeters(value?: string | null) {
+  const text = cleanText(value);
+
+  if (!text) {
+    return "";
+  }
+
+  return /м²|м2/i.test(text) ? text : `${text} м²`;
+}
+
 function readableDealType(value?: string | null) {
   const text = cleanText(value).toLowerCase();
 
@@ -21,69 +31,134 @@ function readableDealType(value?: string | null) {
 function isCommercialType(value?: string | null) {
   const text = cleanText(value).toLowerCase();
 
-  return text.includes("комер") || text.includes("маф") || text.includes("кіоск");
+  return (
+    text.includes("комер") ||
+    text.includes("маф") ||
+    text.includes("кіоск") ||
+    text.includes("офіс") ||
+    text.includes("склад") ||
+    text.includes("магаз")
+  );
 }
 
-function locationFromProperty(property: FormattedProperty) {
-  const address = cleanText(property.address);
+function normalizeType(value?: string | null) {
+  const text = cleanText(value);
+  const lower = text.toLowerCase();
 
-  if (!address) {
-    return "Житомир";
+  if (lower.includes("маф") || lower.includes("кіоск")) {
+    return "МАФ/кіоск";
   }
 
-  return address.length > 70 ? `${address.slice(0, 67).trim()}...` : address;
+  if (lower.includes("офіс")) {
+    return "офіс";
+  }
+
+  if (lower.includes("склад")) {
+    return "склад";
+  }
+
+  if (lower.includes("магаз")) {
+    return "магазин";
+  }
+
+  if (isCommercialType(text)) {
+    return "комерційне приміщення";
+  }
+
+  return text || "комерційне приміщення";
+}
+
+function cleanSentence(value: string) {
+  return value.replace(/\s+/g, " ").replace(/\s+([,.—])/g, "$1").trim();
+}
+
+function sentenceFromParts(parts: string[]) {
+  return cleanSentence(parts.filter(Boolean).join(" "));
+}
+
+function capitalize(value: string) {
+  return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
 }
 
 export function getVisiblePropertyPrice(property: FormattedProperty) {
   return cleanText(property.pricePerMeter || property.price || "");
 }
 
-export function buildPropertySeoTitle(property: FormattedProperty) {
-  const dealType = readableDealType(property.dealType);
-  const type = cleanText(property.type).toLowerCase();
-  const area = cleanText(property.area);
-  const location = locationFromProperty(property);
-
-  if (dealType === "Оренда" && isCommercialType(property.type)) {
-    return ["Оренда комерційного приміщення", area, location]
-      .filter(Boolean)
-      .join(", ");
-  }
-
-  return [dealType, type, area, location].filter(Boolean).join(", ");
-}
-
-export function buildPropertySeoDescription(property: FormattedProperty) {
-  const dealType = readableDealType(property.dealType).toLowerCase();
-  const type = cleanText(property.type).toLowerCase();
-  const address = locationFromProperty(property);
-  const area = cleanText(property.area);
-  const price = getVisiblePropertyPrice(property);
-  const intro = [dealType, type, area, address].filter(Boolean).join(", ");
-  const details = cleanText(property.description);
-  const pricePart = price ? ` Ціна за м²: ${price}.` : "";
-  const text = `${intro}.${pricePart} ${details}`.trim();
-
-  return text.length > 160 ? `${text.slice(0, 157).trim()}...` : text;
-}
-
 export function getPropertyDealTypeLabel(property: FormattedProperty) {
   return readableDealType(property.dealType);
 }
 
-export function buildPropertyImageAlt(property: {
-  address?: string | null;
-  dealType?: string | null;
-  type?: string | null;
-}) {
-  const dealType = readableDealType(property.dealType).toLowerCase();
-  const address = cleanText(property.address);
-  const suffix = address ? ` на ${address}, Житомир` : " у Житомирі";
-
-  if (dealType === "оренда" && isCommercialType(property.type)) {
-    return `Комерційне приміщення в оренду${suffix}`;
-  }
-
-  return `Фото приміщення${suffix}`;
+export function getPropertyDisplayType(property: FormattedProperty) {
+  return normalizeType(property.type);
 }
 
+export function buildPropertySeoTitle(property: FormattedProperty) {
+  const dealType = readableDealType(property.dealType);
+  const type = normalizeType(property.type);
+  const area = ensureSquareMeters(property.area);
+  const address = cleanText(property.address);
+
+  const base =
+    dealType === "Оренда"
+      ? `${capitalize(type)} в оренду у Житомирі`
+      : `${capitalize(type)} на продаж у Житомирі`;
+  const location = address && address.length <= 54 ? ` на ${address}` : "";
+  const areaPart = area ? ` — ${area}` : "";
+
+  return cleanSentence(`${base}${location}${areaPart} | Investal Estate`);
+}
+
+export function buildPropertySeoDescription(property: FormattedProperty) {
+  const dealType = readableDealType(property.dealType);
+  const type = normalizeType(property.type);
+  const address = cleanText(property.address);
+  const area = ensureSquareMeters(property.area);
+  const intro =
+    dealType === "Оренда"
+      ? `Оренда ${type} у Житомирі`
+      : `Продаж ${type} у Житомирі`;
+  const addressPart = address ? `за адресою ${address}.` : "";
+  const areaPart = area ? `Площа — ${area}.` : "";
+
+  return sentenceFromParts([
+    `${intro} ${addressPart}`,
+    areaPart,
+    "Переглядайте фотографії, характеристики, опис та умови оренди.",
+  ]);
+}
+
+export function buildPropertyH1(property: FormattedProperty) {
+  const dealType = readableDealType(property.dealType);
+  const type = normalizeType(property.type);
+  const area = ensureSquareMeters(property.area);
+  const address = cleanText(property.address);
+
+  if (address) {
+    return cleanSentence(
+      `${capitalize(type)} ${
+        dealType === "Оренда" ? "в оренду" : "на продаж"
+      } на ${address} у Житомирі`
+    );
+  }
+
+  return cleanSentence(`${capitalize(type)} ${area} у Житомирі`);
+}
+
+export function buildPropertyImageAlt(
+  property: {
+    address?: string | null;
+    dealType?: string | null;
+    type?: string | null;
+  },
+  photoNumber?: number
+) {
+  const type = normalizeType(property.type);
+  const address = cleanText(property.address);
+  const suffix = photoNumber ? `, фото ${photoNumber}` : "";
+
+  if (address) {
+    return `${capitalize(type)} за адресою ${address} у Житомирі${suffix}`;
+  }
+
+  return `${capitalize(type)} у Житомирі${suffix}`;
+}

@@ -16,9 +16,12 @@ import PropertyPageAccessGate from "@/components/PropertyPageAccessGate";
 import ObjectAnalytics from "@/components/ObjectAnalytics";
 import { DEFAULT_OG_IMAGE, SITE_NAME, absoluteUrl } from "@/lib/site";
 import {
+  buildPropertyH1,
+  buildPropertyImageAlt,
   buildPropertySeoDescription,
   buildPropertySeoTitle,
   getPropertyDealTypeLabel,
+  getPropertyDisplayType,
   getVisiblePropertyPrice,
 } from "@/lib/propertySeo";
 
@@ -39,6 +42,38 @@ function parseNumericValue(value?: string | null) {
   return match ? Number(match[0]) : null;
 }
 
+function compactJsonLd<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => compactJsonLd(item))
+      .filter((item) => item !== null && item !== undefined) as T;
+  }
+
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value)
+        .map(([key, item]) => [key, compactJsonLd(item)])
+        .filter(([, item]) => {
+          if (item === null || item === undefined) {
+            return false;
+          }
+
+          if (Array.isArray(item)) {
+            return item.length > 0;
+          }
+
+          if (typeof item === "object") {
+            return Object.keys(item).length > 0;
+          }
+
+          return item !== "";
+        })
+    ) as T;
+  }
+
+  return value;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const { data } = await getPropertyBySlugOrId(id);
@@ -50,29 +85,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const property = formatProperty(data);
   const propertySlug = getPropertySlug(property);
   const canonicalPath = `/objects/${propertySlug}`;
+  const canonicalUrl = absoluteUrl(canonicalPath);
   const title = buildPropertySeoTitle(property);
   const description = buildPropertySeoDescription(property);
   const image = property.image || DEFAULT_OG_IMAGE;
+  const imageUrl = absoluteUrl(image);
 
   return {
-    title,
+    title: {
+      absolute: title,
+    },
     description,
     alternates: {
-      canonical: canonicalPath,
+      canonical: canonicalUrl,
     },
     openGraph: {
       title,
       description,
-      url: canonicalPath,
+      url: canonicalUrl,
       siteName: SITE_NAME,
       type: "website",
       locale: "uk_UA",
       images: [
         {
-          url: image,
+          url: imageUrl,
           width: 1200,
           height: 630,
-          alt: property.title,
+          alt: buildPropertyImageAlt(property, 1),
         },
       ],
     },
@@ -80,7 +119,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description,
-      images: [image],
+      images: [imageUrl],
     },
   };
 }
@@ -107,12 +146,18 @@ export default async function PropertyPage({ params }: Props) {
   const visiblePrice = getVisiblePropertyPrice(property);
   const areaValue = parseNumericValue(property.area);
   const offerPrice = parseNumericValue(visiblePrice);
-  const propertyImages = property.images?.filter(Boolean) || [];
-  const listingJsonLd = {
+  const propertyImages = (property.images?.filter(Boolean) || [property.image])
+    .filter(Boolean)
+    .map((image) => absoluteUrl(image));
+  const propertyH1 = buildPropertyH1(property);
+  const propertyType = getPropertyDisplayType(property);
+  const dealTypeLabel = getPropertyDealTypeLabel(property);
+  const hasDescription = Boolean(property.description?.trim());
+  const listingJsonLd = compactJsonLd({
     "@context": "https://schema.org",
     "@type": "RealEstateListing",
-    name: property.title,
-    description: property.description,
+    name: propertyH1,
+    description: buildPropertySeoDescription(property),
     url: absolutePropertyUrl,
     image: propertyImages.length ? propertyImages : [absoluteUrl(DEFAULT_OG_IMAGE)],
     address: {
@@ -122,31 +167,25 @@ export default async function PropertyPage({ params }: Props) {
       addressRegion: "Житомирська область",
       addressCountry: "UA",
     },
-    ...(areaValue
+    floorSize: areaValue
       ? {
-          floorSize: {
-            "@type": "QuantitativeValue",
-            value: areaValue,
-            unitCode: "MTK",
-          },
+          "@type": "QuantitativeValue",
+          value: areaValue,
+          unitCode: "MTK",
         }
-      : {}),
+      : undefined,
     offers: {
       "@type": "Offer",
       url: absolutePropertyUrl,
       availability: "https://schema.org/InStock",
       businessFunction:
-        getPropertyDealTypeLabel(property) === "Оренда"
+        dealTypeLabel === "Оренда"
           ? "http://purl.org/goodrelations/v1#LeaseOut"
           : "http://purl.org/goodrelations/v1#Sell",
-      ...(offerPrice
-        ? {
-            price: offerPrice,
-            priceCurrency: "UAH",
-          }
-        : {}),
+      price: offerPrice || undefined,
+      priceCurrency: offerPrice ? "UAH" : undefined,
     },
-  };
+  });
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -161,12 +200,12 @@ export default async function PropertyPage({ params }: Props) {
         "@type": "ListItem",
         position: 2,
         name: "Об’єкти",
-        item: absoluteUrl("/#objects"),
+        item: absoluteUrl("/objects"),
       },
       {
         "@type": "ListItem",
         position: 3,
-        name: property.title,
+        name: propertyH1,
         item: absolutePropertyUrl,
       },
     ],
@@ -199,6 +238,21 @@ export default async function PropertyPage({ params }: Props) {
       />
 
       <section className="mx-auto max-w-7xl overflow-hidden px-4 py-6 sm:px-6 md:py-10">
+        <nav
+          aria-label="Навігація сторінки"
+          className="mb-5 flex min-w-0 flex-wrap items-center gap-2 text-xs text-white/45"
+        >
+          <Link href="/" className="transition hover:text-[#d8ba68]">
+            Головна
+          </Link>
+          <span aria-hidden="true">→</span>
+          <Link href="/objects" className="transition hover:text-[#d8ba68]">
+            Об’єкти
+          </Link>
+          <span aria-hidden="true">→</span>
+          <span className="min-w-0 truncate text-white/70">{propertyH1}</span>
+        </nav>
+
         <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)] lg:gap-8">
           <PropertyGallery
             images={property.images || [property.image]}
@@ -214,12 +268,17 @@ export default async function PropertyPage({ params }: Props) {
             </p>
 
             <h1 className="break-words text-2xl font-extrabold leading-tight md:text-4xl">
-              {property.title}
+              {propertyH1}
             </h1>
 
-            <p className="mt-3 break-words text-sm leading-6 text-white/50">
-              Адреса: {property.address}
-            </p>
+            <section aria-labelledby="location-heading">
+              <h2 id="location-heading" className="sr-only">
+                Розташування
+              </h2>
+              <p className="mt-3 break-words text-sm leading-6 text-white/50">
+                Адреса: {property.address}
+              </p>
+            </section>
 
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-white/70">
@@ -227,28 +286,46 @@ export default async function PropertyPage({ params }: Props) {
               </span>
 
               <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-white/70">
-                {property.type}
+                {propertyType}
               </span>
 
               <span className="rounded-full border border-[#b89652]/45 bg-[#b89652]/15 px-3 py-1.5 text-xs font-semibold text-[#d8ba68]">
-                {property.dealType}
+                {dealTypeLabel}
               </span>
             </div>
 
-            <PropertyFeatures
-              address={property.address}
-              floor={property.floor}
-              floors={property.floors}
-              parking={property.parking}
-              heating={property.heating}
-              internet={property.internet}
-              security={property.security}
-              bathroom={property.bathroom}
-            />
+            <section aria-labelledby="features-heading">
+              <h2
+                id="features-heading"
+                className="mt-5 text-lg font-extrabold text-white md:text-xl"
+              >
+                Основні характеристики
+              </h2>
+              <PropertyFeatures
+                address={property.address}
+                floor={property.floor}
+                floors={property.floors}
+                parking={property.parking}
+                heating={property.heating}
+                internet={property.internet}
+                security={property.security}
+                bathroom={property.bathroom}
+              />
+            </section>
 
-            <p className="mt-4 text-sm leading-6 text-white/60 md:text-[15px] md:leading-7">
-              {property.description}
-            </p>
+            {hasDescription && (
+              <section aria-labelledby="description-heading">
+                <h2
+                  id="description-heading"
+                  className="mt-5 text-lg font-extrabold text-white md:text-xl"
+                >
+                  Опис приміщення
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-white/60 md:text-[15px] md:leading-7">
+                  {property.description}
+                </p>
+              </section>
+            )}
 
             <div className="mt-6 rounded-2xl border border-[#b89652]/25 bg-[#b89652]/8 px-4 py-3">
               <div className="break-words text-2xl font-extrabold text-[#d8ba68] md:text-3xl">
@@ -268,7 +345,7 @@ export default async function PropertyPage({ params }: Props) {
                 className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[#b89652]/45 bg-[#b89652]/10 px-4 py-2 text-center text-xs font-semibold text-white shadow-[0_0_22px_rgba(184,150,82,0.14)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_28px_rgba(212,175,55,0.26)] focus:outline-none focus:ring-2 focus:ring-[#b89652] sm:text-sm [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
               >
                 <MessageIcon />
-                Написати
+                Написати в Telegram
               </a>
 
               <SharePropertyButton
@@ -293,11 +370,11 @@ export default async function PropertyPage({ params }: Props) {
             )}
 
             <Link
-              href="/"
+              href="/objects"
               className="mt-2 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#b89652]/35 bg-black/30 px-4 py-2 text-center text-xs font-semibold text-white shadow-[0_0_18px_rgba(184,150,82,0.1)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652]/12 hover:text-[#d8ba68] hover:shadow-[0_0_24px_rgba(212,175,55,0.2)] focus:outline-none focus:ring-2 focus:ring-[#b89652] sm:w-auto sm:text-sm [&>svg]:text-[#d8ba68]"
             >
               <BackIcon />
-              Назад
+              Назад до каталогу
             </Link>
 
             <ContactForm
@@ -310,6 +387,22 @@ export default async function PropertyPage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      {hasDescription && (
+        <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 md:pb-14">
+          <div className="rounded-3xl border border-[#b89652]/25 bg-white/[0.028] p-5 shadow-[0_20px_70px_rgba(0,0,0,0.24)] backdrop-blur-xl sm:p-7">
+            <h2 className="text-xl font-extrabold text-white sm:text-2xl">
+              Оренда комерційного приміщення у Житомирі
+            </h2>
+            <p className="mt-3 max-w-4xl text-sm leading-6 text-white/62 sm:text-[15px] sm:leading-7">
+              Цей об’єкт представлений у каталозі Investal Estate. Перегляньте
+              характеристики, фотографії та розташування приміщення, а також
+              зв’яжіться з нами для уточнення актуальної вартості та умов
+              оренди.
+            </p>
+          </div>
+        </section>
+      )}
     </main>
   );
 }
