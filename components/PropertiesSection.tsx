@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PropertyCard from "@/components/PropertyCard";
 import { propertyTypeFilters } from "@/lib/propertyCategories";
 import type { FormattedProperty } from "@/types/property";
 import { ObjectsIcon } from "@/components/PremiumIcons";
+import { analyticsEvents } from "@/lib/analytics";
 
 const dealFilters = ["Всі", "Оренда", "Продаж"] as const;
 
@@ -25,6 +26,29 @@ export default function PropertiesSection({
   const [activeFilter, setActiveFilter] = useState<PropertyTypeFilter>("Всі");
   const [activeDealType, setActiveDealType] = useState<DealType>("Всі");
   const [search, setSearch] = useState("");
+  const isInitialSearchRender = useRef(true);
+
+  useEffect(() => {
+    if (isInitialSearchRender.current) {
+      isInitialSearchRender.current = false;
+      return;
+    }
+
+    const searchTerm = search.trim();
+
+    if (!searchTerm) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      analyticsEvents.search({
+        search_term: searchTerm,
+        section: "properties",
+      });
+    }, 600);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [search]);
 
   const filteredProperties = properties.filter((property) => {
     const typeMatch =
@@ -70,7 +94,15 @@ export default function PropertiesSection({
 
           <select
             value={activeFilter}
-            onChange={(e) => setActiveFilter(e.target.value as PropertyTypeFilter)}
+            onChange={(e) => {
+              const value = e.target.value as PropertyTypeFilter;
+              setActiveFilter(value);
+              analyticsEvents.filterChange({
+                filter_name: "property_type",
+                filter_value: value,
+                section: "properties",
+              });
+            }}
             className="min-h-12 rounded-xl border border-white/10 bg-[#070707] px-4 py-4 text-white outline-none transition focus:border-[#b89652]/60 md:px-5"
           >
             {propertyTypeFilters.map((filter) => (
@@ -80,7 +112,15 @@ export default function PropertiesSection({
 
           <select
             value={activeDealType}
-            onChange={(e) => setActiveDealType(e.target.value as DealType)}
+            onChange={(e) => {
+              const value = e.target.value as DealType;
+              setActiveDealType(value);
+              analyticsEvents.filterChange({
+                filter_name: "deal_type",
+                filter_value: value,
+                section: "properties",
+              });
+            }}
             className="min-h-12 rounded-xl border border-white/10 bg-[#070707] px-4 py-4 text-white outline-none transition focus:border-[#b89652]/60 md:px-5"
           >
             {dealFilters.map((filter) => (

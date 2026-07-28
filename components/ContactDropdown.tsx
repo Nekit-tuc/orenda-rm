@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { MessageIcon } from "@/components/PremiumIcons";
+import { analyticsEvents } from "@/lib/analytics";
 
 type ContactItem = {
   label: string;
@@ -262,7 +263,13 @@ export default function ContactDropdown() {
                         : undefined
                     }
                     tabIndex={isOpen ? 0 : -1}
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => {
+                      analyticsEvents.contactClick({
+                        method: contact.icon,
+                        label: contact.label,
+                      });
+                      setIsOpen(false);
+                    }}
                     className="group flex min-h-[52px] items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-3.5 py-3 text-base text-white transition-all duration-300 hover:scale-[1.01] hover:border-[#d4af37]/70 hover:bg-[#b89652]/10 hover:shadow-[0_0_24px_rgba(212,175,55,0.18)] focus:outline-none focus:ring-2 focus:ring-[#b89652]/70 md:min-h-12 md:text-sm"
                   >
                     <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-[#b89652]/25 bg-black/35 text-white/76 transition group-hover:border-[#d4af37]/70 group-hover:text-[#d8ba68]">

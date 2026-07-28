@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SendIcon } from "@/components/PremiumIcons";
+import { analyticsEvents } from "@/lib/analytics";
 
 type ContactFormProps = {
   propertyTitle: string;
@@ -25,6 +26,17 @@ ID: ${propertyId}
 
 Мене звати: ${name}
 Телефон: ${phone}`;
+
+    analyticsEvents.contactClick({
+      method: "telegram",
+      property_id: propertyId,
+      property_title: propertyTitle,
+    });
+    analyticsEvents.telegramClick({
+      source: "property_contact_form",
+      property_id: propertyId,
+      property_title: propertyTitle,
+    });
 
     window.open(
       `https://t.me/orenda_rm?text=${encodeURIComponent(message)}`,

@@ -13,6 +13,7 @@ import { getPropertySlug } from "@/lib/getPropertySlug";
 import Header from "@/components/Header";
 import { BackIcon, MessageIcon, RouteIcon } from "@/components/PremiumIcons";
 import PropertyPageAccessGate from "@/components/PropertyPageAccessGate";
+import ObjectAnalytics from "@/components/ObjectAnalytics";
 import { DEFAULT_OG_IMAGE, SITE_NAME, absoluteUrl } from "@/lib/site";
 import {
   buildPropertySeoDescription,
@@ -180,6 +181,14 @@ export default async function PropertyPage({ params }: Props) {
         }}
       />
       <ViewCounter propertyId={property.id} currentViews={property.views} />
+      <ObjectAnalytics
+        id={property.id}
+        slug={propertySlug}
+        type={property.type}
+        city="Житомир"
+        district={property.address}
+        dealType={property.dealType}
+      />
       <Header />
       <PropertyPageAccessGate
         propertyId={property.id}

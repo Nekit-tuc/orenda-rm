@@ -11,6 +11,7 @@ import SharePropertyButton from "@/components/SharePropertyButton";
 import { DetailsIcon, FavoriteIcon, RouteIcon } from "@/components/PremiumIcons";
 import PropertyLeadModal from "@/components/PropertyLeadModal";
 import { hasPropertyLeadAccess } from "@/lib/propertyLeadAccess";
+import { analyticsEvents } from "@/lib/analytics";
 
 type PropertyCardProps = {
   id: number;
@@ -120,6 +121,20 @@ export default function PropertyCard({
   function toggleFavorite(event?: MouseEvent<HTMLButtonElement>) {
     event?.stopPropagation();
     toggleFavoriteId(id);
+
+    const params = {
+      id,
+      slug: propertySlug,
+      title,
+      type,
+      deal_type: dealType,
+    };
+
+    if (isFavorite) {
+      analyticsEvents.favoriteRemove(params);
+    } else {
+      analyticsEvents.favoriteAdd(params);
+    }
   }
 
   return (
