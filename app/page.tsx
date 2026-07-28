@@ -11,6 +11,7 @@ import SubmitPropertyButton from "@/components/SubmitPropertyButton";
 import ContactDropdown from "@/components/ContactDropdown";
 import NewsSlider from "@/components/news/NewsSlider";
 import PartnersMarquee from "@/components/PartnersMarquee";
+import SeoLandingLinks from "@/components/SeoLandingLinks";
 import { getActivePartners } from "@/lib/getActivePartners";
 import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/site";
 
@@ -182,6 +183,7 @@ export default async function Home() {
       </section>
 
       <PartnersMarquee partners={partners} />
+      <SeoLandingLinks compact title="Популярні запити" />
 
       <div className="relative flex w-full max-w-full min-w-0 flex-col overflow-hidden md:block">
       <section className="relative order-5 mx-auto max-w-7xl px-4 py-5 sm:px-6 md:order-none md:py-8">

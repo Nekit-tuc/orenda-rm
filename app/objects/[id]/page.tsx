@@ -194,6 +194,8 @@ export default async function PropertyPage({ params }: Props) {
         propertyId={property.id}
         propertyTitle={property.title}
         propertySlug={propertySlug}
+        propertyType={property.type}
+        dealType={property.dealType}
       />
 
       <section className="mx-auto max-w-7xl overflow-hidden px-4 py-6 sm:px-6 md:py-10">
@@ -295,7 +297,13 @@ export default async function PropertyPage({ params }: Props) {
               Назад
             </Link>
 
-            <ContactForm propertyTitle={property.title} propertyId={property.id} />
+            <ContactForm
+              propertyTitle={property.title}
+              propertyId={property.id}
+              propertySlug={propertySlug}
+              propertyType={property.type}
+              dealType={property.dealType}
+            />
           </div>
         </div>
       </section>

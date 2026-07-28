@@ -8,12 +8,16 @@ type PropertyPageAccessGateProps = {
   propertyId: number;
   propertyTitle: string;
   propertySlug: string;
+  propertyType?: string;
+  dealType?: string;
 };
 
 export default function PropertyPageAccessGate({
   propertyId,
   propertyTitle,
   propertySlug,
+  propertyType,
+  dealType,
 }: PropertyPageAccessGateProps) {
   const [hasAccess, setHasAccess] = useState(false);
   const [isReady, setIsReady] = useState(false);
@@ -37,6 +41,8 @@ export default function PropertyPageAccessGate({
       propertyId={propertyId}
       propertyTitle={propertyTitle}
       propertySlug={propertySlug}
+      propertyType={propertyType}
+      dealType={dealType}
       source="property_page"
       onSuccess={() => setHasAccess(true)}
     />

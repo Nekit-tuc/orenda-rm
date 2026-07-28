@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { analyticsEvents } from "@/lib/analytics";
 
 type ProposePropertyFormProps = {
   rules: string[];
@@ -14,7 +15,8 @@ const maxPhotos = 15;
 export default function ProposePropertyForm({ rules }: ProposePropertyFormProps) {
   const [step, setStep] = useState<"rules" | "form">("rules");
   const [acceptedRules, setAcceptedRules] = useState(false);
-  const [propertyType, setPropertyType] = useState<(typeof propertyTypes)[number]>("Земля");
+  const [propertyType, setPropertyType] =
+    useState<(typeof propertyTypes)[number]>("Земля");
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,9 +26,9 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
   const cadastralHelp = useMemo(
     () =>
       isLand
-        ? "Для землі кадастровий номер і фото кадастрового плану обовʼязкові."
+        ? "Для землі кадастровий номер і фото кадастрового плану обов’язкові."
         : "Для комерції та будинку можна залишити, якщо є кадастрові дані.",
-    [isLand]
+    [isLand],
   );
 
   function validateFiles(files: File[], required: boolean, label: string) {
@@ -39,7 +41,7 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
     }
 
     const invalidFile = files.find(
-      (file) => !allowedMimeTypes.includes(file.type) || file.size > maxFileSize
+      (file) => !allowedMimeTypes.includes(file.type) || file.size > maxFileSize,
     );
 
     if (invalidFile) {
@@ -49,8 +51,21 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
     return "";
   }
 
+  function trackSubmitError(errorType: "validation" | "server" | "network") {
+    analyticsEvents.formSubmitError({
+      form_name: "property_submission_form",
+      page_path: window.location.pathname,
+      error_type: errorType,
+    });
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
+
     setMessage("");
     setIsSuccess(false);
 
@@ -65,24 +80,36 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
       .getAll("cadastralPhoto")
       .filter((item): item is File => item instanceof File && item.size > 0);
 
-    const photosError = validateFiles(photos, true, "мінімум 1 фото обʼєкта");
+    const photosError = validateFiles(photos, true, "мінімум 1 фото об’єкта");
     const cadastralError = validateFiles(
       cadastralPhotos,
       isLand,
-      "фото кадастрового плану"
+      "фото кадастрового плану",
     );
 
     if (photosError || cadastralError) {
+      trackSubmitError("validation");
       setMessage(photosError || cadastralError);
       return;
     }
 
     setIsSubmitting(true);
 
-    const response = await fetch("/api/property-submissions", {
-      method: "POST",
-      body: formData,
-    });
+    let response: Response;
+
+    try {
+      response = await fetch("/api/property-submissions", {
+        method: "POST",
+        body: formData,
+      });
+    } catch (error) {
+      console.error("PROPERTY SUBMISSION FORM ERROR:", error);
+      trackSubmitError("network");
+      setIsSubmitting(false);
+      setMessage("Не вдалося надіслати об’єкт.");
+      return;
+    }
+
     const result = (await response.json().catch(() => null)) as {
       ok?: boolean;
       message?: string;
@@ -91,13 +118,21 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
     setIsSubmitting(false);
 
     if (!response.ok || !result?.ok) {
-      setMessage(result?.message || "Не вдалося надіслати обʼєкт.");
+      trackSubmitError("server");
+      setMessage(result?.message || "Не вдалося надіслати об’єкт.");
       return;
     }
 
+    analyticsEvents.generateLead({
+      lead_source: "contact_form",
+      form_name: "property_submission_form",
+      page_path: window.location.pathname,
+      object_type: propertyType,
+    });
+
     setIsSuccess(true);
     setMessage(
-      "Дякуємо! Ваш обʼєкт надіслано на перевірку. Ми звʼяжемося з вами найближчим часом."
+      "Дякуємо! Ваш об’єкт надіслано на перевірку. Ми зв’яжемося з вами найближчим часом.",
     );
     formRef.current?.reset();
     setPropertyType("Земля");
@@ -111,10 +146,10 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
             Правила
           </p>
           <h2 className="mt-2 text-xl font-black leading-tight sm:text-2xl">
-            Перед додаванням обʼєкта
+            Перед додаванням об’єкта
           </h2>
           <p className="mt-2 text-sm leading-5 text-white/62">
-            Будь ласка, уважно ознайомтеся з обовʼязковими умовами.
+            Будь ласка, уважно ознайомтеся з обов’язковими умовами.
           </p>
         </div>
 
@@ -171,10 +206,11 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
             Форма
           </p>
           <h2 className="mt-2 text-xl font-black leading-tight sm:text-2xl">
-            Дані обʼєкта
+            Дані об’єкта
           </h2>
           <p className="mt-2 text-sm leading-5 text-white/62">
-            Заповніть поля та додайте фото. Обʼєкт не буде опублікований без перевірки.
+            Заповніть поля та додайте фото. Об’єкт не буде опублікований без
+            перевірки.
           </p>
         </div>
 
@@ -199,7 +235,9 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
         </section>
 
         <section className="w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-black/30 p-3.5 sm:p-4">
-          <h3 className="text-base font-black sm:text-lg">Інформація про обʼєкт</h3>
+          <h3 className="text-base font-black sm:text-lg">
+            Інформація про об’єкт
+          </h3>
           <div className="mt-3 grid min-w-0 gap-2.5">
             <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-3">
               {propertyTypes.map((type) => (
@@ -234,7 +272,9 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
 
         <section className="w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-black/30 p-3.5 sm:p-4">
           <h3 className="text-base font-black sm:text-lg">Кадастр</h3>
-          <p className="mt-1.5 text-[13px] leading-5 text-white/52 sm:text-sm">{cadastralHelp}</p>
+          <p className="mt-1.5 text-[13px] leading-5 text-white/52 sm:text-sm">
+            {cadastralHelp}
+          </p>
           <div className="mt-3 grid min-w-0 gap-2.5">
             <input
               required={isLand}
@@ -258,7 +298,7 @@ export default function ProposePropertyForm({ rules }: ProposePropertyFormProps)
         </section>
 
         <section className="w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-black/30 p-3.5 sm:p-4">
-          <h3 className="text-base font-black sm:text-lg">Фото обʼєкта</h3>
+          <h3 className="text-base font-black sm:text-lg">Фото об’єкта</h3>
           <p className="mt-1.5 text-[13px] leading-5 text-white/52 sm:text-sm">
             Додайте від 1 до 15 фото. JPG, JPEG, PNG або WEBP до 10MB.
           </p>

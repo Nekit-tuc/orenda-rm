@@ -289,6 +289,8 @@ export default function PropertyCard({
         propertyId={id}
         propertyTitle={title}
         propertySlug={propertySlug}
+        propertyType={type}
+        dealType={dealType}
         source="price_access"
         onClose={() => setIsLeadModalOpen(false)}
         onSuccess={handleLeadSuccess}

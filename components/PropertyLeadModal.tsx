@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { analyticsEvents } from "@/lib/analytics";
 import { setPropertyLeadAccess } from "@/lib/propertyLeadAccess";
 
 type PropertyLeadModalProps = {
@@ -9,6 +10,8 @@ type PropertyLeadModalProps = {
   propertyId: number;
   propertyTitle: string;
   propertySlug: string;
+  propertyType?: string;
+  dealType?: string;
   source?: string;
   onClose?: () => void;
   onSuccess: () => void;
@@ -32,6 +35,8 @@ export default function PropertyLeadModal({
   propertyId,
   propertyTitle,
   propertySlug,
+  propertyType,
+  dealType,
   source = "price_access",
   onClose,
   onSuccess,
@@ -40,6 +45,7 @@ export default function PropertyLeadModal({
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitInProgressRef = useRef(false);
 
   const portalTarget = typeof document === "undefined" ? null : document.body;
 
@@ -47,21 +53,37 @@ export default function PropertyLeadModal({
     return null;
   }
 
+  function trackSubmitError(errorType: "validation" | "server" | "network") {
+    analyticsEvents.formSubmitError({
+      form_name: "price_access_form",
+      page_path: window.location.pathname,
+      error_type: errorType,
+    });
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     event.stopPropagation();
+
+    if (submitInProgressRef.current) {
+      return;
+    }
+
     setMessage("");
 
     if (!isValidFullName(fullName)) {
-      setMessage("Вкажіть прізвище та імʼя. По батькові можна не вводити.");
+      trackSubmitError("validation");
+      setMessage("Вкажіть прізвище та ім’я. По батькові можна не вводити.");
       return;
     }
 
     if (!isValidPhone(phone)) {
+      trackSubmitError("validation");
       setMessage("Телефон має бути у форматі 0961212121.");
       return;
     }
 
+    submitInProgressRef.current = true;
     setIsSubmitting(true);
 
     let response: Response;
@@ -83,8 +105,12 @@ export default function PropertyLeadModal({
       });
     } catch (error) {
       console.error("PROPERTY LEAD SUBMIT ERROR:", error);
+      trackSubmitError("network");
+      submitInProgressRef.current = false;
       setIsSubmitting(false);
-      setMessage("Не вдалося відправити заявку. Перевірте інтернет і спробуйте ще раз.");
+      setMessage(
+        "Не вдалося відправити заявку. Перевірте інтернет і спробуйте ще раз.",
+      );
       return;
     }
 
@@ -93,13 +119,25 @@ export default function PropertyLeadModal({
       message?: string;
     } | null;
 
-    setIsSubmitting(false);
-
     if (!response.ok || !result?.ok) {
+      trackSubmitError("server");
+      submitInProgressRef.current = false;
+      setIsSubmitting(false);
       setMessage(result?.message || "Не вдалося зберегти заявку.");
       return;
     }
 
+    analyticsEvents.generateLead({
+      lead_source: "contact_form",
+      form_name: "price_access_form",
+      page_path: window.location.pathname,
+      object_id: propertyId,
+      object_slug: propertySlug,
+      object_type: propertyType,
+      deal_type: dealType,
+    });
+
+    setIsSubmitting(false);
     setPropertyLeadAccess();
     onSuccess();
   }
@@ -135,7 +173,7 @@ export default function PropertyLeadModal({
             Отримати доступ до ціни
           </h2>
           <p className="mt-3 text-sm leading-6 text-white/62">
-            Залиште контакти, щоб переглянути ціну та деталі обʼєкта.
+            Залиште контакти, щоб переглянути ціну та деталі об’єкта.
           </p>
 
           <div className="mt-5 grid gap-3">
@@ -151,7 +189,9 @@ export default function PropertyLeadModal({
             </label>
 
             <label className="grid gap-2">
-              <span className="text-sm font-medium text-white/70">Телефон</span>
+              <span className="text-sm font-medium text-white/70">
+                Телефон
+              </span>
               <input
                 value={phone}
                 onChange={(event) =>
@@ -179,7 +219,7 @@ export default function PropertyLeadModal({
             className="inline-flex min-h-12 w-full items-center justify-center rounded-2xl border border-[#d4af37]/55 bg-[#b89652] px-5 py-3 text-base font-black text-black shadow-[0_0_30px_rgba(184,150,82,0.28)] transition-colors duration-300 hover:bg-[#d4af37] focus:outline-none focus:ring-2 focus:ring-[#d4af37]/70 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <span className="min-w-[10.5rem] text-center">
-              {isSubmitting ? "Зберігаємо..." : "Переглянути обʼєкт"}
+              {isSubmitting ? "Зберігаємо..." : "Переглянути об’єкт"}
             </span>
           </button>
 
@@ -189,6 +229,6 @@ export default function PropertyLeadModal({
         </div>
       </form>
     </div>,
-    portalTarget
+    portalTarget,
   );
 }

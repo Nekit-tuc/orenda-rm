@@ -83,6 +83,12 @@ export const analyticsEvents = {
   contactClick(params: AnalyticsParams = {}) {
     event("contact_click", params);
   },
+  generateLead(params: AnalyticsParams = {}) {
+    event("generate_lead", params);
+  },
+  formSubmitError(params: AnalyticsParams = {}) {
+    event("form_submit_error", params);
+  },
   objectView(params: AnalyticsParams = {}) {
     event("object_view", params);
   },
@@ -91,5 +97,8 @@ export const analyticsEvents = {
   },
   filterChange(params: AnalyticsParams = {}) {
     event("filter_change", params);
+  },
+  seoLandingView(params: AnalyticsParams = {}) {
+    event("seo_landing_view", params);
   },
 };
