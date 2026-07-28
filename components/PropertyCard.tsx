@@ -12,6 +12,7 @@ import { DetailsIcon, FavoriteIcon, RouteIcon } from "@/components/PremiumIcons"
 import PropertyLeadModal from "@/components/PropertyLeadModal";
 import { hasPropertyLeadAccess } from "@/lib/propertyLeadAccess";
 import { analyticsEvents } from "@/lib/analytics";
+import { buildPropertyImageAlt } from "@/lib/propertySeo";
 
 type PropertyCardProps = {
   id: number;
@@ -50,6 +51,7 @@ export default function PropertyCard({
   const propertySlug = getPropertySlug({ id, title, slug });
   const propertyUrl = `/objects/${propertySlug}`;
   const shareText = `${description} ${pricePerMeter}`.trim();
+  const imageAlt = buildPropertyImageAlt({ address, dealType, type });
   const [hasLeadAccess, setHasLeadAccess] = useState(false);
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
 
@@ -260,7 +262,7 @@ export default function PropertyCard({
       <div className="relative order-first min-h-[210px] overflow-hidden sm:min-h-[250px] md:min-h-[320px] lg:order-none lg:min-h-[500px]">
         <Image
           src={image}
-          alt={title}
+          alt={imageAlt}
           fill
           sizes="(min-width: 1280px) 45vw, 100vw"
           unoptimized

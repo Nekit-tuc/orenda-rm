@@ -11,7 +11,6 @@ import SubmitPropertyButton from "@/components/SubmitPropertyButton";
 import ContactDropdown from "@/components/ContactDropdown";
 import NewsSlider from "@/components/news/NewsSlider";
 import PartnersMarquee from "@/components/PartnersMarquee";
-import SeoLandingLinks from "@/components/SeoLandingLinks";
 import { getActivePartners } from "@/lib/getActivePartners";
 import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/site";
 
@@ -22,23 +21,23 @@ export const fetchCache = "force-no-store";
 const benefits = [
   {
     icon: "▥",
-    title: "Актуальні обʼєкти",
-    text: "Щоденне оновлення бази",
+    title: "Актуальні приміщення",
+    text: "Оновлення каталогу оренди",
   },
   {
     icon: "◇",
     title: "Перевірені власники",
-    text: "Тільки надійні пропозиції",
+    text: "Прямий контакт і перегляд",
   },
   {
     icon: "⌖",
-    title: "Весь регіон",
-    text: "Україна та актуальні напрямки",
+    title: "Житомир і область",
+    text: "Райони та ключові локації",
   },
   {
     icon: "◌",
-    title: "Підтримка 24/7",
-    text: "Допоможемо знайти найкраще",
+    title: "Підбір під бізнес",
+    text: "Площа, район, під’їзд, бюджет",
   },
 ];
 
@@ -113,7 +112,7 @@ export default async function Home() {
       <section className="relative overflow-hidden border-b border-white/10">
         <Image
           src="/hero-building.png"
-          alt="Сучасна нерухомість Investal Estate"
+          alt="Комерційні приміщення в оренду у Житомирі"
           fill
           priority
           sizes="100vw"
@@ -125,7 +124,7 @@ export default async function Home() {
         <div className="relative mx-auto grid min-h-[calc(100svh-76px)] w-full max-w-7xl gap-5 px-4 py-7 sm:px-6 sm:py-9 md:min-h-[660px] md:gap-8 md:py-12 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-center lg:py-10 xl:grid-cols-[minmax(0,1fr)_390px]">
           <div className="relative z-10 max-w-3xl">
             <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-[#c9a85a] sm:text-[11px] sm:tracking-[0.32em]">
-              INVESTAL ESTATE • УКРАЇНА
+              INVESTAL ESTATE • ЖИТОМИР
             </p>
 
             <h1 className="max-w-[570px] text-[clamp(2.05rem,9.6vw,2.55rem)] font-extrabold uppercase leading-[1.1] tracking-[-0.01em] text-white md:text-[clamp(2.85rem,4.9vw,4.15rem)]">
@@ -142,11 +141,10 @@ export default async function Home() {
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#b89652]/45 bg-[#b89652]/10 px-5 py-2.5 text-center text-[13px] font-bold text-white shadow-[0_0_25px_rgba(184,150,82,0.18)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_35px_rgba(212,175,55,0.35)] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] md:px-7 md:py-3.5 md:text-sm [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
               >
                 <ObjectsIcon />
-                Дивитись обʼєкти
+                Дивитись об’єкти
               </a>
 
               <ContactDropdown />
-
             </div>
           </div>
 
@@ -157,7 +155,7 @@ export default async function Home() {
 
             <div className="mt-3 grid grid-cols-3 gap-2 lg:grid-cols-1 lg:gap-3">
               <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.045] p-3 lg:rounded-2xl lg:p-4">
-                <p className="text-[10px] text-white/45 sm:text-xs">Обʼєкти</p>
+                <p className="text-[10px] text-white/45 sm:text-xs">Об’єкти</p>
                 <p className="mt-1 text-lg font-extrabold text-[#c9a85a] sm:text-xl lg:text-2xl">
                   {properties.length}
                 </p>
@@ -166,7 +164,7 @@ export default async function Home() {
               <div className="min-w-0 rounded-xl border border-white/10 bg-white/[0.045] p-3 lg:rounded-2xl lg:p-4">
                 <p className="text-[10px] text-white/45 sm:text-xs">Напрямок</p>
                 <p className="mt-1 text-xs font-extrabold leading-tight sm:text-sm lg:text-lg">
-                  Оренда / Продаж
+                  Оренда
                 </p>
               </div>
 
@@ -183,128 +181,130 @@ export default async function Home() {
       </section>
 
       <PartnersMarquee partners={partners} />
-      <SeoLandingLinks compact title="Популярні запити" />
 
       <div className="relative flex w-full max-w-full min-w-0 flex-col overflow-hidden md:block">
-      <section className="relative order-5 mx-auto max-w-7xl px-4 py-5 sm:px-6 md:order-none md:py-8">
-        <div className="grid gap-4 overflow-hidden rounded-3xl border border-[#b89652]/30 bg-[radial-gradient(circle_at_top_right,rgba(184,150,82,0.18),transparent_32%),rgba(255,255,255,0.035)] p-4 shadow-[0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-5 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:p-6">
-          <div className="grid h-12 w-12 place-items-center rounded-2xl border border-[#b89652]/35 bg-black/35 text-[#d8ba68] shadow-[0_0_24px_rgba(184,150,82,0.14)] sm:h-14 sm:w-14">
-            <BuyoutIcon className="h-7 w-7" />
-          </div>
+        <section className="relative order-5 mx-auto max-w-7xl px-4 py-5 sm:px-6 md:order-none md:py-8">
+          <div className="grid gap-4 overflow-hidden rounded-3xl border border-[#b89652]/30 bg-[radial-gradient(circle_at_top_right,rgba(184,150,82,0.18),transparent_32%),rgba(255,255,255,0.035)] p-4 shadow-[0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-5 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center md:p-6">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl border border-[#b89652]/35 bg-black/35 text-[#d8ba68] shadow-[0_0_24px_rgba(184,150,82,0.14)] sm:h-14 sm:w-14">
+              <BuyoutIcon className="h-7 w-7" />
+            </div>
 
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.28em] text-[#b89652]">
-              Пропозиція власникам
-            </p>
-            <h2 className="mt-1.5 text-xl font-extrabold text-white sm:text-2xl">
-              Викуп обʼєктів
-            </h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-white/64">
-              Ми також розглядаємо обʼєкти для викупу: землю, комерційну нерухомість та будинки.
-              Надішліть інформацію про свій обʼєкт — ми ознайомимось із пропозицією та звʼяжемося з вами.
-            </p>
-          </div>
-
-          <SubmitPropertyButton
-            label="Запропонувати"
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#b89652]/45 bg-[#b89652]/10 px-5 py-2.5 text-center text-sm font-bold text-white shadow-[0_0_24px_rgba(184,150,82,0.16)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_34px_rgba(212,175,55,0.3)] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] md:w-auto"
-          />
-        </div>
-      </section>
-
-      <section className="relative order-4 mx-auto max-w-7xl px-4 pb-10 sm:px-6 md:order-none md:pb-14">
-        <div className="overflow-hidden rounded-3xl border border-[#b89652]/30 bg-[radial-gradient(circle_at_80%_35%,rgba(184,150,82,0.22),transparent_28%),linear-gradient(135deg,rgba(184,150,82,0.16),rgba(255,255,255,0.035))] p-5 shadow-[0_26px_90px_rgba(0,0,0,0.32)] sm:p-6 md:p-8">
-          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
-            <div>
-              <h2 className="text-xl font-extrabold sm:text-2xl md:text-3xl">
-                Не знайшли <span className="text-[#d8ba68]">потрібний варіант?</span>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-[#b89652]">
+                Пропозиція власникам
+              </p>
+              <h2 className="mt-1.5 text-xl font-extrabold text-white sm:text-2xl">
+                Викуп об’єктів
               </h2>
-              <p className="mt-2.5 max-w-2xl text-sm leading-6 text-white/68 sm:text-[15px]">
-                Не знайшли потрібний варіант? Напишіть нам — підберемо приміщення під ваш бюджет і задачу.
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-white/64">
+                Ми також розглядаємо для викупу землю, комерційну нерухомість
+                та будинки. Надішліть інформацію про свій об’єкт — ми
+                ознайомимось із пропозицією та зв’яжемося з вами.
               </p>
             </div>
 
-            <div className="grid gap-3 sm:flex md:justify-end">
-              <a
-                href="https://t.me/orenda_rm"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#b89652]/45 bg-[#b89652]/10 px-5 py-2.5 text-center text-[13px] font-bold text-white shadow-[0_0_25px_rgba(184,150,82,0.18)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_35px_rgba(212,175,55,0.35)] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] sm:text-sm [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
-              >
-                <MessageIcon />
-                Написати в Telegram
-              </a>
-              <a
-                href="#objects"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#b89652]/35 bg-black/25 px-5 py-2.5 text-center text-[13px] font-bold text-white shadow-[0_0_20px_rgba(184,150,82,0.12)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652]/12 hover:text-[#d8ba68] hover:shadow-[0_0_28px_rgba(212,175,55,0.22)] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] sm:text-sm [&>svg]:text-[#d8ba68]"
-              >
-                <ObjectsIcon />
-                Переглянути обʼєкти
-              </a>
-            </div>
+            <SubmitPropertyButton
+              label="Запропонувати"
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#b89652]/45 bg-[#b89652]/10 px-5 py-2.5 text-center text-sm font-bold text-white shadow-[0_0_24px_rgba(184,150,82,0.16)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_34px_rgba(212,175,55,0.3)] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] md:w-auto"
+            />
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="relative order-1 flex w-full max-w-full min-w-0 flex-col overflow-hidden md:order-none">
-        <div className="order-2 md:order-1">
-          <NewsSlider news={publishedNews} />
-        </div>
-
-        <div className="order-1 mx-auto mb-6 grid w-full max-w-7xl grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/[0.035] p-2 sm:grid-cols-2 sm:gap-0 sm:overflow-hidden sm:p-0 md:order-2 md:mb-0 md:mt-7 lg:grid-cols-4">
-          {benefits.map((item) => (
-            <div
-              key={item.title}
-              className="flex min-w-0 gap-2 rounded-xl bg-black/20 p-3 sm:gap-4 sm:rounded-none sm:border-r sm:border-white/10 sm:bg-transparent sm:p-5 last:sm:border-r-0"
-            >
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#c9a85a]/15 text-sm text-[#c9a85a] sm:h-12 sm:w-12 sm:text-xl">
-                {item.icon}
-              </span>
-              <div className="min-w-0">
-                <h3 className="line-clamp-2 text-sm font-bold leading-tight sm:text-base">
-                  {item.title}
-                </h3>
-                <p className="mt-1 line-clamp-2 text-xs leading-4 text-white/48 sm:mt-2 sm:text-sm sm:leading-5">
-                  {item.text}
+        <section className="relative order-4 mx-auto max-w-7xl px-4 pb-10 sm:px-6 md:order-none md:pb-14">
+          <div className="overflow-hidden rounded-3xl border border-[#b89652]/30 bg-[radial-gradient(circle_at_80%_35%,rgba(184,150,82,0.22),transparent_28%),linear-gradient(135deg,rgba(184,150,82,0.16),rgba(255,255,255,0.035))] p-5 shadow-[0_26px_90px_rgba(0,0,0,0.32)] sm:p-6 md:p-8">
+            <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+              <div>
+                <h2 className="text-xl font-extrabold sm:text-2xl md:text-3xl">
+                  Не знайшли <span className="text-[#d8ba68]">потрібний варіант?</span>
+                </h2>
+                <p className="mt-2.5 max-w-2xl text-sm leading-6 text-white/68 sm:text-[15px]">
+                  Напишіть нам, які площа, район, під’їзд і бюджет важливі для
+                  вашого бізнесу. Підкажемо актуальні приміщення в оренду та
+                  допоможемо організувати перегляд.
                 </p>
               </div>
+
+              <div className="grid gap-3 sm:flex md:justify-end">
+                <a
+                  href="https://t.me/orenda_rm"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#b89652]/45 bg-[#b89652]/10 px-5 py-2.5 text-center text-[13px] font-bold text-white shadow-[0_0_25px_rgba(184,150,82,0.18)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_35px_rgba(212,175,55,0.35)] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] sm:text-sm [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
+                >
+                  <MessageIcon />
+                  Написати в Telegram
+                </a>
+                <a
+                  href="#objects"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#b89652]/35 bg-black/25 px-5 py-2.5 text-center text-[13px] font-bold text-white shadow-[0_0_20px_rgba(184,150,82,0.12)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-[#d4af37] hover:bg-[#b89652]/12 hover:text-[#d8ba68] hover:shadow-[0_0_28px_rgba(212,175,55,0.22)] focus:outline-none focus:ring-2 focus:ring-[#d8ba68] sm:text-sm [&>svg]:text-[#d8ba68]"
+                >
+                  <ObjectsIcon />
+                  Усі приміщення в оренду
+                </a>
+              </div>
             </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="order-3 md:contents">
-      <PropertiesSection
-        properties={properties}
-        sectionTitle={homepageSettings.sectionTitle}
-        sectionSubtitle={homepageSettings.sectionSubtitle}
-      />
-      </div>
-
-      <section id="map" className="order-5 mx-auto w-full max-w-7xl min-w-0 overflow-hidden px-4 pb-16 sm:px-6 md:order-none md:pb-24">
-        <div className="mb-8 flex min-w-0 max-w-full flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div className="min-w-0">
-            <p className="text-sm uppercase tracking-[0.3em] text-[#b89652]">
-              Географія обʼєктів
-            </p>
-
-            <h3 className="mt-3 text-3xl font-bold md:text-4xl">
-              Карта актуальних обʼєктів
-            </h3>
-
-            <p className="mt-3 max-w-2xl text-white/50">
-              Переглядайте актуальні обʼєкти на карті та швидко знаходьте
-              нерухомість у потрібній локації.
-            </p>
           </div>
+        </section>
+
+        <section className="relative order-1 flex w-full max-w-full min-w-0 flex-col overflow-hidden md:order-none">
+          <div className="order-2 md:order-1">
+            <NewsSlider news={publishedNews} />
+          </div>
+
+          <div className="order-1 mx-auto mb-6 grid w-full max-w-7xl grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/[0.035] p-2 sm:grid-cols-2 sm:gap-0 sm:overflow-hidden sm:p-0 md:order-2 md:mb-0 md:mt-7 lg:grid-cols-4">
+            {benefits.map((item) => (
+              <div
+                key={item.title}
+                className="flex min-w-0 gap-2 rounded-xl bg-black/20 p-3 sm:gap-4 sm:rounded-none sm:border-r sm:border-white/10 sm:bg-transparent sm:p-5 last:sm:border-r-0"
+              >
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#c9a85a]/15 text-sm text-[#c9a85a] sm:h-12 sm:w-12 sm:text-xl">
+                  {item.icon}
+                </span>
+                <div className="min-w-0">
+                  <h3 className="line-clamp-2 text-sm font-bold leading-tight sm:text-base">
+                    {item.title}
+                  </h3>
+                  <p className="mt-1 line-clamp-2 text-xs leading-4 text-white/48 sm:mt-2 sm:text-sm sm:leading-5">
+                    {item.text}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <div className="order-3 md:contents">
+          <PropertiesSection
+            properties={properties}
+            sectionTitle={homepageSettings.sectionTitle}
+            sectionSubtitle={homepageSettings.sectionSubtitle}
+          />
         </div>
 
-        <div className="w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-[#070707] p-2 shadow-[0_0_40px_rgba(184,150,82,0.08)] md:rounded-[2rem] md:p-4">
-          <MapWrapper properties={properties} />
-        </div>
-      </section>
+        <section id="map" className="order-5 mx-auto w-full max-w-7xl min-w-0 overflow-hidden px-4 pb-16 sm:px-6 md:order-none md:pb-24">
+          <div className="mb-8 flex min-w-0 max-w-full flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="min-w-0">
+              <p className="text-sm uppercase tracking-[0.3em] text-[#b89652]">
+                Географія об’єктів
+              </p>
 
-      <div id="contacts" />
+              <h3 className="mt-3 text-3xl font-bold md:text-4xl">
+                Карта актуальних приміщень
+              </h3>
+
+              <p className="mt-3 max-w-2xl text-white/50">
+                Переглядайте комерційні приміщення на карті, оцінюйте
+                розташування, під’їзд і швидко знаходьте локацію для бізнесу.
+              </p>
+            </div>
+          </div>
+
+          <div className="w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-[#070707] p-2 shadow-[0_0_40px_rgba(184,150,82,0.08)] md:rounded-[2rem] md:p-4">
+            <MapWrapper properties={properties} />
+          </div>
+        </section>
+
+        <div id="contacts" />
       </div>
       <Footer />
     </main>

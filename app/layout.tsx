@@ -3,6 +3,10 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
+const homeTitle = "Комерційні приміщення в оренду у Житомирі | Investal Estate";
+const homeDescription =
+  "Актуальні комерційні приміщення в оренду у Житомирі та Житомирській області для магазинів, офісів, складів та інших видів бізнесу.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   applicationName: SITE_NAME,
@@ -12,18 +16,17 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
   },
   title: {
-    default: "Investal Estate — комерційна нерухомість у Житомирі",
+    default: homeTitle,
     template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Оренда та продаж комерційної нерухомості у Житомирі та Житомирській області. Офіси, магазини, склади та інші перевірені об’єкти.",
+  description: homeDescription,
   keywords: [
     "Investal Estate",
-    "комерційна нерухомість Житомир",
-    "оренда офісу Житомир",
-    "продаж складу Житомир",
-    "оренда магазину Житомир",
-    "нерухомість Житомирська область",
+    "оренда комерційної нерухомості Житомир",
+    "оренда комерційних приміщень Житомир",
+    "приміщення для бізнесу Житомир",
+    "офісні приміщення Житомир",
+    "складські приміщення Житомир",
   ],
   manifest: "/manifest.webmanifest",
   icons: {
@@ -41,9 +44,8 @@ export const metadata: Metadata = {
     locale: "uk_UA",
     siteName: SITE_NAME,
     url: "/",
-    title: "Investal Estate — комерційна нерухомість у Житомирі",
-    description:
-      "Оренда та продаж комерційної нерухомості у Житомирі та Житомирській області.",
+    title: homeTitle,
+    description: homeDescription,
     images: [
       {
         url: DEFAULT_OG_IMAGE,
@@ -55,9 +57,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Investal Estate — комерційна нерухомість у Житомирі",
-    description:
-      "Оренда та продаж комерційної нерухомості у Житомирі та Житомирській області.",
+    title: homeTitle,
+    description: homeDescription,
     images: [DEFAULT_OG_IMAGE],
   },
   robots: {

@@ -133,14 +133,14 @@ export default function PropertiesSection({
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#b89652]/45 bg-[#b89652]/10 px-6 py-4 text-center font-semibold text-white shadow-[0_0_25px_rgba(184,150,82,0.14)] transition-all duration-300 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_30px_rgba(212,175,55,0.28)] focus:outline-none focus:ring-2 focus:ring-[#b89652] [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
           >
             <ObjectsIcon />
-            Показати об’єкти
+            Показати приміщення
           </a>
         </div>
       </div>
 
       {filteredProperties.length > 0 ? (
         <div className="grid gap-5 md:gap-8">
-              {filteredProperties.map((property) => (
+          {filteredProperties.map((property) => (
             <PropertyCard
               key={property.id}
               id={property.id}
@@ -163,7 +163,7 @@ export default function PropertiesSection({
         <div className="rounded-3xl border border-white/10 bg-[#b89652] text-white/5 p-10 text-center">
           <h4 className="text-2xl font-bold">Нічого не знайдено</h4>
           <p className="mt-2 text-white/40">
-            Спробуй змінити пошук або фільтри.
+            Спробуйте змінити пошук або фільтри.
           </p>
         </div>
       )}

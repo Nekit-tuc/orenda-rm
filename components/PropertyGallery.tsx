@@ -3,20 +3,31 @@
 import Image from "next/image";
 import { useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/PremiumIcons";
+import { buildPropertyImageAlt } from "@/lib/propertySeo";
 
 type PropertyGalleryProps = {
   images: readonly string[];
   title: string;
+  address?: string | null;
+  dealType?: string | null;
+  type?: string | null;
 };
 
 export default function PropertyGallery({
   images,
   title,
+  address,
+  dealType,
+  type,
 }: PropertyGalleryProps) {
   const safeImages = images.length > 0 ? images : ["/logo.png"];
   const [activeIndex, setActiveIndex] = useState(0);
 
   const activeImage = safeImages[activeIndex];
+  const primaryAlt = buildPropertyImageAlt({ address, dealType, type });
+  const secondaryAlt = address
+    ? `Фото приміщення на ${address}, Житомир`
+    : `Фото приміщення ${title}`;
 
   function prevImage() {
     setActiveIndex((current) =>
@@ -35,7 +46,7 @@ export default function PropertyGallery({
       <div className="relative w-full max-w-full overflow-hidden rounded-3xl border border-[#b89652]/20 bg-[#070707] shadow-[0_0_35px_rgba(184,150,82,0.12)] md:rounded-[2rem]">
         <Image
           src={activeImage}
-          alt={title}
+          alt={activeIndex === 0 ? primaryAlt : secondaryAlt}
           width={1000}
           height={700}
           sizes="(min-width: 1024px) 50vw, 100vw"
@@ -86,7 +97,7 @@ export default function PropertyGallery({
             >
               <Image
                 src={image}
-                alt={title}
+                alt={index === 0 ? primaryAlt : secondaryAlt}
                 width={220}
                 height={130}
                 sizes="20vw"

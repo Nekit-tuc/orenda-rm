@@ -203,6 +203,9 @@ export default async function PropertyPage({ params }: Props) {
           <PropertyGallery
             images={property.images || [property.image]}
             title={property.title}
+            address={property.address}
+            dealType={property.dealType}
+            type={property.type}
           />
 
           <div className="min-w-0">

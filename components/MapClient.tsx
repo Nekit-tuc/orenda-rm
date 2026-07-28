@@ -9,6 +9,7 @@ import { propertyTypeFilters } from "@/lib/propertyCategories";
 import { getRouteUrl } from "@/lib/getRouteUrl";
 import { getPropertySlug } from "@/lib/getPropertySlug";
 import { hasPropertyLeadAccess } from "@/lib/propertyLeadAccess";
+import { buildPropertyImageAlt } from "@/lib/propertySeo";
 import {
   CloseIcon,
   DetailsIcon,
@@ -61,6 +62,11 @@ function PropertyMarker({ property }: { property: MappableProperty }) {
   });
   const propertyUrl = `/objects/${getPropertySlug(property)}`;
   const [hasLeadAccess, setHasLeadAccess] = useState(false);
+  const imageAlt = buildPropertyImageAlt({
+    address: property.address,
+    dealType: property.dealType,
+    type: property.type,
+  });
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -91,7 +97,7 @@ function PropertyMarker({ property }: { property: MappableProperty }) {
           <div className="relative overflow-hidden rounded-[1.15rem]">
             <Image
               src={property.image}
-              alt={property.title}
+              alt={imageAlt}
               width={320}
               height={160}
               sizes="320px"

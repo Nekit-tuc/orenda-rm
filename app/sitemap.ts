@@ -2,11 +2,6 @@ import type { MetadataRoute } from "next";
 import { getProperties } from "@/lib/getProperties";
 import { getPropertySlug } from "@/lib/getPropertySlug";
 import { getPublishedNews } from "@/lib/getPublishedNews";
-import {
-  filterSeoLandingProperties,
-  seoLandingPages,
-  seoLandingUpdatedAt,
-} from "@/lib/seoLandingPages";
 import { absoluteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -16,9 +11,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getProperties(),
     getPublishedNews(),
   ]);
-  const indexableSeoLandingPages = seoLandingPages.filter(
-    (page) => filterSeoLandingProperties(properties, page).length > 0,
-  );
 
   return [
     {
@@ -33,12 +25,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.9,
     },
-    ...indexableSeoLandingPages.map((page) => ({
-      url: absoluteUrl(`/nerukhomist/${page.slug}`),
-      lastModified: new Date(seoLandingUpdatedAt),
-      changeFrequency: "weekly" as const,
-      priority: 0.75,
-    })),
     ...properties.map((property) => ({
       url: absoluteUrl(`/objects/${getPropertySlug(property)}`),
       lastModified: property.updated_at

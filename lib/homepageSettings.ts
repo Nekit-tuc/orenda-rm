@@ -28,17 +28,17 @@ export type HomepageSettingsRow = {
 };
 
 export const defaultHomepageSettings: HomepageSettings = {
-  heroTitle: "Інвестиційна нерухомість по всій Україні",
+  heroTitle: "Комерційні приміщення в оренду у Житомирі та Житомирській області",
   heroSubtitle:
-    "Комерційні приміщення, земельні ділянки, будинки, квартири та інвестиційні об'єкти в одному сучасному каталозі.",
-  heroButtonText: "Дивитись об'єкти",
+    "Актуальні приміщення для магазинів, офісів, складів, сфери послуг та інших напрямів бізнесу.",
+  heroButtonText: "Дивитись об’єкти",
   heroButtonUrl: "#objects",
-  sectionTitle: "Преміальні об'єкти",
-  sectionSubtitle: "Каталог Investal Estate",
-  telegramTitle: "Зв'язатися в Telegram",
+  sectionTitle: "Комерційні приміщення в оренду",
+  sectionSubtitle: "Оренда комерційної нерухомості",
+  telegramTitle: "Зв’язатися в Telegram",
   telegramText:
-    "Напишіть нам у Telegram, щоб уточнити деталі, домовитися про перегляд або запропонувати свій об'єкт.",
-  telegramButtonText: "Зв'язатися",
+    "Напишіть нам у Telegram, щоб уточнити деталі, домовитися про перегляд або залишити запит на підбір приміщення.",
+  telegramButtonText: "Зв’язатися",
   telegramUrl: "https://t.me/orenda_rm",
 };
 
@@ -55,6 +55,38 @@ function normalizeText(value: unknown, fallback: string) {
   return trimmed || fallback;
 }
 
+function normalizeHomepageContent(settings: HomepageSettings): HomepageSettings {
+  const oldBroadSubtitle =
+    settings.heroSubtitle.includes("земельні ділянки") ||
+    settings.heroSubtitle.includes("будинки") ||
+    settings.heroSubtitle.includes("квартири") ||
+    settings.heroSubtitle.includes("інвестиційні об'єкти") ||
+    settings.heroSubtitle.includes("інвестиційні об’єкти");
+
+  return {
+    ...settings,
+    heroTitle:
+      settings.heroTitle === "Комерційна нерухомість"
+        ? defaultHomepageSettings.heroTitle
+        : settings.heroTitle,
+    heroSubtitle: oldBroadSubtitle
+      ? defaultHomepageSettings.heroSubtitle
+      : settings.heroSubtitle,
+    sectionTitle:
+      settings.sectionTitle === "Актуальні об'єкти" ||
+      settings.sectionTitle === "Актуальні об’єкти" ||
+      settings.sectionTitle === "Преміальні об'єкти" ||
+      settings.sectionTitle === "Преміальні об’єкти"
+        ? defaultHomepageSettings.sectionTitle
+        : settings.sectionTitle,
+    sectionSubtitle:
+      settings.sectionSubtitle === "Каталог нерухомості" ||
+      settings.sectionSubtitle === "Каталог Investal Estate"
+        ? defaultHomepageSettings.sectionSubtitle
+        : settings.sectionSubtitle,
+  };
+}
+
 export function rowToSettings(
   row: HomepageSettingsRow | null | undefined
 ): HomepageSettings {
@@ -62,7 +94,7 @@ export function rowToSettings(
     return defaultHomepageSettings;
   }
 
-  return {
+  return normalizeHomepageContent({
     heroTitle: normalizeText(row.hero_title, defaultHomepageSettings.heroTitle),
     heroSubtitle: normalizeText(
       row.hero_subtitle,
@@ -100,7 +132,7 @@ export function rowToSettings(
       row.telegram_url,
       defaultHomepageSettings.telegramUrl
     ),
-  };
+  });
 }
 
 export async function getHomepageSettings(): Promise<HomepageSettings> {

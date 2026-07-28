@@ -98,7 +98,4 @@ export const analyticsEvents = {
   filterChange(params: AnalyticsParams = {}) {
     event("filter_change", params);
   },
-  seoLandingView(params: AnalyticsParams = {}) {
-    event("seo_landing_view", params);
-  },
 };
