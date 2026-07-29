@@ -1,3 +1,4 @@
+import Link from "next/link";
 import BrandLogo from "@/components/BrandLogo";
 
 export type AdminSection =
@@ -6,6 +7,7 @@ export type AdminSection =
   | "homepage"
   | "news"
   | "partners"
+  | "clientLeads"
   | "leads"
   | "submissions";
 
@@ -16,11 +18,31 @@ type AdminSidebarProps = {
   onSectionChange: (section: AdminSection) => void;
 };
 
-const navItems = [
+type AdminNavItem =
+  | {
+      id: AdminSection;
+      label: string;
+      short: string;
+      href?: undefined;
+    }
+  | {
+      id: "clientLeads";
+      label: string;
+      short: string;
+      href: string;
+    };
+
+const navItems: AdminNavItem[] = [
   { id: "overview" as const, label: "Огляд", short: "О" },
-  { id: "objects" as const, label: "Об'єкти", short: "ОБ" },
+  { id: "objects" as const, label: "Об’єкти", short: "ОБ" },
   { id: "news" as const, label: "Новини", short: "Н" },
   { id: "partners" as const, label: "Партнери", short: "ПА" },
+  {
+    id: "clientLeads" as const,
+    label: "Заявки клієнтів",
+    short: "ЗК",
+    href: "/admin/leads",
+  },
   { id: "leads" as const, label: "Клієнти / Ліди", short: "Л" },
   { id: "submissions" as const, label: "Пропозиції", short: "П" },
   { id: "homepage" as const, label: "Контент головної", short: "К" },
@@ -59,34 +81,57 @@ export default function AdminSidebar({
         </div>
 
         <nav className="mt-6 grid gap-2">
-          {navItems.map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              onClick={() => {
-                onSectionChange(item.id);
-                onClose();
-              }}
-              className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-300 ${
-                activeSection === item.id
-                  ? "border-blue-400/30 bg-blue-500/15 text-blue-100"
-                  : "border-transparent text-slate-400 hover:border-white/10 hover:bg-white/5 hover:text-white"
-              }`}
-              aria-current={activeSection === item.id ? "page" : undefined}
-            >
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white/5 text-xs font-bold">
-                {item.short}
-              </span>
-              <span className="md:hidden lg:inline">{item.label}</span>
-            </button>
-          ))}
+          {navItems.map((item) => {
+            const itemClassName = `flex items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+              activeSection === item.id
+                ? "border-blue-400/30 bg-blue-500/15 text-blue-100"
+                : "border-transparent text-slate-400 hover:border-white/10 hover:bg-white/5 hover:text-white"
+            }`;
+            const content = (
+              <>
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white/5 text-xs font-bold">
+                  {item.short}
+                </span>
+                <span className="md:hidden lg:inline">{item.label}</span>
+              </>
+            );
+
+            if (item.href) {
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={onClose}
+                  className={itemClassName}
+                  aria-current={activeSection === item.id ? "page" : undefined}
+                >
+                  {content}
+                </Link>
+              );
+            }
+
+            return (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => {
+                  onSectionChange(item.id);
+                  onClose();
+                }}
+                className={itemClassName}
+                aria-current={activeSection === item.id ? "page" : undefined}
+              >
+                {content}
+              </button>
+            );
+          })}
         </nav>
 
         <div className="mt-auto rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-xs text-slate-400 md:hidden lg:block">
           <p className="font-medium text-slate-200">Панель керування</p>
           <p className="mt-2 leading-5">
-            Обʼєкти, новини, партнери, ліди, пропозиції та контент головної
-            сторінки.
+            Об’єкти, новини, партнери, ліди, заявки клієнтів, пропозиції та
+            контент головної сторінки.
           </p>
         </div>
       </aside>

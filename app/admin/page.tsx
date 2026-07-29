@@ -25,6 +25,7 @@ type AdminSection =
   | "homepage"
   | "news"
   | "partners"
+  | "clientLeads"
   | "leads"
   | "submissions";
 

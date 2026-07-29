@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { SendIcon } from "@/components/PremiumIcons";
 import { analyticsEvents } from "@/lib/analytics";
 
@@ -12,6 +12,19 @@ type ContactFormProps = {
   dealType?: string;
 };
 
+const successMessage =
+  "Заявку успішно надіслано. Ми зв’яжемося з вами найближчим часом.";
+const errorMessage =
+  "Не вдалося надіслати заявку. Спробуйте ще раз або зв’яжіться з нами телефоном.";
+
+function normalizePhone(value: string) {
+  return value.replace(/[\s\-()]/g, "").trim();
+}
+
+function isValidPhone(value: string) {
+  return /^(?:0\d{9}|\+380\d{9}|380\d{9})$/.test(value);
+}
+
 export default function ContactForm({
   propertyTitle,
   propertyId,
@@ -21,65 +34,93 @@ export default function ContactForm({
 }: ContactFormProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [website, setWebsite] = useState("");
+  const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submitInProgressRef = useRef(false);
 
-  function submitForm(e: React.FormEvent) {
+  async function submitForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (submitInProgressRef.current) {
       return;
     }
 
-    submitInProgressRef.current = true;
-    setIsSubmitting(true);
+    const clientName = name.replace(/\s+/g, " ").trim();
+    const normalizedPhone = normalizePhone(phone);
 
-    const message = `Добрий день! Цікавить об'єкт:
-
-${propertyTitle}
-ID: ${propertyId}
-
-Мене звати: ${name}
-Телефон: ${phone}`;
-
-    analyticsEvents.contactClick({
-      method: "telegram",
-      property_id: propertyId,
-      property_title: propertyTitle,
-    });
-    analyticsEvents.telegramClick({
-      source: "property_contact_form",
-      property_id: propertyId,
-      property_title: propertyTitle,
-    });
-
-    const telegramWindow = window.open(
-      `https://t.me/orenda_rm?text=${encodeURIComponent(message)}`,
-      "_blank"
-    );
-
-    setIsSubmitting(false);
-
-    if (!telegramWindow) {
-      submitInProgressRef.current = false;
+    if (clientName.length < 2 || !isValidPhone(normalizedPhone)) {
+      setIsError(true);
+      setMessage(errorMessage);
       analyticsEvents.formSubmitError({
-        form_name: "object_contact_form",
+        form_name: "object_callback_form",
         page_path: window.location.pathname,
-        error_type: "unknown",
+        error_type: "validation",
       });
       return;
     }
 
-    analyticsEvents.generateLead({
-      lead_source: "contact_form",
-      form_name: "object_contact_form",
-      page_path: window.location.pathname,
-      object_id: propertyId,
-      object_slug: propertySlug,
-      object_type: propertyType,
-      deal_type: dealType,
-    });
-    submitInProgressRef.current = false;
+    submitInProgressRef.current = true;
+    setIsSubmitting(true);
+    setMessage("");
+    setIsError(false);
+
+    try {
+      const response = await fetch("/api/client-leads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          client_name: clientName,
+          phone: normalizedPhone,
+          property_id: propertyId,
+          property_slug: propertySlug,
+          property_title: propertyTitle,
+          source: "property_callback_form",
+          website,
+        }),
+      });
+
+      if (!response.ok) {
+        analyticsEvents.formSubmitError({
+          form_name: "object_callback_form",
+          page_path: window.location.pathname,
+          error_type: response.status === 429 ? "server" : "server",
+        });
+        setIsError(true);
+        setMessage(errorMessage);
+        return;
+      }
+
+      setName("");
+      setPhone("");
+      setWebsite("");
+      setIsError(false);
+      setMessage(successMessage);
+      analyticsEvents.generateLead({
+        lead_source: "contact_form",
+        form_name: "object_callback_form",
+        page_path: window.location.pathname,
+        object_id: propertyId,
+        object_slug: propertySlug,
+        object_type: propertyType,
+        deal_type: dealType,
+      });
+    } catch (error) {
+      console.error("CLIENT LEAD FORM ERROR:", error);
+      setIsError(true);
+      setMessage(errorMessage);
+      analyticsEvents.formSubmitError({
+        form_name: "object_callback_form",
+        page_path: window.location.pathname,
+        error_type: "network",
+      });
+    } finally {
+      setIsSubmitting(false);
+      submitInProgressRef.current = false;
+    }
   }
 
   return (
@@ -96,6 +137,15 @@ ID: ${propertyId}
       </h3>
 
       <input
+        tabIndex={-1}
+        autoComplete="off"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+        className="sr-only"
+        aria-hidden="true"
+      />
+
+      <input
         required
         placeholder="Ваше ім’я"
         value={name}
@@ -108,12 +158,26 @@ ID: ${propertyId}
         placeholder="Телефон"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
+        inputMode="tel"
         className="mt-3 w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none placeholder:text-white/30 focus:border-[#b89652]/60"
       />
 
-      <button disabled={isSubmitting} className="mt-4 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#b89652]/45 bg-[#b89652]/10 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_0_22px_rgba(184,150,82,0.14)] backdrop-blur transition-all duration-300 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_28px_rgba(212,175,55,0.26)] focus:outline-none focus:ring-2 focus:ring-[#b89652] disabled:cursor-not-allowed disabled:opacity-60 [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black">
+      {message && (
+        <p
+          className={`mt-3 text-sm leading-5 ${
+            isError ? "text-red-300" : "text-[#d8ba68]"
+          }`}
+        >
+          {message}
+        </p>
+      )}
+
+      <button
+        disabled={isSubmitting}
+        className="mt-4 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#b89652]/45 bg-[#b89652]/10 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_0_22px_rgba(184,150,82,0.14)] backdrop-blur transition-all duration-300 hover:border-[#d4af37] hover:bg-[#b89652] hover:text-black hover:shadow-[0_0_28px_rgba(212,175,55,0.26)] focus:outline-none focus:ring-2 focus:ring-[#b89652] disabled:cursor-not-allowed disabled:opacity-60 [&>svg]:text-[#d8ba68] hover:[&>svg]:text-black"
+      >
         <SendIcon />
-        Відправити заявку
+        {isSubmitting ? "Надсилання..." : "Відправити заявку"}
       </button>
     </form>
   );
